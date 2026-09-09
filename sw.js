@@ -1,5 +1,5 @@
-const CACHE = 'arena-logbuch-v1';
-const ASSETS = ['./', './index.html', './manifest.webmanifest',
+const CACHE = 'arena-logbuch-v2';
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './firebase-config.js',
   './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
@@ -12,6 +12,7 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  if (new URL(e.request.url).origin !== self.location.origin) return; // Firebase & Fonts direkt durchlassen
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
       const copy = res.clone();

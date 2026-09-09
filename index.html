@@ -6,6 +6,7 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#060D16">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="firebase-config.js"></script>
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -392,8 +393,8 @@ function syncFromDb() {
 function connectDb() {
   const p = HOSTED ? window.claude.use('db') : Promise.resolve(null);
   p.then(handle => {
+    if (!handle) { connectFirebase(); return; }
     dbSettled = true;
-    if (!handle) { renderNotices(); return; }
     db = handle; storeMode = 'db';
     db.collection('teams').onSnapshot(snap => {
       liveTeams = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
@@ -403,22 +404,61 @@ function connectDb() {
       liveMatches = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
       syncFromDb();
     }, err => { flash('Runden konnten nicht geladen werden (' + err.code + ').', true); });
-  }).catch(() => { dbSettled = true; renderNotices(); });
+  }).catch(() => { connectFirebase(); });
 }
 
 let flashMsg = null;
 function flash(text, bad) { flashMsg = { text: text, bad: !!bad }; renderNotices(); setTimeout(() => { flashMsg = null; renderNotices(); }, 6000); }
 
 /* ---------------- writes ---------------- */
+let fb = null;
+function isRemote() { return storeMode === 'db' || storeMode === 'firebase'; }
+async function storeAdd(col, data) {
+  if (storeMode === 'firebase') { const r = await fb.addDoc(fb.col(col), data); return r.id; }
+  const ref = await db.collection(col).add(data); return ref.id;
+}
+async function storeSet(col, id, data) {
+  if (storeMode === 'firebase') { await fb.setDoc(fb.doc(col + '/' + id), data); return; }
+  await db.doc(col + '/' + id).set(data);
+}
+async function storeDelete(col, id) {
+  if (storeMode === 'firebase') { await fb.deleteDoc(fb.doc(col + '/' + id)); return; }
+  await db.doc(col + '/' + id).delete();
+}
+
+async function connectFirebase() {
+  const cfg = window.ARENA_FIREBASE, code = (window.ARENA_TEAM_CODE || '').trim();
+  if (!cfg || !cfg.projectId || /^DEIN/i.test(cfg.projectId) || !code) { dbSettled = true; renderNotices(); return; }
+  try {
+    const V = 'https://www.gstatic.com/firebasejs/10.12.0/';
+    const [appMod, fsMod] = await Promise.all([import(V + 'firebase-app.js'), import(V + 'firebase-firestore.js')]);
+    const store = fsMod.getFirestore(appMod.initializeApp(cfg));
+    const base = 'logs/' + code;
+    fb = {
+      addDoc: fsMod.addDoc, setDoc: fsMod.setDoc, deleteDoc: fsMod.deleteDoc, code: code,
+      col: n => fsMod.collection(store, base + '/' + n),
+      doc: n => fsMod.doc(store, base + '/' + n)
+    };
+    storeMode = 'firebase'; dbSettled = true;
+    const watch = (name, set) => fsMod.onSnapshot(fb.col(name),
+      snap => { set(snap.docs.map(d => Object.assign({ id: d.id }, d.data()))); syncFromDb(); },
+      err => { storeMode = 'local'; renderNotices(); flash('Verbindung zum gemeinsamen Logbuch fehlgeschlagen (' + err.code + ').', true); });
+    watch('teams', v => { liveTeams = v; });
+    watch('matches', v => { liveMatches = v; });
+    renderNotices();
+  } catch (e) {
+    storeMode = 'local'; dbSettled = true; renderNotices();
+  }
+}
+
 async function putTeam(team) {
-  if (storeMode === 'db') {
+  if (isRemote()) {
     const body = { name: team.name, players: team.players };
     if (team.id && team.id !== 'seed' && teams.some(t => t.id === team.id && !t.unsaved)) {
-      await db.doc('teams/' + team.id).set(body);
+      await storeSet('teams', team.id, body);
       return team.id;
     }
-    const ref = await db.collection('teams').add(body);
-    return ref.id;
+    return await storeAdd('teams', body);
   }
   const ex = team.id && team.id !== 'seed' ? teams.find(t => t.id === team.id && !t.unsaved) : null;
   if (ex) { Object.assign(ex, team); saveLocal(); return ex.id; }
@@ -431,9 +471,9 @@ async function removeTeam(id) {
   const t = teams.find(x => x.id === id);
   if (t && t.unsaved) { teams = teams.filter(x => x.id !== id); curTeamId = null; applySeed(); resetDraft(); renderAll(); return; }
   const own = matches.filter(m => m.teamId === id);
-  if (storeMode === 'db') {
-    for (const m of own) { try { await db.doc('matches/' + m.id).delete(); } catch (e) {} }
-    await db.doc('teams/' + id).delete();
+  if (isRemote()) {
+    for (const m of own) { try { await storeDelete('matches', m.id); } catch (e) {} }
+    await storeDelete('teams', id);
   } else {
     matches = matches.filter(m => m.teamId !== id);
     teams = teams.filter(t => t.id !== id);
@@ -443,12 +483,12 @@ async function removeTeam(id) {
 }
 
 async function addMatch(rec) {
-  if (storeMode === 'db') { await db.collection('matches').add(rec); return; }
+  if (isRemote()) { await storeAdd('matches', rec); return; }
   matches.push(Object.assign({ id: uid() }, rec));
   saveLocal(); renderAll();
 }
 async function delMatch(id) {
-  if (storeMode === 'db') { await db.doc('matches/' + id).delete(); return; }
+  if (isRemote()) { await storeDelete('matches', id); return; }
   matches = matches.filter(m => m.id !== id); saveLocal(); renderAll();
 }
 
@@ -483,7 +523,9 @@ function renderNotices() {
   let h = '';
   if (flashMsg) h += '<div class="notice' + (flashMsg.bad ? ' warn' : '') + '"><div>' + esc(flashMsg.text) + '</div></div>';
   if (!hideStorageNote && storeMode === 'local' && (!HOSTED || dbSettled)) {
-    h += HOSTED
+    h += (window.ARENA_FIREBASE && !/^DEIN/i.test(window.ARENA_FIREBASE.projectId || ''))
+      ? '<div class="notice warn"><div><b>Kein Kontakt zum gemeinsamen Logbuch.</b> Deine Runden werden solange hier auf dem Gerät gespeichert. Prüfe die Internetverbindung und lade die App neu &ndash; danach gleicht sie sich wieder mit den anderen ab.</div><button class="x" title="Hinweis ausblenden" onclick="hideStorageNote=true;renderNotices()">×</button></div>'
+      : HOSTED
       ? '<div class="notice warn"><div><b>Geteilte Ablage nicht erreichbar.</b> Deine Runden werden trotzdem gespeichert &ndash; im Speicher dieses Browsers. Sobald die Verbindung wieder steht, synchronisiert ein Neuladen sie mit deinem Team.</div><button class="x" title="Hinweis ausblenden" onclick="hideStorageNote=true;renderNotices()">×</button></div>'
       : '<div class="notice"><div><b>Offline-Fassung.</b> Diese Datei speichert alles in diesem Browser &ndash; das ist hier so gewollt und funktioniert dauerhaft. Nur teilen können deine Mitspieler dabei nicht.</div><button class="x" title="Hinweis ausblenden" onclick="hideStorageNote=true;renderNotices()">×</button></div>';
   }
@@ -493,8 +535,11 @@ function renderNotices() {
 function renderFooter() {
   const el = document.getElementById('footer');
   const n = matches.length, tn = teams.length;
+  const sync = storeMode === 'firebase'
+    ? ' · <span style="color:var(--teal)">● live mit deinem Team verbunden</span>'
+    : (storeMode === 'db' ? ' · <span style="color:var(--teal)">● geteilt gespeichert</span>' : ' · nur auf diesem Gerät');
   el.innerHTML = '<span>' + tn + (tn === 1 ? ' Team' : ' Teams') + ' · ' + n + (n === 1 ? ' Runde' : ' Runden') +
-    ' · Champion-Daten Patch 16.17</span>' +
+    sync + '</span>' +
     ((resetArmed
       ? '<span style="display:flex;gap:9px;align-items:center"><span>Alle Teams und Runden werden gelöscht.</span>' +
         '<button class="btn danger sm" onclick="resetAll()">Ja, alles löschen</button>' +
@@ -579,9 +624,9 @@ let resetArmed = false;
 async function resetAll() {
   resetArmed = false;
   try {
-    if (storeMode === 'db') {
-      for (const m of matches.slice()) { try { await db.doc('matches/' + m.id).delete(); } catch (e) {} }
-      for (const t of teams.slice()) { try { await db.doc('teams/' + t.id).delete(); } catch (e) {} }
+    if (isRemote()) {
+      for (const m of matches.slice()) { try { await storeDelete('matches', m.id); } catch (e) {} }
+      for (const t of teams.slice()) { try { await storeDelete('teams', t.id); } catch (e) {} }
     } else {
       try { localStorage.removeItem(LS); } catch (e) {}
       teams = []; matches = []; curTeamId = null; applySeed(); resetDraft(); renderAll();
@@ -878,7 +923,7 @@ async function clearTeamMatches() {
   const t = currentTeam(); if (!t) return;
   const own = matches.filter(m => m.teamId === t.id);
   try {
-    if (storeMode === 'db') { for (const m of own) { try { await db.doc('matches/' + m.id).delete(); } catch (e) {} } }
+    if (isRemote()) { for (const m of own) { try { await storeDelete('matches', m.id); } catch (e) {} } }
     else { matches = matches.filter(m => m.teamId !== t.id); saveLocal(); renderAll(); }
     flash('Alle Runden von „' + t.name + '“ gelöscht. Der Kader bleibt.');
   } catch (e) { flash('Löschen fehlgeschlagen.', true); renderHistory(); }
