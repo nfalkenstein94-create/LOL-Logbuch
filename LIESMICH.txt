@@ -1,0 +1,61 @@
+﻿ARENA LOGBUCH - als App aufs Handy
+
+Dieser Ordner ist eine fertige Web-App. Er muss einmal ins Netz gestellt
+werden (kostenlos), danach installiert ihr sie euch aufs Handy wie eine
+normale App - mit Symbol auf dem Startbildschirm, ohne Adressleiste,
+und sie laeuft auch ohne Internet.
+
+------------------------------------------------------------------
+SCHRITT 1: Ordner online stellen (einmalig, ca. 3 Minuten)
+------------------------------------------------------------------
+
+Variante A - GitHub Pages
+  1. Auf github.com ein neues, oeffentliches Repository anlegen,
+     z. B. "arena-logbuch".
+  2. "Add file" -> "Upload files" -> ALLE Dateien aus diesem Ordner
+     hochladen (index.html, sw.js, manifest.webmanifest, die vier
+     icon-*.png) -> "Commit changes".
+  3. Settings -> Pages -> Source: "Deploy from a branch",
+     Branch: main, Ordner: / (root) -> Save.
+  4. Nach ein bis zwei Minuten steht dort die Adresse, etwa
+     https://DEINNAME.github.io/arena-logbuch/
+
+Variante B - Cloudflare Pages oder Netlify
+  Beide bieten "Direct Upload" bzw. "Drop": Ordner ins Browserfenster
+  ziehen, fertig. Adresse wird sofort angezeigt.
+
+Wichtig: Es muss https sein. Ueber file:// oder http funktioniert die
+Installation nicht - das ist eine Regel der Browser, kein Fehler der App.
+
+------------------------------------------------------------------
+SCHRITT 2: Auf dem Handy installieren
+------------------------------------------------------------------
+
+Android (Chrome)
+  Adresse oeffnen -> Menue (drei Punkte) -> "App installieren"
+  bzw. "Zum Startbildschirm zufuegen".
+
+iPhone (Safari - andere Browser koennen das auf iOS nicht)
+  Adresse oeffnen -> Teilen-Symbol -> "Zum Home-Bildschirm".
+
+Danach liegt das Hextech-Symbol auf dem Startbildschirm und die App
+startet im Vollbild.
+
+------------------------------------------------------------------
+Wo liegen die Runden
+------------------------------------------------------------------
+Im Speicher des jeweiligen Geraets. Jeder von euch hat sein eigenes
+Logbuch; die Daten wandern nicht automatisch zwischen euren Handys.
+"Alle Daten loeschen" ganz unten auf der Seite setzt alles zurueck.
+
+------------------------------------------------------------------
+Aktualisieren
+------------------------------------------------------------------
+Neue index.html hochladen und in sw.js die Zeile
+  const CACHE = 'arena-logbuch-v1';
+auf v2, v3 usw. aendern. Sonst zeigen die Handys weiter die alte
+Fassung aus ihrem Zwischenspeicher.
+
+Champion-Daten: Patch 16.17, alle 173 Champions mit Portrait.
+Arena Logbuch wird nicht von Riot Games unterstuetzt und gibt nicht
+die Ansichten von Riot Games wieder.
