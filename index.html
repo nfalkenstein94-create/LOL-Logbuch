@@ -916,7 +916,12 @@ function paintToasts() {
 
 /* ---------- Render-Takt ---------- */
 let rafId = null;
-function render() { if (rafId) return; rafId = requestAnimationFrame(() => { rafId = null; paint(); }); }
+function render() {
+  if (rafId) return;
+  // In ausgeblendeten Fenstern feuert requestAnimationFrame nicht – dann per Timer zeichnen
+  if (document.hidden) { rafId = setTimeout(() => { rafId = null; paint(); }, 30); return; }
+  rafId = requestAnimationFrame(() => { rafId = null; paint(); });
+}
 function captureFocus() {
   const el = document.activeElement;
   if (!el || !el.id) return null;
@@ -1869,11 +1874,12 @@ document.addEventListener('keydown', e => {
 });
 window.addEventListener('online', () => { retryCloud(); });
 window.addEventListener('resize', () => { render(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
 
 loadMirror();
 applySeed();
 resetDraft();
-render();
+paint();
 connectCloud();
 initSW();
 
