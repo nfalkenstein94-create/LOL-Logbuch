@@ -155,7 +155,7 @@ header.top::after{content:"";position:absolute;left:0;bottom:-1px;width:120px;he
 .res.loss[aria-pressed="true"]{background:linear-gradient(180deg,#C0413F,#8b2f2d);border-color:#d4615f;color:#fdeaea}
 
 /* ---------- stat tiles ---------- */
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
 .tile{background:var(--panel);padding:13px 14px;display:flex;flex-direction:column;gap:3px}
 .tile .k{font-family:var(--fc);text-transform:uppercase;letter-spacing:.13em;font-size:11.5px;color:var(--ink-3);font-weight:600}
 .tile .v{font-family:var(--fd);font-size:27px;line-height:1.05;color:var(--gold-hi);font-variant-numeric:tabular-nums}
@@ -305,6 +305,102 @@ footer{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:s
   .sel{font-size:16px}
   .pc{min-height:44px}
 }
+
+/* ================= Hextech-Politur ================= */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:repeating-linear-gradient(60deg,rgba(200,170,110,.032) 0 1px,transparent 1px 46px),
+                   repeating-linear-gradient(-60deg,rgba(200,170,110,.032) 0 1px,transparent 1px 46px)}
+.wrap{position:relative;z-index:1}
+.frame>.inner{position:relative}
+.frame>.inner::before,.frame>.inner::after{content:"";position:absolute;width:17px;height:17px;pointer-events:none;opacity:.55}
+.frame>.inner::before{top:7px;left:7px;border-top:1px solid var(--gold);border-left:1px solid var(--gold)}
+.frame>.inner::after{bottom:7px;right:7px;border-bottom:1px solid var(--gold);border-right:1px solid var(--gold)}
+.sec-head h2{position:relative;padding-left:17px}
+.sec-head h2::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:8px;background:var(--gold);transform:rotate(45deg)}
+.eyebrow-row{margin:22px 0 9px}
+@keyframes goldpulse{0%{box-shadow:0 0 0 0 rgba(200,170,110,.5)}100%{box-shadow:0 0 0 20px rgba(200,170,110,0)}}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#formFrame.saved{animation:goldpulse .9s ease-out}
+.tiles,.gcard,.session{animation:rise .22s ease-out}
+
+/* ---------- Teams innerhalb der Runde ---------- */
+.gcards{display:flex;flex-direction:column;gap:12px}
+.gcard{--gc:#7C8B9C;border:1px solid var(--line);border-left:3px solid var(--gc);background:rgba(3,10,18,.45);padding:12px 12px 14px;transition:border-color .18s}
+.gcard.set{box-shadow:inset 0 0 26px -18px var(--gc)}
+.ghead{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.gname{font-family:var(--fd);font-size:15px;color:var(--gold-hi)}
+.modebadge{font-family:var(--fc);text-transform:uppercase;letter-spacing:.12em;font-size:11px;font-weight:600;
+  border:1px solid var(--gold-line);color:var(--gold);padding:2px 8px;flex:none}
+.ghead .slot-x{margin-left:auto}
+
+/* ---------- Platzierung ---------- */
+.places{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px}
+.pl{--pc:#7C8B9C;background:rgba(3,10,18,.6);border:1px solid var(--line);color:var(--ink-3);
+  font-family:var(--fd);font-size:15px;font-weight:600;padding:10px 0;line-height:1;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);transition:background .15s,color .15s}
+.pl:hover{color:var(--pc);border-color:var(--pc)}
+.pl[aria-pressed="true"]{background:var(--pc);border-color:var(--pc);color:#0d1a26;box-shadow:0 0 16px -3px var(--pc)}
+@media(max-width:560px){.places{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}}
+
+/* ---------- Medaille im Verlauf ---------- */
+.medal{--pc:#7C8B9C;width:34px;height:34px;flex:none;display:grid;place-items:center;
+  border:1px solid var(--pc);color:var(--pc);background:rgba(255,255,255,.05);
+  font-family:var(--fd);font-size:15px;font-weight:700;line-height:1;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.medal.top{background:var(--pc);color:#0d1a26}
+.medal b{font-weight:700}
+
+/* ---------- Platzverteilung ---------- */
+.pdist{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;height:112px}
+.pcol{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;min-width:0}
+.pcv{font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums;height:14px;line-height:14px}
+.pcb{flex:1;width:100%;display:flex;align-items:flex-end;background:rgba(255,255,255,.05)}
+.pcb i{display:block;width:100%;min-height:2px}
+.pcl{font-family:var(--fc);font-size:12.5px;font-weight:600;color:var(--ink-3)}
+.pcl.top{color:var(--gold)}
+
+/* ---------- Form ---------- */
+.formdots{display:flex;gap:4px;flex-wrap:wrap}
+.fdot{--fc:#7C8B9C;width:27px;height:27px;display:grid;place-items:center;background:var(--fc);color:#0d1a26;
+  font-family:var(--fd);font-size:13px;font-weight:700;line-height:1;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+
+/* ---------- Modus-/Pick-Vergleich ---------- */
+.mrow{grid-template-columns:80px minmax(0,1fr) 136px}
+@media(max-width:560px){.mrow{grid-template-columns:70px minmax(0,1fr);row-gap:2px}.mrow .mv{grid-column:2;text-align:left}}
+
+/* ---------- Verlauf mit Spielabenden ---------- */
+.session+.session{margin-top:20px}
+.session-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;
+  padding:0 2px 7px;border-bottom:1px solid var(--gold-line);margin-bottom:1px}
+.sd{font-family:var(--fc);text-transform:uppercase;letter-spacing:.14em;font-size:12.5px;font-weight:600;color:var(--gold)}
+.hrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:11px 12px}
+.hmeta{display:flex;align-items:center;gap:8px;flex:none}
+.hgroups{display:flex;flex-direction:column;gap:9px;flex:1 1 300px;min-width:0}
+.hgroup{display:flex;align-items:center;gap:11px;min-width:0}
+.hactions{display:flex;gap:6px;flex:none;margin-left:auto}
+.hrow.bad{box-shadow:inset 3px 0 0 rgba(192,65,63,.6)}
+
+/* ---------- Schnellwahl in der Champion-Suche ---------- */
+.qp{display:flex;gap:5px;flex-wrap:wrap;padding:0 1px 8px}
+.qpc{padding:0;border:1px solid var(--gold-line);background:none;line-height:0}
+.qpc img{width:30px;height:30px;display:block}
+.qpc:hover{border-color:var(--gold-hi);box-shadow:0 0 10px -2px var(--gold)}
+
+.scrollx{-webkit-overflow-scrolling:touch}
+th:first-child,td:first-child{white-space:nowrap}
+@media (max-width:760px){
+  .scrollx table{min-width:560px}
+}
+@media (max-width:700px){
+  .hactions{margin-left:0;width:100%}
+  .hactions .btn{flex:1}
+  .pdist{height:96px}
+  .frame>.inner::before,.frame>.inner::after{width:13px;height:13px}
+}
+@media (prefers-reduced-motion:reduce){
+  .tiles,.gcard,.session,#formFrame.saved{animation:none}
+}
 </style>
 </head>
 <body>
@@ -334,7 +430,7 @@ footer{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:s
 
   <div class="cols">
     <div class="stack">
-      <section class="frame"><div class="inner" id="formPanel"></div></section>
+      <section class="frame" id="formFrame"><div class="inner" id="formPanel"></div></section>
     </div>
     <div class="stack">
       <section class="frame"><div class="inner" id="statPanel"></div></section>
@@ -360,18 +456,16 @@ const champIcon = id => { const c = CH_BY_ID.get(id); return c ? c[2] : ''; };
 const HOSTED = !!(typeof window !== 'undefined' && window.claude && window.claude.use);
 const PALETTE = ['#F0C97B', '#0AC8B9', '#9B8CFF', '#FF8A5B', '#5FB8FF'];
 const RANDOM = { id: '__random', name: 'Random', color: '#7C8B9C', random: true };
-function rosterOf(t) { return t ? t.players.concat([RANDOM]) : [RANDOM]; }
 function playerById(t, id) { return id === RANDOM.id ? RANDOM : (t ? t.players.find(p => p.id === id) : null); }
-const RESULTS = {
-  win:    { label: 'Sieg',       rank: '1.', color: '#C8AA6E' },
-  second: { label: '2. Platz',   rank: '2.', color: '#A6BCD0' },
-  loss:   { label: 'Niederlage', rank: '–', color: '#C0413F' }
-};
-/* Runden aus alten/abgebrochenen Speicherungen abfangen, damit die Anzeige nicht aussteigt */
-const cleanPicks = m => (m && Array.isArray(m.picks) ? m.picks : []).filter(pk => pk && pk.c && CH_BY_ID.has(pk.c));
-const isBroken = m => !m || !RESULTS[m.result] || cleanPicks(m).length === 0;
-const pickMode = pk => (pk && pk.m === 'bravery') ? 'bravery' : 'regular';
-const isGay = pk => !!(pk && pk.g);
+
+/* ---------------- Modi & Plätze ---------------- */
+const MODES = { '2v2': 2, '3v3': 3 };
+const modeSize = m => MODES[m] || 2;
+const PLACES = [1, 2, 3, 4, 5, 6, 7, 8];
+const PLACE_C = { 1: '#E0C288', 2: '#C4D5E4', 3: '#CD8B4E', 4: '#0AC8B9' };
+const placeColor = n => PLACE_C[n] || '#7C8B9C';
+const isTop4 = n => !!n && n <= 4;
+const placeTxt = n => n ? n + '. Platz' : 'Platz unbekannt';
 
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
 const CH_SEARCH = CHAMPS.map(c => {
@@ -384,6 +478,33 @@ const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
 const plural = (n, one, many) => n + ' ' + (n === 1 ? one : many);
 const uid = () => Math.random().toString(36).slice(2, 10);
 const esc = s => String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+const dec1 = v => (Math.round(v * 10) / 10).toFixed(1).replace('.', ',');
+
+/* ---------------- Runden lesen (inkl. alter Fassungen) ---------------- */
+const validPicks = arr => (Array.isArray(arr) ? arr : [])
+  .filter(pk => pk && pk.c && CH_BY_ID.has(pk.c))
+  .map(pk => ({ p: pk.p || null, c: pk.c, m: pk.m === 'bravery' ? 'bravery' : 'regular', g: !!pk.g }));
+const validPlace = v => { const n = Number(v); return (n >= 1 && n <= 8) ? Math.round(n) : null; };
+
+function normMatch(m) {
+  if (!m) return null;
+  let groups;
+  if (Array.isArray(m.groups)) {
+    groups = m.groups.map(g => {
+      const place = validPlace(g && g.place);
+      return { place: place, u: place === null && !!(g && g.u), picks: validPicks(g && g.picks) };
+    });
+  } else {
+    const place = m.result === 'win' ? 1 : m.result === 'second' ? 2 : null;
+    groups = [{ place: place, u: place === null && m.result === 'loss', picks: validPicks(m.picks) }];
+  }
+  const keep = groups.filter(g => g.picks.length);
+  const size = keep.length ? Math.max.apply(null, keep.map(g => g.picks.length)) : 2;
+  const mode = MODES[m.mode] ? m.mode : (size >= 3 ? '3v3' : '2v2');
+  return { id: m.id, teamId: m.teamId, ts: m.ts || 0, mode: mode, groups: keep };
+}
+const groupOk = g => g.picks.length > 0 && (g.place !== null || g.u);
+const matchOk = n => !!n && n.groups.length > 0 && n.groups.every(groupOk);
 
 /* ---------------- storage ---------------- */
 let db = null, storeMode = 'local';
@@ -415,6 +536,7 @@ function teamMatches() {
   const t = currentTeam(); if (!t) return [];
   return matches.filter(m => m.teamId === t.id).sort((a, b) => b.ts - a.ts);
 }
+function normMatches() { return teamMatches().map(normMatch); }
 function applySeed() {
   if (teams.length === 0) { teams = [seedTeam()]; curTeamId = 'seed'; }
 }
@@ -524,31 +646,127 @@ async function addMatch(rec) {
   matches.push(Object.assign({ id: uid() }, rec));
   saveLocal(); renderAll();
 }
+async function updMatch(id, rec) {
+  if (isRemote()) { await storeSet('matches', id, rec); return; }
+  const i = matches.findIndex(m => m.id === id);
+  if (i >= 0) matches[i] = Object.assign({ id: id }, rec);
+  saveLocal(); renderAll();
+}
 async function delMatch(id) {
   if (isRemote()) { await storeDelete('matches', id); return; }
   matches = matches.filter(m => m.id !== id); saveLocal(); renderAll();
 }
 
-/* ---------------- draft ---------------- */
+/* ---------------- Entwurf ---------------- */
+let lastMode = '3v3';
+let draft = null;
 const newSlot = pid => ({ pid: pid || null, champ: null, mode: 'regular', gay: false });
-let draft = { result: null, slots: [newSlot(), newSlot()] };
-function resetDraft() {
-  const t = currentTeam();
-  const ps = t ? t.players : [];
-  const n = Math.max(2, Math.min(3, ps.length));
-  draft = { result: null, slots: Array.from({ length: n }, (_, i) => newSlot(ps[i] ? ps[i].id : null)) };
+
+function allSlots() {
+  const out = [];
+  if (draft) draft.groups.forEach((g, gi) => g.slots.forEach((s, si) => out.push({ gi: gi, si: si, slot: s })));
+  return out;
 }
-/* schon in dieser Runde vergebene Champions (ohne den Slot i) */
-function takenChamps(skip) {
+function takenChamps(skipG, skipS) {
   const set = new Set();
-  draft.slots.forEach((s, idx) => { if (idx !== skip && s.champ) set.add(s.champ); });
+  allSlots().forEach(x => { if (!(x.gi === skipG && x.si === skipS) && x.slot.champ) set.add(x.slot.champ); });
   return set;
 }
+function takenPlayers(skipG, skipS) {
+  const set = new Set();
+  allSlots().forEach(x => { if (!(x.gi === skipG && x.si === skipS) && x.slot.pid && x.slot.pid !== RANDOM.id) set.add(x.slot.pid); });
+  return set;
+}
+function freePlayerId() {
+  const t = currentTeam(); if (!t) return null;
+  const used = takenPlayers(-1, -1);
+  const p = t.players.find(x => !used.has(x.id));
+  return p ? p.id : RANDOM.id;
+}
+function newGroup(mode) {
+  const g = { place: null, slots: [] };
+  const size = modeSize(mode);
+  for (let i = 0; i < size; i++) { g.slots.push(newSlot(null)); }
+  return g;
+}
+function resetDraft(mode) {
+  const t = currentTeam();
+  const ps = t ? t.players : [];
+  const md = MODES[mode] ? mode : lastMode;
+  lastMode = md;
+  const size = modeSize(md);
+  draft = { mode: md, editId: null, editTs: null,
+    groups: [{ place: null, slots: Array.from({ length: size }, (_, i) => newSlot(ps[i] ? ps[i].id : null)) }] };
+}
+function setMode(md) {
+  if (!MODES[md] || !draft || draft.mode === md) return;
+  draft.mode = md; lastMode = md;
+  const size = modeSize(md);
+  draft.groups.forEach(g => {
+    while (g.slots.length > size) g.slots.pop();
+    while (g.slots.length < size) g.slots.push(newSlot(freePlayerId()));
+  });
+  renderForm();
+}
+function addGroup() {
+  if (!draft || draft.groups.length >= 4) return;
+  const g = newGroup(draft.mode);
+  g.slots.forEach(s => { s.pid = null; });
+  draft.groups.push(g);
+  g.slots.forEach(s => { if (!s.pid) s.pid = freePlayerId(); });
+  renderForm();
+}
+function rmGroup(gi) { if (draft.groups.length > 1) { draft.groups.splice(gi, 1); renderForm(); } }
+function setSlotPlayer(gi, si, v) { draft.groups[gi].slots[si].pid = v || null; renderForm(); }
+function setSlotMode(gi, si, m) { draft.groups[gi].slots[si].mode = m; renderForm(); }
+function toggleGay(gi, si) { const s = draft.groups[gi].slots[si]; s.gay = !s.gay; renderForm(); }
+function setPlace(gi, n) {
+  const g = draft.groups[gi];
+  if (g.place === n) { g.place = null; renderForm(); return; }
+  const clash = draft.groups.findIndex((x, i) => i !== gi && x.place === n);
+  if (clash >= 0) { flash('Platz ' + n + ' gehört schon Team ' + (clash + 1) + '.', true); return; }
+  g.place = n; renderForm();
+}
+function formReady() {
+  if (!draft || !draft.groups.length) return false;
+  const champs = [], places = [], pl = [];
+  for (const g of draft.groups) {
+    if (!g.place || places.indexOf(g.place) >= 0) return false;
+    places.push(g.place);
+    for (const s of g.slots) {
+      if (!s.pid || !s.champ) return false;
+      if (champs.indexOf(s.champ) >= 0) return false;
+      champs.push(s.champ);
+      if (s.pid !== RANDOM.id) { if (pl.indexOf(s.pid) >= 0) return false; pl.push(s.pid); }
+    }
+  }
+  return true;
+}
+
+function editMatch(id) {
+  const raw = matches.find(m => m.id === id); if (!raw) return;
+  const n = normMatch(raw);
+  const size = modeSize(n.mode);
+  draft = { mode: n.mode, editId: id, editTs: n.ts,
+    groups: n.groups.map(g => {
+      const slots = g.picks.map(pk => ({ pid: pk.p, champ: pk.c, mode: pk.m, gay: pk.g }));
+      while (slots.length < size) slots.push(newSlot(null));
+      return { place: g.place, slots: slots };
+    }) };
+  if (!draft.groups.length) draft.groups = [newGroup(n.mode)];
+  confirmDel = null;
+  renderAll();
+  const el = document.getElementById('formPanel');
+  if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function cancelEdit() { resetDraft(); renderAll(); }
 
 /* ---------------- render ---------------- */
 function renderAll() {
+  aggCache = null;
   const t = currentTeam();
-  if (draft.slots.some(s => s.pid && s.pid !== RANDOM.id && t && !t.players.some(p => p.id === s.pid))) resetDraft();
+  if (!draft) resetDraft();
+  if (!draft.editId && allSlots().some(x => x.slot.pid && x.slot.pid !== RANDOM.id && t && !t.players.some(p => p.id === x.slot.pid))) resetDraft();
   [renderTeamBar, renderNotices, renderForm, renderStats, renderPerf, renderChampChart, renderHistory, renderPool, renderFooter]
     .forEach(fn => { try { fn(); } catch (e) { console.error('Anzeigefehler in ' + fn.name, e); } });
 }
@@ -596,7 +814,7 @@ function renderFooter() {
 
 /* ----- Sicherung ----- */
 async function exportData() {
-  const payload = { app: 'arena-logbuch', v: 1, exportedAt: new Date().toISOString(),
+  const payload = { app: 'arena-logbuch', v: 2, exportedAt: new Date().toISOString(),
     teams: teams.filter(t => !t.unsaved), matches: matches };
   const text = JSON.stringify(payload, null, 2);
   const name = 'arena-logbuch-' + new Date().toISOString().slice(0, 10) + '.json';
@@ -653,9 +871,12 @@ async function doImport(input) {
       const key = tid + '|' + im.ts;
       if (seen.has(key)) continue;
       seen.add(key);
+      const n = normMatch(im);
+      if (!n || !n.groups.length) continue;
       const map = playerMap[tid] || {};
-      await addMatch({ teamId: tid, ts: im.ts, result: im.result,
-        picks: (im.picks || []).map(pk => ({ p: map[pk.p] || pk.p, c: pk.c, m: pickMode(pk), g: isGay(pk) })) });
+      await addMatch({ teamId: tid, ts: im.ts, mode: n.mode,
+        groups: n.groups.map(g => ({ place: g.place, u: !!g.u,
+          picks: g.picks.map(pk => ({ p: map[pk.p] || pk.p, c: pk.c, m: pk.m, g: pk.g })) })) });
       newRounds++;
     }
     renderAll();
@@ -679,7 +900,7 @@ async function resetAll() {
   } catch (e) { flash('Löschen fehlgeschlagen.', true); }
 }
 
-/* ----- match form ----- */
+/* ----- Eingabemaske ----- */
 function renderForm() {
   const t = currentTeam();
   const el = document.getElementById('formPanel');
@@ -689,77 +910,94 @@ function renderForm() {
       '<div class="rowend" style="justify-content:flex-start"><button class="btn primary" onclick="openTeamDialog(null)">Team anlegen</button></div>';
     return;
   }
-  const used = draft.slots.map(s => s.pid);
-  const slotHtml = draft.slots.map((s, i) => {
-    const opts = t.players.map(p =>
-      '<option value="' + p.id + '"' + (p.id === s.pid ? ' selected' : '') + (used.includes(p.id) && p.id !== s.pid ? ' disabled' : '') + '>' + esc(p.name) + '</option>'
-    ).join('') +
-      '<option value="' + RANDOM.id + '"' + (s.pid === RANDOM.id ? ' selected' : '') + '>Random (fremder Mitspieler)</option>';
-    const pl = playerById(t, s.pid);
-    const dot = pl ? '<span class="swatch" style="background:' + pl.color + '"></span>' : '';
-    return '<div class="slot"><div class="slot-main">' +
-      '<div class="slot-row">' + dot + '<select class="pname" onchange="setSlotPlayer(' + i + ',this.value)"><option value="">Spieler wählen</option>' + opts + '</select></div>' +
-      '<div class="slot-row">' + comboHtml(i, s.champ) + '</div>' +
-      '<div class="slot-row" style="flex-wrap:wrap">' +
-        '<span class="modelabel">Pick</span>' +
-        '<div class="seg"><button type="button" aria-pressed="' + (s.mode === 'regular') + '" onclick="setSlotMode(' + i + ',\'regular\')">Regular</button>' +
-        '<button type="button" class="brav" aria-pressed="' + (s.mode === 'bravery') + '" onclick="setSlotMode(' + i + ',\'bravery\')">Bravery</button></div>' +
-        '<button type="button" class="tog" aria-pressed="' + (!!s.gay) + '" title="Zählt zusätzlich in den Gay-Counter – geht mit Regular und mit Bravery" onclick="toggleGay(' + i + ')">' +
-          '<span class="tick">' + (s.gay ? '✦' : '✧') + '</span>Gay</button>' +
-      '</div></div>' +
-      (draft.slots.length > 2 ? '<button class="slot-x" title="Slot entfernen" onclick="rmSlot(' + i + ')">×</button>' : '<span></span>') +
-      '</div>';
-  }).join('');
-
-  const canAdd = draft.slots.length < Math.min(5, t.players.length);
-  const ready = draft.result && draft.slots.every(s => s.pid && s.champ);
+  if (!draft) resetDraft();
+  const groups = draft.groups.map((g, gi) => groupCard(t, g, gi)).join('');
+  const canAdd = draft.groups.length < 4;
+  const ready = formReady();
   el.innerHTML =
-    '<div class="sec-head"><h2>Runde eintragen</h2><span class="tiny muted">' + t.players.length + ' im Kader</span></div>' +
-    '<div class="slots">' + slotHtml + '</div>' +
-    '<div class="rowend" style="justify-content:flex-start;margin-top:10px">' +
-      '<button class="btn ghost sm" ' + (canAdd ? '' : 'disabled ') + 'onclick="addSlot()">+ Spieler</button>' +
-    '</div>' +
-    '<div class="eyebrow" style="margin-top:18px">Ergebnis</div>' +
-    '<div class="results">' +
-      resBtn('win') + resBtn('second') + resBtn('loss') +
-    '</div>' +
-    '<div class="rowend"><button class="btn ghost" onclick="resetDraft();renderForm()">Zurücksetzen</button>' +
-    '<button class="btn primary" id="saveBtn" ' + (ready ? '' : 'disabled') + ' onclick="saveDraft()">Runde speichern</button></div>';
+    '<div class="sec-head"><h2>' + (draft.editId ? 'Runde bearbeiten' : 'Runde eintragen') + '</h2>' +
+      '<div class="seg">' +
+        '<button type="button" aria-pressed="' + (draft.mode === '2v2') + '" onclick="setMode(\'2v2\')">2v2</button>' +
+        '<button type="button" aria-pressed="' + (draft.mode === '3v3') + '" onclick="setMode(\'3v3\')">3v3</button>' +
+      '</div></div>' +
+    (draft.editId ? '<div class="notice" style="margin-bottom:14px"><div>Runde vom <b>' + esc(fmtDT(draft.editTs)) + '</b> wird bearbeitet.</div>' +
+      '<button class="x" title="Bearbeiten abbrechen" onclick="cancelEdit()">×</button></div>' : '') +
+    '<div class="gcards">' + groups + '</div>' +
+    (canAdd ? '<button class="btn ghost sm" style="margin-top:11px" onclick="addGroup()">+ ' +
+      (draft.groups.length === 1 ? 'Zweites Team dieser Runde' : 'Weiteres Team') + '</button>' : '') +
+    '<p class="tiny muted" style="margin:10px 0 0">' + (draft.groups.length > 1
+      ? 'Beide Teams sind in derselben Lobby &ndash; jedes bekommt seine eigene Platzierung.'
+      : 'Spielt ihr zu dritt im 2v2, öffne ein zweites Team für die Runde.') + '</p>' +
+    '<div class="rowend"><button class="btn ghost" onclick="' + (draft.editId ? 'cancelEdit()' : 'resetDraft();renderForm()') + '">' +
+      (draft.editId ? 'Abbrechen' : 'Zurücksetzen') + '</button>' +
+    '<button class="btn primary" id="saveBtn" ' + (ready ? '' : 'disabled') + ' onclick="saveDraft()">' +
+      (draft.editId ? 'Änderungen speichern' : 'Runde speichern') + '</button></div>';
 }
-function resBtn(k) {
-  const r = RESULTS[k];
-  return '<button type="button" class="res ' + k + '" aria-pressed="' + (draft.result === k) + '" onclick="setResult(\'' + k + '\')">' +
-    '<span class="rank">' + r.rank + '</span>' + r.label + '</button>';
+
+function groupCard(t, g, gi) {
+  const slots = g.slots.map((s, si) => slotHtml(t, gi, si, s)).join('');
+  return '<div class="gcard' + (g.place ? ' set' : '') + '" style="--gc:' + placeColor(g.place) + '">' +
+    '<div class="ghead">' +
+      '<span class="gname">' + (draft.groups.length > 1 ? 'Team ' + (gi + 1) : 'Euer Team') + '</span>' +
+      '<span class="modebadge">' + draft.mode + '</span>' +
+      (draft.groups.length > 1 ? '<button class="slot-x" title="Team entfernen" onclick="rmGroup(' + gi + ')">×</button>' : '') +
+    '</div>' +
+    '<div class="slots">' + slots + '</div>' +
+    '<div class="eyebrow" style="margin:13px 0 7px">Platzierung</div>' +
+    '<div class="places">' + PLACES.map(n =>
+      '<button type="button" class="pl' + (isTop4(n) ? ' top' : '') + '" aria-pressed="' + (g.place === n) + '"' +
+      ' style="--pc:' + placeColor(n) + '" title="' + placeTxt(n) + '" onclick="setPlace(' + gi + ',' + n + ')">' + n + '</button>').join('') +
+    '</div></div>';
 }
-function comboHtml(i, champ) {
+
+function slotHtml(t, gi, si, s) {
+  const taken = takenPlayers(gi, si);
+  const opts = t.players.map(p =>
+    '<option value="' + p.id + '"' + (p.id === s.pid ? ' selected' : '') + (taken.has(p.id) && p.id !== s.pid ? ' disabled' : '') + '>' + esc(p.name) + '</option>'
+  ).join('') +
+    '<option value="' + RANDOM.id + '"' + (s.pid === RANDOM.id ? ' selected' : '') + '>Random (fremder Mitspieler)</option>';
+  const pl = playerById(t, s.pid);
+  const dot = pl ? '<span class="swatch" style="background:' + pl.color + '"></span>' : '';
+  return '<div class="slot"><div class="slot-main">' +
+    '<div class="slot-row">' + dot + '<select class="pname" onchange="setSlotPlayer(' + gi + ',' + si + ',this.value)"><option value="">Spieler wählen</option>' + opts + '</select></div>' +
+    '<div class="slot-row">' + comboHtml(gi, si, s.champ) + '</div>' +
+    '<div class="slot-row" style="flex-wrap:wrap">' +
+      '<span class="modelabel">Pick</span>' +
+      '<div class="seg"><button type="button" aria-pressed="' + (s.mode === 'regular') + '" onclick="setSlotMode(' + gi + ',' + si + ',\'regular\')">Regular</button>' +
+      '<button type="button" class="brav" aria-pressed="' + (s.mode === 'bravery') + '" onclick="setSlotMode(' + gi + ',' + si + ',\'bravery\')">Bravery</button></div>' +
+      '<button type="button" class="tog" aria-pressed="' + (!!s.gay) + '" title="Zählt zusätzlich in den Gay-Counter – geht mit Regular und mit Bravery" onclick="toggleGay(' + gi + ',' + si + ')">' +
+        '<span class="tick">' + (s.gay ? '✦' : '✧') + '</span>Gay</button>' +
+    '</div></div></div>';
+}
+function comboHtml(gi, si, champ) {
   const inner = champ
     ? '<img src="' + champIcon(champ) + '" alt=""><span class="cbx-label">' + esc(champName(champ)) + '</span>'
     : '<span class="cbx-ph">?</span><span class="cbx-label empty">Champion suchen</span>';
-  return '<div class="cbx" id="cbx' + i + '"><button type="button" class="cbx-btn" onclick="openCombo(' + i + ')">' + inner + '</button></div>';
+  return '<div class="cbx" id="cbx' + gi + '_' + si + '"><button type="button" class="cbx-btn" onclick="openCombo(' + gi + ',' + si + ')">' + inner + '</button></div>';
 }
-function setSlotPlayer(i, v) { draft.slots[i].pid = v || null; renderForm(); }
-function setSlotMode(i, m) { draft.slots[i].mode = m; renderForm(); }
-function toggleGay(i) { draft.slots[i].gay = !draft.slots[i].gay; renderForm(); }
-function addSlot() { draft.slots.push(newSlot()); renderForm(); }
-function rmSlot(i) { draft.slots.splice(i, 1); renderForm(); }
-function setResult(k) { draft.result = draft.result === k ? null : k; renderForm(); }
+
+function pulseSave() {
+  const p = document.getElementById('formFrame');
+  if (!p) return;
+  p.classList.remove('saved'); void p.offsetWidth; p.classList.add('saved');
+  setTimeout(() => p.classList.remove('saved'), 1200);
+}
 
 async function saveDraft() {
-  const t = currentTeam(); if (!t) return;
+  const t = currentTeam(); if (!t || !draft) return;
+  if (!formReady()) { flash('Für jedes Team fehlen noch Spieler, Champion oder Platzierung.', true); return; }
   const btn = document.getElementById('saveBtn'); if (btn) btn.disabled = true;
   try {
-    const chosen = draft.slots.map(s => s.champ);
-    if (!draft.result || chosen.some(c => !c) || draft.slots.some(s => !s.pid)) {
-      flash('Bitte alle Spieler, Champions und das Ergebnis eintragen.', true); renderForm(); return;
-    }
-    if (new Set(chosen).size !== chosen.length) {
-      flash('Jeder Champion darf pro Runde nur einmal vorkommen.', true); renderForm(); return;
-    }
     let teamId = t.id;
     if (t.unsaved) { teamId = await putTeam({ id: null, name: t.name, players: t.players }); curTeamId = teamId; }
-    const rec = { teamId: teamId, ts: Date.now(), result: draft.result,
-      picks: draft.slots.map(s => ({ p: s.pid, c: s.champ, m: s.mode, g: !!s.gay })) };
-    await addMatch(rec); resetDraft(); renderAll(); flash('Runde gespeichert.'); }
+    const rec = { teamId: teamId, ts: draft.editId ? (draft.editTs || Date.now()) : Date.now(), mode: draft.mode,
+      groups: draft.groups.map(g => ({ place: g.place, u: false,
+        picks: g.slots.map(s => ({ p: s.pid, c: s.champ, m: s.mode, g: !!s.gay })) })) };
+    const wasEdit = !!draft.editId;
+    if (wasEdit) await updMatch(draft.editId, rec); else await addMatch(rec);
+    resetDraft(rec.mode); renderAll(); pulseSave();
+    flash(wasEdit ? 'Runde aktualisiert.' : 'Runde gespeichert.');
+  }
   catch (e) { flash('Speichern fehlgeschlagen: ' + (e && e.code ? e.code : 'unbekannt') + '. Versuch es noch einmal.', true); renderForm(); }
 }
 
@@ -778,15 +1016,28 @@ function placeCombo() {
   pop.style.left = left + 'px';
   pop.style.top = top + 'px';
 }
-function openCombo(i) {
+function quickPicks(gi, si) {
+  const slot = draft.groups[gi].slots[si];
+  if (!slot.pid) return [];
+  const a = agg();
+  const rec = a.byPlayer.get(slot.pid);
+  if (!rec || !rec.champs.size) return [];
+  const taken = takenChamps(gi, si);
+  return [...rec.champs.entries()].sort((x, y) => y[1] - x[1])
+    .map(e => e[0]).filter(id => !taken.has(id)).slice(0, 6);
+}
+function openCombo(gi, si) {
   closeCombo();
-  const host = document.getElementById('cbx' + i);
+  const host = document.getElementById('cbx' + gi + '_' + si);
   const pop = document.createElement('div');
   pop.className = 'cbx-pop';
+  const qp = quickPicks(gi, si);
   pop.innerHTML = '<input type="text" placeholder="Anfangsbuchstaben tippen, z. B. „se“ oder „tf“" aria-label="Champion suchen">' +
+    (qp.length ? '<div class="qp">' + qp.map(id => '<button type="button" class="qpc" title="' + esc(champName(id)) + '" onclick="pickChamp(\'' + id + '\')">' +
+      '<img src="' + champIcon(id) + '" alt="' + esc(champName(id)) + '"></button>').join('') + '</div>' : '') +
     '<div class="cbx-hint">Enter übernimmt den obersten Treffer · ↑ ↓ blättern</div><div class="cbx-list"></div>';
   document.body.appendChild(pop);
-  combo = { i: i, pop: pop, host: host, sel: 0, list: [] };
+  combo = { gi: gi, si: si, pop: pop, host: host, sel: 0, list: [], taken: [] };
   const input = pop.querySelector('input');
   input.addEventListener('input', () => { combo.sel = 0; fillCombo(input.value); });
   input.addEventListener('keydown', e => {
@@ -811,10 +1062,10 @@ function closeCombo() {
   combo.pop.remove(); combo = null;
 }
 function comboRank(c, n) {
-  if (c.key.startsWith(n)) return 0;          // Anfangsbuchstaben des Namens
-  if (c.initials.startsWith(n)) return 1;     // Initialen, z. B. "tf" → Twisted Fate
-  if (c.words.some(w => w.startsWith(n))) return 2; // zweites Wort, z. B. "fate"
-  if (c.key.includes(n)) return 3;            // irgendwo im Namen
+  if (c.key.startsWith(n)) return 0;
+  if (c.initials.startsWith(n)) return 1;
+  if (c.words.some(w => w.startsWith(n))) return 2;
+  if (c.key.includes(n)) return 3;
   return 99;
 }
 function fillCombo(q) {
@@ -826,7 +1077,7 @@ function fillCombo(q) {
       .sort((a, b) => a.r - b.r || a.c.name.localeCompare(b.c.name))
       .map(x => x.c);
   }
-  const taken = takenChamps(combo.i);
+  const taken = takenChamps(combo.gi, combo.si);
   combo.list = list.filter(c => !taken.has(c.id)).slice(0, 80);
   combo.taken = list.filter(c => taken.has(c.id)).slice(0, 20);
   combo.sel = 0;
@@ -834,9 +1085,9 @@ function fillCombo(q) {
 }
 function takenBy(id) {
   const t = currentTeam();
-  const idx = draft.slots.findIndex((s, i) => i !== combo.i && s.champ === id);
-  if (idx < 0) return '';
-  const p = playerById(t, draft.slots[idx].pid);
+  const hit = allSlots().find(x => !(x.gi === combo.gi && x.si === combo.si) && x.slot.champ === id);
+  if (!hit) return 'schon gewählt';
+  const p = playerById(t, hit.slot.pid);
   return p ? p.name : 'schon gewählt';
 }
 function paintCombo() {
@@ -857,168 +1108,202 @@ function paintCombo() {
   placeCombo();
 }
 function pickChamp(id) {
-  const i = combo.i;
-  if (takenChamps(i).has(id)) { flash('„' + champName(id) + '“ ist in dieser Runde schon vergeben.', true); return; }
-  closeCombo(); draft.slots[i].champ = id; renderForm();
+  if (!combo) return;
+  const gi = combo.gi, si = combo.si;
+  if (takenChamps(gi, si).has(id)) { flash('„' + champName(id) + '“ ist in dieser Runde schon vergeben.', true); return; }
+  closeCombo(); draft.groups[gi].slots[si].champ = id; renderForm();
 }
 
-/* ----- statistics ----- */
+/* ----- Statistik ----- */
 function tile(k, v, s) { return '<div class="tile"><div class="k">' + k + '</div><div class="v">' + v + '</div><div class="s">' + s + '</div></div>'; }
-function seg(v, n, c) { return n ? '<i style="width:' + (v / n * 100) + '%;background:' + c + '"></i>' : ''; }
 function lg(c, t) { return '<span><b style="background:' + c + '"></b>' + t + '</span>'; }
 function fmtDate(ts) { return new Date(ts).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: 'numeric' }); }
 function fmtDT(ts) { return new Date(ts).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+function dayKey(ts) { const d = new Date(ts); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+function dayLabel(ts) {
+  const d = new Date(ts), now = new Date();
+  const same = (a, b) => a.toDateString() === b.toDateString();
+  const y = new Date(now.getTime() - 864e5);
+  if (same(d, now)) return 'Heute';
+  if (same(d, y)) return 'Gestern';
+  return d.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long' });
+}
+const blank = () => ({ g: 0, w: 0, top: 0, sum: 0, cnt: 0 });
+function bump(o, place) { o.g++; if (place === 1) o.w++; if (isTop4(place)) o.top++; if (place) { o.sum += place; o.cnt++; } }
+const avgOf = o => o.cnt ? o.sum / o.cnt : null;
+const avgTxt = o => o.cnt ? dec1(o.sum / o.cnt) : '–';
 
 function calcStreaks(chrono) {
   let run = 0, runKind = null, bestTop = 0, bestLoss = 0;
-  chrono.forEach(m => {
-    const kind = m.result === 'loss' ? 'loss' : 'top';
+  chrono.forEach(e => {
+    const kind = isTop4(e.place) ? 'top' : 'low';
     if (kind === runKind) run++; else { runKind = kind; run = 1; }
     if (kind === 'top') bestTop = Math.max(bestTop, run); else bestLoss = Math.max(bestLoss, run);
   });
   return { kind: runKind, n: run, bestTop: bestTop, bestLoss: bestLoss };
 }
 
+let aggCache = null, aggKey = '';
 function agg() {
+  const key = curTeamId + '|' + matches.length + '|' + matches.reduce((a, m) => a + (m.ts || 0), 0);
+  if (aggCache && aggKey === key) return aggCache;
   const t = currentTeam();
-  const all = teamMatches();                       // neueste zuerst
-  const ms = all.filter(m => !isBroken(m));
-  const broken = all.filter(isBroken);
+  const all = normMatches();
+  const valid = all.filter(matchOk);
+  const broken = all.filter(n => !matchOk(n));
   const players = t ? t.players : [];
   const roster = players.concat([RANDOM]);
-  const byPlayer = new Map(roster.map(p => [p.id, { p: p, g: 0, w: 0, s: 0, l: 0, brav: 0, gay: 0, champs: new Map() }]));
+  const byPlayer = new Map(roster.map(p => [p.id, Object.assign(blank(), { p: p, brav: 0, gay: 0, champs: new Map() })]));
   const byChamp = new Map();
-  const mode = { regular: { g: 0, top: 0, w: 0 }, bravery: { g: 0, top: 0, w: 0 }, gay: { g: 0, top: 0, w: 0 } };
+  const mode = { regular: blank(), bravery: blank(), gay: blank() };
+  const fmt = { '2v2': blank(), '3v3': blank() };
   const duos = new Map();
-  const squad = { full: { g: 0, top: 0 }, random: { g: 0, top: 0 } };
-  let w = 0, s = 0, l = 0;
-  ms.forEach(m => {
-    const win = m.result === 'win', top = m.result !== 'loss';
-    if (win) w++; else if (m.result === 'second') s++; else l++;
-    const picks = cleanPicks(m);
-    picks.forEach(pk => {
-      const md = pickMode(pk), gay = isGay(pk);
-      const rec = byPlayer.get(pk.p);
-      if (rec) {
-        rec.g++; rec[win ? 'w' : m.result === 'second' ? 's' : 'l']++;
-        if (md === 'bravery') rec.brav++;
-        if (gay) rec.gay++;
-        rec.champs.set(pk.c, (rec.champs.get(pk.c) || 0) + 1);
+  const squad = { full: blank(), random: blank() };
+  const dist = [0, 0, 0, 0, 0, 0, 0, 0];
+  const total = blank();
+  const entries = [];
+  let unknown = 0;
+  valid.forEach(n => {
+    n.groups.forEach(g => {
+      const e = { ts: n.ts, mode: n.mode, place: g.place, picks: g.picks, matchId: n.id };
+      entries.push(e);
+      bump(total, g.place);
+      bump(fmt[n.mode] || (fmt[n.mode] = blank()), g.place);
+      if (g.place) dist[g.place - 1]++; else unknown++;
+      g.picks.forEach(pk => {
+        const rec = byPlayer.get(pk.p);
+        if (rec) {
+          bump(rec, g.place);
+          if (pk.m === 'bravery') rec.brav++;
+          if (pk.g) rec.gay++;
+          rec.champs.set(pk.c, (rec.champs.get(pk.c) || 0) + 1);
+        }
+        if (!byChamp.has(pk.c)) byChamp.set(pk.c, Object.assign(blank(), { brav: 0, gay: 0, by: new Map() }));
+        const c = byChamp.get(pk.c);
+        bump(c, g.place);
+        if (pk.m === 'bravery') c.brav++;
+        if (pk.g) c.gay++;
+        c.by.set(pk.p, (c.by.get(pk.p) || 0) + 1);
+        bump(mode[pk.m === 'bravery' ? 'bravery' : 'regular'], g.place);
+        if (pk.g) bump(mode.gay, g.place);
+      });
+      const ids = g.picks.map(pk => pk.p);
+      for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) {
+        if (ids[i] === ids[j] || ids[i] === RANDOM.id || ids[j] === RANDOM.id) continue;
+        const key2 = [ids[i], ids[j]].sort().join('|');
+        if (!duos.has(key2)) duos.set(key2, Object.assign(blank(), { a: ids[i], b: ids[j] }));
+        bump(duos.get(key2), g.place);
       }
-      if (!byChamp.has(pk.c)) byChamp.set(pk.c, { g: 0, w: 0, top: 0, brav: 0, gay: 0, by: new Map() });
-      const c = byChamp.get(pk.c);
-      c.g++; if (win) c.w++; if (top) c.top++;
-      if (md === 'bravery') c.brav++;
-      if (gay) c.gay++;
-      c.by.set(pk.p, (c.by.get(pk.p) || 0) + 1);
-      mode[md].g++; if (top) mode[md].top++; if (win) mode[md].w++;
-      if (gay) { mode.gay.g++; if (top) mode.gay.top++; if (win) mode.gay.w++; }
+      bump(ids.includes(RANDOM.id) ? squad.random : squad.full, g.place);
     });
-    const ids = picks.map(pk => pk.p);
-    for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) {
-      if (ids[i] === ids[j] || ids[i] === RANDOM.id || ids[j] === RANDOM.id) continue;
-      const key = [ids[i], ids[j]].sort().join('|');
-      if (!duos.has(key)) duos.set(key, { a: ids[i], b: ids[j], g: 0, top: 0, w: 0 });
-      const d = duos.get(key); d.g++; if (top) d.top++; if (win) d.w++;
-    }
-    const box = ids.includes(RANDOM.id) ? squad.random : squad.full;
-    box.g++; if (top) box.top++;
   });
-  const chrono = ms.slice().reverse();
+  const chrono = entries.slice().reverse();
+  const days = new Set(valid.map(n => dayKey(n.ts))).size;
   const shown = roster.filter(p => !p.random || byPlayer.get(p.id).g > 0);
-  return { ms: ms, all: all, broken: broken, chrono: chrono, players: players, roster: shown,
-    byPlayer: byPlayer, byChamp: byChamp, mode: mode, duos: duos, squad: squad,
-    streaks: calcStreaks(chrono), w: w, s: s, l: l, n: ms.length };
+  aggKey = key;
+  aggCache = { all: all, valid: valid, broken: broken, entries: entries, chrono: chrono,
+    players: players, roster: shown, byPlayer: byPlayer, byChamp: byChamp,
+    mode: mode, fmt: fmt, duos: duos, squad: squad, dist: dist, unknown: unknown,
+    total: total, streaks: calcStreaks(chrono), n: valid.length, e: entries.length, days: days };
+  return aggCache;
 }
 
-function streakText(st) {
-  if (!st.kind) return 'noch keine Runde';
-  return st.kind === 'top' ? 'Podium in Folge' : 'Niederlagen in Folge';
+function rateCell(v, n) {
+  return '<span class="rate"><span class="ratebar"><i style="width:' + (n ? v : 0) + '%"></i></span>' + (n ? v + ' %' : '–') + '</span>';
 }
 function modeRow(label, cls, color, rec) {
   const p = pct(rec.top, rec.g);
   return '<div class="mrow"><span class="ml' + (cls ? ' ' + cls : '') + '">' + label + '</span>' +
     '<span class="mbar"><i style="width:' + (rec.g ? p : 0) + '%;background:' + color + '"></i></span>' +
-    '<span class="mv">' + (rec.g ? p + ' % · ' + rec.g + '×' : 'keine Picks') + '</span></div>';
+    '<span class="mv">' + (rec.g ? p + ' % Top 4 · Ø ' + avgTxt(rec) : 'keine Picks') + '</span></div>';
 }
 
 function renderStats() {
   const a = agg(); const el = document.getElementById('statPanel');
-  const top = a.w + a.s;
-  const wPct = pct(a.w, a.n), tPct = pct(top, a.n);
-  const form = a.ms.slice(0, 12).reverse();
   const st = a.streaks;
+  const form = a.entries.slice(0, 12).reverse();
+  const maxDist = Math.max.apply(null, a.dist.concat([1]));
   el.innerHTML =
     '<div class="sec-head"><h2>Bilanz</h2><span class="tiny muted">' + (currentTeam() ? esc(currentTeam().name) : '') + '</span></div>' +
-    (a.broken.length ? '<div class="notice warn" style="margin-bottom:12px"><div><b>' + plural(a.broken.length, 'unvollständige Runde', 'unvollständige Runden') + '.</b> Sie zählen nicht mit &ndash; im Verlauf unten kannst du sie löschen.</div></div>' : '') +
+    (a.broken.length ? '<div class="notice warn" style="margin-bottom:12px"><div><b>' + plural(a.broken.length, 'unvollständige Runde', 'unvollständige Runden') + '.</b> Zählen nicht mit &ndash; im Verlauf kannst du sie bearbeiten oder löschen.</div></div>' : '') +
     '<div class="tiles">' +
       tile('Runden', a.n, a.n ? 'seit ' + fmtDate(a.chrono[0].ts) : 'noch keine') +
-      tile('Siege', a.w, wPct + ' % aller Runden') +
-      tile('Podium', top, tPct + ' % Sieg oder 2.') +
-      tile('Niederlagen', a.l, pct(a.l, a.n) + ' %') +
-      tile('Serie', st.n || 0, streakText(st)) +
-      tile('Bravery', a.mode.bravery.g, a.mode.bravery.g ? pct(a.mode.bravery.top, a.mode.bravery.g) + ' % Podium' : 'keine Picks') +
-      tile('Gay-Counter', a.mode.gay.g, a.mode.gay.g ? pct(a.mode.gay.top, a.mode.gay.g) + ' % Podium' : 'noch nie angeklickt') +
+      tile('Ø Platz', a.total.cnt ? avgTxt(a.total) : '–', a.total.cnt ? 'aus ' + plural(a.total.cnt, 'Wertung', 'Wertungen') : 'noch keine') +
+      tile('Siege', a.total.w, pct(a.total.w, a.total.g) + ' % aller Wertungen') +
+      tile('Top 4', a.total.top, pct(a.total.top, a.total.g) + ' % der Wertungen') +
+      tile('Serie', st.n || 0, st.kind === 'top' ? 'Top 4 in Folge' : st.kind ? 'außerhalb Top 4' : 'noch keine Runde') +
+      tile('Bravery', a.mode.bravery.g, a.mode.bravery.g ? 'Ø Platz ' + avgTxt(a.mode.bravery) : 'keine Picks') +
+      tile('Gay-Counter', a.mode.gay.g, a.mode.gay.g ? 'Ø Platz ' + avgTxt(a.mode.gay) : 'noch nie angeklickt') +
+      tile('Abende', a.days, a.days ? 'zuletzt ' + esc(dayLabel(a.entries[0].ts)) : 'noch keiner') +
     '</div>' +
-    (a.n ? '<div style="margin-top:16px"><div class="distbar">' +
-      seg(a.w, a.n, RESULTS.win.color) + seg(a.s, a.n, RESULTS.second.color) + seg(a.l, a.n, RESULTS.loss.color) +
-      '</div><div class="legend">' +
-        lg(RESULTS.win.color, 'Sieg ' + a.w) + lg(RESULTS.second.color, '2. Platz ' + a.s) + lg(RESULTS.loss.color, 'Niederlage ' + a.l) +
-      '</div></div>' : '') +
+    (a.total.g ? '<div class="eyebrow-row"><span class="eyebrow">Platzverteilung</span>' +
+      (a.unknown ? '<span class="tiny muted">' + a.unknown + '× Platz unbekannt (alte Runden)</span>' : '') + '</div>' +
+      '<div class="pdist">' + a.dist.map((v, i) => {
+        const n = i + 1;
+        return '<div class="pcol" title="' + placeTxt(n) + ': ' + v + '×">' +
+          '<span class="pcv">' + (v || '') + '</span>' +
+          '<span class="pcb"><i style="height:' + Math.round(v / maxDist * 100) + '%;background:' + placeColor(n) + '"></i></span>' +
+          '<span class="pcl' + (isTop4(n) ? ' top' : '') + '">' + n + '</span></div>';
+      }).join('') + '</div>' : '') +
     (form.length ? '<div class="eyebrow-row"><span class="eyebrow">Form &middot; letzte ' + form.length + '</span>' +
-      '<span class="tiny muted">längste Podiumserie ' + st.bestTop + ' &middot; längste Pechsträhne ' + st.bestLoss + '</span></div>' +
-      '<div class="formdots">' + form.map(m =>
-        '<span class="fdot ' + m.result + '" title="' + RESULTS[m.result].label + ' &middot; ' + fmtDT(m.ts) + '">' + RESULTS[m.result].rank + '</span>').join('') +
-      '</div><p class="tiny muted" style="margin:7px 0 0">links die ältere, rechts die neueste Runde</p>' : '') +
-    (a.n ? '<div class="eyebrow-row"><span class="eyebrow">Podiumquote nach Pick-Art</span></div>' +
+      '<span class="tiny muted">längste Top-4-Serie ' + st.bestTop + ' &middot; längste Durststrecke ' + st.bestLoss + '</span></div>' +
+      '<div class="formdots">' + form.map(e =>
+        '<span class="fdot" style="--fc:' + placeColor(e.place) + '" title="' + placeTxt(e.place) + ' &middot; ' + esc(fmtDT(e.ts)) + '">' + (e.place || '?') + '</span>').join('') +
+      '</div><p class="tiny muted" style="margin:7px 0 0">links die ältere, rechts die neueste Wertung</p>' : '') +
+    (a.total.g ? '<div class="eyebrow-row"><span class="eyebrow">Nach Pick-Art</span></div>' +
       '<div class="modes">' +
         modeRow('Regular', '', 'var(--gold)', a.mode.regular) +
         modeRow('Bravery', 'tealcol', 'var(--teal)', a.mode.bravery) +
         modeRow('Gay', 'gaycol', 'var(--rose)', a.mode.gay) +
-      '</div><p class="tiny muted" style="margin:8px 0 0">Gay-Picks zählen zusätzlich &ndash; sie stecken je nach Runde auch in Regular oder Bravery.</p>' : '') +
+      '</div>' +
+      ((a.fmt['2v2'].g && a.fmt['3v3'].g) ? '<div class="modes" style="margin-top:9px">' +
+        modeRow('2v2', '', 'var(--second)', a.fmt['2v2']) + modeRow('3v3', '', 'var(--second)', a.fmt['3v3']) + '</div>' : '') +
+      '<p class="tiny muted" style="margin:8px 0 0">Gay-Picks zählen zusätzlich &ndash; sie stecken je nach Runde auch in Regular oder Bravery.</p>' : '') +
     '<div class="eyebrow-row"><span class="eyebrow">Spieler</span></div>' +
-    (a.roster.length ? '<div class="scrollx"><table><thead><tr><th>Spieler</th><th class="num">Runden</th><th class="num">1.</th><th class="num">2.</th><th class="num">Podium</th><th class="num">Brav.</th><th class="num">Gay</th><th>Meistgespielt</th></tr></thead><tbody>' +
+    (a.roster.length ? '<div class="scrollx"><table><thead><tr><th>Spieler</th><th class="num">Wert.</th><th class="num">Ø Platz</th><th class="num">Siege</th><th class="num">Top 4</th><th class="num">Brav.</th><th class="num">Gay</th><th>Meistgespielt</th></tr></thead><tbody>' +
       a.roster.map(p => {
         const r = a.byPlayer.get(p.id);
         const best = [...r.champs.entries()].sort((x, y) => y[1] - x[1])[0];
-        const rate = pct(r.w + r.s, r.g);
         return '<tr><td><span class="pdot" style="background:' + p.color + '"></span>' + esc(p.name) + '</td>' +
-          '<td class="num">' + r.g + '</td><td class="num">' + r.w + '</td><td class="num">' + r.s + '</td>' +
-          '<td class="num"><span class="rate"><span class="ratebar"><i style="width:' + rate + '%"></i></span>' + (r.g ? rate + ' %' : '–') + '</span></td>' +
+          '<td class="num">' + r.g + '</td>' +
+          '<td class="num"><b style="color:var(--gold-hi)">' + avgTxt(r) + '</b></td>' +
+          '<td class="num">' + r.w + '</td>' +
+          '<td class="num">' + rateCell(pct(r.top, r.g), r.g) + '</td>' +
           '<td class="num tealcol">' + (r.brav || '–') + '</td>' +
           '<td class="num gaycol">' + (r.gay || '–') + '</td>' +
           '<td>' + (best ? '<span style="display:inline-flex;align-items:center;gap:7px"><img src="' + champIcon(best[0]) + '" alt="" style="width:24px;height:24px">' + esc(champName(best[0])) + ' ×' + best[1] + '</span>' : '<span class="muted">–</span>') + '</td></tr>';
       }).join('') + '</tbody></table></div>' : '<div class="empty">Noch keine Spieler im Kader.</div>');
 }
 
-/* ----- Performance: Duos, Gay-Ranking, Champion-Bestenliste ----- */
+/* ----- Performance ----- */
 function renderPerf() {
   const a = agg(); const el = document.getElementById('perfPanel');
-  const head = '<div class="sec-head"><h2>Performance</h2><span class="tiny muted">' + plural(a.n, 'gewertete Runde', 'gewertete Runden') + '</span></div>';
-  if (!a.n) {
+  const head = '<div class="sec-head"><h2>Performance</h2><span class="tiny muted">' + plural(a.e, 'Wertung', 'Wertungen') + '</span></div>';
+  if (!a.e) {
     el.innerHTML = head + '<div class="empty">Sobald ein paar Runden drin sind, stehen hier eure besten Paarungen, die stärksten Champions und das Gay-Ranking.</div>';
     return;
   }
   const t = currentTeam();
   const nameOf = id => { const p = playerById(t, id); return p ? p.name : '?'; };
   const colorOf = id => { const p = playerById(t, id); return p ? p.color : 'var(--ink-3)'; };
+  const thin = a.e < 20
+    ? '<div class="notice" style="margin-bottom:14px"><div>Bei ' + plural(a.e, 'Wertung', 'Wertungen') + ' sind die Quoten noch stark vom Zufall geprägt. Ab etwa 30 werden die Zahlen belastbar &ndash; bis dahin lieber die Ø-Platzierung als Anhalt nehmen.</div></div>'
+    : '';
 
-  const duos = [...a.duos.values()].sort((x, y) => pct(y.top, y.g) - pct(x.top, x.g) || y.g - x.g);
+  const duos = [...a.duos.values()].sort((x, y) => (avgOf(x) === null) - (avgOf(y) === null) || avgOf(x) - avgOf(y) || y.g - x.g);
   const duoHtml = duos.length
-    ? '<div class="scrollx"><table><thead><tr><th>Paarung</th><th class="num">Runden</th><th class="num">Siege</th><th class="num">Podium</th></tr></thead><tbody>' +
-      duos.map(d => {
-        const rate = pct(d.top, d.g);
-        return '<tr><td><span class="pdot" style="background:' + colorOf(d.a) + '"></span>' + esc(nameOf(d.a)) +
+    ? '<div class="scrollx"><table><thead><tr><th>Paarung</th><th class="num">Wert.</th><th class="num">Ø Platz</th><th class="num">Siege</th><th class="num">Top 4</th></tr></thead><tbody>' +
+      duos.map(d => '<tr><td><span class="pdot" style="background:' + colorOf(d.a) + '"></span>' + esc(nameOf(d.a)) +
           ' <span class="muted">+</span> <span class="pdot" style="background:' + colorOf(d.b) + '"></span>' + esc(nameOf(d.b)) + '</td>' +
-          '<td class="num">' + d.g + '</td><td class="num">' + d.w + '</td>' +
-          '<td class="num"><span class="rate"><span class="ratebar"><i style="width:' + rate + '%"></i></span>' + rate + ' %</span></td></tr>';
-      }).join('') + '</tbody></table></div>'
-    : '<div class="empty">Noch keine Runde mit zwei Leuten aus dem Kader.</div>';
+          '<td class="num">' + d.g + '</td><td class="num"><b style="color:var(--gold-hi)">' + avgTxt(d) + '</b></td>' +
+          '<td class="num">' + d.w + '</td><td class="num">' + rateCell(pct(d.top, d.g), d.g) + '</td></tr>').join('') +
+      '</tbody></table></div>'
+    : '<div class="empty">Noch keine Runde, in der zwei aus dem Kader zusammen im selben Team standen.</div>';
 
   const sq = a.squad;
   const squadHtml = (sq.full.g && sq.random.g)
-    ? '<p class="tiny muted" style="margin:10px 0 0">Nur eigener Kader: <b style="color:var(--gold-hi)">' + pct(sq.full.top, sq.full.g) + ' %</b> Podium aus ' + sq.full.g +
-      ' &middot; mit fremdem Mitspieler: <b style="color:var(--gold-hi)">' + pct(sq.random.top, sq.random.g) + ' %</b> aus ' + sq.random.g + '</p>'
+    ? '<p class="tiny muted" style="margin:10px 0 0">Nur eigener Kader: <b style="color:var(--gold-hi)">Ø ' + avgTxt(sq.full) + '</b> aus ' + sq.full.g +
+      ' &middot; mit fremdem Mitspieler: <b style="color:var(--gold-hi)">Ø ' + avgTxt(sq.random) + '</b> aus ' + sq.random.g + '</p>'
     : '';
 
   const gayRank = a.roster.filter(p => a.byPlayer.get(p.id).gay > 0)
@@ -1031,32 +1316,34 @@ function renderPerf() {
           '<span class="mbar"><i style="width:' + Math.round(r.gay / maxGay * 100) + '%;background:var(--rose)"></i></span>' +
           '<span class="mv">' + r.gay + '× (' + pct(r.gay, r.g) + ' %)</span></div>';
       }).join('') + '</div>' +
-      '<p class="tiny muted" style="margin:8px 0 0">Gesamt <b class="gaycol">' + a.mode.gay.g + '</b> Gay-Picks, davon ' + a.mode.gay.w + ' mit Sieg.</p>'
+      '<p class="tiny muted" style="margin:8px 0 0">Gesamt <b class="gaycol">' + a.mode.gay.g + '</b> Gay-Picks, Ø Platz ' + avgTxt(a.mode.gay) + ', davon ' + a.mode.gay.w + '× Platz 1.</p>'
     : '<div class="empty">Noch kein Gay-Pick angeklickt.</div>';
 
-  const MIN = a.n >= 8 ? 3 : 2;
-  const ranked = [...a.byChamp.entries()].filter(([, c]) => c.g >= MIN)
-    .sort((x, y) => pct(y[1].top, y[1].g) - pct(x[1].top, x[1].g) || y[1].g - x[1].g);
-  const chRow = ([id, c]) => '<tr><td class="chcell"><img src="' + champIcon(id) + '" alt="">' + esc(champName(id)) +
-    (c.brav ? ' <span class="bmark">B×' + c.brav + '</span>' : '') + (c.gay ? ' <span class="gmark">G×' + c.gay + '</span>' : '') + '</td>' +
-    '<td class="num">' + c.g + '</td><td class="num">' + c.w + '</td>' +
-    '<td class="num"><span class="rate"><span class="ratebar"><i style="width:' + pct(c.top, c.g) + '%"></i></span>' + pct(c.top, c.g) + ' %</span></td></tr>';
-  const head6 = ranked.slice(0, 6);
-  const tail6 = ranked.length > 12 ? ranked.slice(-6) : ranked.slice(6);
+  const MIN = a.e >= 30 ? 4 : a.e >= 12 ? 3 : 2;
+  const ranked = [...a.byChamp.entries()].filter(e => e[1].g >= MIN && e[1].cnt)
+    .sort((x, y) => avgOf(x[1]) - avgOf(y[1]) || y[1].g - x[1].g);
+  const chRow = e => {
+    const id = e[0], c = e[1];
+    return '<tr><td class="chcell"><img src="' + champIcon(id) + '" alt="">' + esc(champName(id)) +
+      (c.brav ? ' <span class="bmark">B×' + c.brav + '</span>' : '') + (c.gay ? ' <span class="gmark">G×' + c.gay + '</span>' : '') + '</td>' +
+      '<td class="num">' + c.g + '</td><td class="num"><b style="color:var(--gold-hi)">' + avgTxt(c) + '</b></td>' +
+      '<td class="num">' + c.w + '</td><td class="num">' + rateCell(pct(c.top, c.g), c.g) + '</td></tr>';
+  };
   const champHtml = ranked.length
-    ? '<div class="scrollx"><table class="matrix"><thead><tr><th>Champion</th><th class="num">Runden</th><th class="num">Siege</th><th class="num">Podium</th></tr></thead><tbody>' +
-      head6.map(chRow).join('') +
-      (ranked.length > 12 ? '<tr><td colspan="4" class="muted tiny" style="padding:9px 0">… ' + (ranked.length - 12) + ' weitere …</td></tr>' : '') +
-      tail6.map(chRow).join('') +
+    ? '<div class="scrollx"><table class="matrix"><thead><tr><th>Champion</th><th class="num">Wert.</th><th class="num">Ø Platz</th><th class="num">Siege</th><th class="num">Top 4</th></tr></thead><tbody>' +
+      ranked.slice(0, 6).map(chRow).join('') +
+      (ranked.length > 12 ? '<tr><td colspan="5" class="muted tiny" style="padding:9px 0">… ' + (ranked.length - 12) + ' weitere …</td></tr>' : '') +
+      (ranked.length > 6 ? ranked.slice(Math.max(6, ranked.length - 6)).map(chRow).join('') : '') +
       '</tbody></table></div>' +
-      '<p class="tiny muted" style="margin:8px 0 0">Nur Champions ab ' + MIN + ' Runden &ndash; oben die stärksten, unten die schwächsten.</p>'
-    : '<div class="empty">Noch kein Champion ' + MIN + '× gespielt – die Bestenliste braucht ein paar Wiederholungen.</div>';
+      '<p class="tiny muted" style="margin:8px 0 0">Nur Champions ab ' + MIN + ' Wertungen, sortiert nach Ø-Platzierung &ndash; oben die stärksten, unten die schwächsten.</p>'
+    : '<div class="empty">Noch kein Champion ' + MIN + '× gespielt &ndash; die Bestenliste braucht Wiederholungen, sonst zeigt sie nur Zufall.</div>';
 
-  el.innerHTML = head +
-    '<div class="eyebrow">Wer mit wem</div><div style="margin-top:9px"></div>' + duoHtml + squadHtml +
+  el.innerHTML = head + thin +
+    '<div class="eyebrow">Wer mit wem im Team</div><div style="margin-top:9px"></div>' + duoHtml + squadHtml +
     '<div class="eyebrow-row"><span class="eyebrow gaycol">Gay-Counter</span><span class="tiny muted">Picks je Spieler</span></div>' + gayHtml +
     '<div class="eyebrow-row"><span class="eyebrow">Champion-Bestenliste</span></div>' + champHtml;
 }
+
 /* ----- champion chart ----- */
 let chartView = 'player';
 function renderChampChart() {
@@ -1081,26 +1368,26 @@ function renderChampChart() {
           return '<span class="chip" title="' + esc(champName(id)) + ' — ' + n + '× gespielt">' +
             '<img src="' + champIcon(id) + '" alt="">' +
             '<span class="chip-txt"><span class="chip-name">' + esc(champName(id)) + '</span>' +
-            '<span class="chip-sub">' + n + '× · ' + pct(c.top, c.g) + ' % Podium</span></span></span>';
+            '<span class="chip-sub">' + n + '× · Ø ' + avgTxt(c) + '</span></span></span>';
         }).join('');
       return '<div class="pblock">' +
         '<div class="phead"><span class="pdot" style="background:' + p.color + '"></span>' +
           '<span class="pname-l">' + esc(p.name) + '</span>' +
-          '<span class="tiny muted">' + plural(r.g, 'Runde', 'Runden') + ' · ' + pct(r.w + r.s, r.g) + ' % Podium · ' + plural(r.champs.size, 'Champion', 'Champions') + '</span></div>' +
+          '<span class="tiny muted">' + plural(r.g, 'Wertung', 'Wertungen') + ' · Ø ' + avgTxt(r) + ' · ' + plural(r.champs.size, 'Champion', 'Champions') + '</span></div>' +
         '<div class="chips">' + chips + '</div></div>';
     }).join('');
     el.innerHTML = head + '<div class="pblocks">' + blocks + '</div>' +
-      '<p class="tiny muted" style="margin:14px 0 0">Champions nach Häufigkeit sortiert. Die Prozentzahl ist die Podiumquote des Champions im ganzen Team, nicht nur bei diesem Spieler.</p>';
+      '<p class="tiny muted" style="margin:14px 0 0">Champions nach Häufigkeit sortiert. Ø ist die Durchschnittsplatzierung des Champions im ganzen Team, nicht nur bei diesem Spieler.</p>';
     return;
   }
 
   const rows = [...a.byChamp.entries()].sort((x, y) => y[1].g - x[1].g || champName(x[0]).localeCompare(champName(y[0])));
   const cols = a.roster.filter(p => a.byPlayer.get(p.id).g > 0);
-  const maxCell = rows.reduce((m, [, c]) => Math.max(m, ...[...c.by.values()]), 1);
+  const maxCell = rows.reduce((m, r) => Math.max(m, ...[...r[1].by.values()]), 1);
   el.innerHTML = head +
     '<div class="scrollx"><table class="matrix"><thead><tr><th>Champion</th>' +
       cols.map(p => '<th class="num"><span class="pdot" style="background:' + p.color + '"></span>' + esc(p.name) + '</th>').join('') +
-      '<th class="num">Gesamt</th><th class="num">Podium</th></tr></thead><tbody>' +
+      '<th class="num">Gesamt</th><th class="num">Ø Platz</th></tr></thead><tbody>' +
     rows.map(([id, c]) => {
       const cells = cols.map(p => {
         const n = c.by.get(p.id) || 0;
@@ -1111,16 +1398,17 @@ function renderChampChart() {
       return '<tr><td class="chcell"><img src="' + champIcon(id) + '" alt="">' + esc(champName(id)) +
         (c.brav ? ' <span class="bmark">B×' + c.brav + '</span>' : '') +
         (c.gay ? ' <span class="gmark">G×' + c.gay + '</span>' : '') + '</td>' +
-        cells + '<td class="num">' + c.g + '</td><td class="num">' + pct(c.top, c.g) + ' %</td></tr>';
+        cells + '<td class="num">' + c.g + '</td><td class="num">' + avgTxt(c) + '</td></tr>';
     }).join('') + '</tbody></table></div>' +
     '<p class="tiny muted" style="margin:12px 0 0">Je kräftiger ein Feld, desto häufiger hat dieser Spieler den Champion gespielt. <span style="color:var(--teal)">B×</span> zählt die Bravery-Picks, <span style="color:var(--rose)">G×</span> die Gay-Picks.</p>';
 }
 function hexA(hex, a) {
+  if (!/^#[0-9a-f]{6}$/i.test(hex)) return 'rgba(200,170,110,' + a.toFixed(2) + ')';
   const n = parseInt(hex.slice(1), 16);
   return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a.toFixed(2) + ')';
 }
 
-/* ----- history ----- */
+/* ----- Verlauf ----- */
 let confirmDel = null, clearArmed = false;
 async function clearTeamMatches() {
   clearArmed = false;
@@ -1132,41 +1420,69 @@ async function clearTeamMatches() {
     flash('Alle Runden von „' + t.name + '“ gelöscht. Der Kader bleibt.');
   } catch (e) { flash('Löschen fehlgeschlagen.', true); renderHistory(); }
 }
+function medal(place) {
+  return '<span class="medal' + (isTop4(place) ? ' top' : '') + '" style="--pc:' + placeColor(place) + '" title="' + placeTxt(place) + '">' +
+    '<b>' + (place || '?') + '</b></span>';
+}
+function picksHtml(t, picks) {
+  return picks.map(pk => {
+    const p = playerById(t, pk.p);
+    const ic = champIcon(pk.c);
+    return '<div class="hpick"><span class="ic">' +
+      (ic ? '<img src="' + ic + '" alt="">' : '<span class="cbx-ph" style="width:32px;height:32px">?</span>') +
+      (pk.m === 'bravery' ? '<span class="bravtag">B</span>' : '') +
+      (pk.g ? '<span class="gaytag">G</span>' : '') + '</span>' +
+      '<span class="txt"><span class="who" style="color:' + (p ? p.color : 'var(--ink-2)') + '">' + esc(p ? p.name : '?') + '</span><br>' +
+      '<span class="ch">' + esc(pk.c ? champName(pk.c) : 'kein Champion') + '</span></span></div>';
+  }).join('');
+}
 function renderHistory() {
   const el = document.getElementById('histPanel');
-  const ms = teamMatches();
+  const t = currentTeam();
+  const ns = normMatches();
   el.innerHTML = '<div class="sec-head"><h2>Verlauf</h2>' +
-    (ms.length ? (clearArmed
-      ? '<span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="tiny muted">Alle ' + ms.length + ' Runden dieses Teams löschen?</span>' +
+    (ns.length ? (clearArmed
+      ? '<span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="tiny muted">Alle ' + ns.length + ' Runden dieses Teams löschen?</span>' +
         '<button class="btn danger sm" onclick="clearTeamMatches()">Ja, löschen</button>' +
         '<button class="btn ghost sm" onclick="clearArmed=false;renderHistory()">Abbrechen</button></span>'
-      : '<span style="display:flex;gap:10px;align-items:center"><span class="tiny muted">' + plural(ms.length, 'Runde', 'Runden') + '</span>' +
+      : '<span style="display:flex;gap:10px;align-items:center"><span class="tiny muted">' + plural(ns.length, 'Runde', 'Runden') + '</span>' +
         '<button class="btn ghost sm" onclick="clearArmed=true;renderHistory()">Runden löschen</button></span>')
       : '<span class="tiny muted">0 Runden</span>') + '</div>' +
-    (ms.length ? '<div class="hist">' + ms.slice(0, 40).map(m => {
-      const t = currentTeam();
-      const broken = isBroken(m);
-      const picks = (Array.isArray(m.picks) ? m.picks : []).map(pk => {
-        const p = playerById(t, pk && pk.p);
-        const ic = champIcon(pk && pk.c);
-        return '<div class="hpick"><span class="ic">' +
-          (ic ? '<img src="' + ic + '" alt="">' : '<span class="cbx-ph" style="width:32px;height:32px">?</span>') +
-          (pickMode(pk) === 'bravery' ? '<span class="bravtag">B</span>' : '') +
-          (isGay(pk) ? '<span class="gaytag">G</span>' : '') + '</span>' +
-          '<span class="txt"><span class="who" style="color:' + (p ? p.color : 'var(--ink-2)') + '">' + esc(p ? p.name : '?') + '</span><br>' +
-          '<span class="ch">' + esc(pk && pk.c ? champName(pk.c) : 'kein Champion') + '</span></span></div>';
-      }).join('');
-      const del = (confirmDel === m.id
-        ? '<button class="btn danger sm" onclick="doDel(\'' + m.id + '\')">Wirklich löschen</button>'
-        : '<button class="btn ghost sm" onclick="confirmDel=\'' + m.id + '\';renderHistory()">Löschen</button>');
-      return '<div class="hrow">' +
-        (broken
-          ? '<span class="pill broken" title="Unvollständig gespeichert – zählt nicht in der Statistik">Unvollständig</span>'
-          : '<span class="pill ' + m.result + '">' + RESULTS[m.result].label + '</span>') +
-        '<div class="hpicks">' + picks + '</div>' +
-        '<span class="hdate">' + fmtDT(m.ts) + '</span>' + del + '</div>';
-    }).join('') + '</div>' + (ms.length > 40 ? '<p class="tiny muted" style="margin:10px 0 0">Es werden die letzten 40 Runden gezeigt; die Statistik oben rechnet mit allen ' + ms.length + '.</p>' : '')
-    : '<div class="empty">Noch keine Runde eingetragen.</div>');
+    (ns.length ? sessionsHtml(t, ns.slice(0, 60)) + (ns.length > 60 ? '<p class="tiny muted" style="margin:10px 0 0">Es werden die letzten 60 Runden gezeigt; die Statistik rechnet mit allen ' + ns.length + '.</p>' : '')
+      : '<div class="empty">Noch keine Runde eingetragen.</div>');
+}
+function sessionsHtml(t, list) {
+  const days = [];
+  list.forEach(n => {
+    const k = dayKey(n.ts);
+    let d = days.find(x => x.k === k);
+    if (!d) { d = { k: k, ts: n.ts, items: [] }; days.push(d); }
+    d.items.push(n);
+  });
+  return days.map(d => {
+    const st = blank();
+    d.items.forEach(n => { if (matchOk(n)) n.groups.forEach(g => bump(st, g.place)); });
+    return '<div class="session">' +
+      '<div class="session-head"><span class="sd">' + esc(dayLabel(d.ts)) + '</span>' +
+        '<span class="tiny muted">' + plural(d.items.length, 'Runde', 'Runden') +
+        (st.cnt ? ' · Ø ' + avgTxt(st) + ' · ' + st.w + '× Platz 1' : '') + '</span></div>' +
+      '<div class="hist">' + d.items.map(n => histRow(t, n)).join('') + '</div></div>';
+  }).join('');
+}
+function histRow(t, n) {
+  const ok = matchOk(n);
+  const del = (confirmDel === n.id
+    ? '<button class="btn danger sm" onclick="doDel(\'' + n.id + '\')">Wirklich löschen</button>'
+    : '<span class="hactions"><button class="btn ghost sm" onclick="editMatch(\'' + n.id + '\')">Bearbeiten</button>' +
+      '<button class="btn ghost sm" onclick="confirmDel=\'' + n.id + '\';renderHistory()">Löschen</button></span>');
+  const body = n.groups.length
+    ? n.groups.map(g => '<div class="hgroup">' + medal(g.place) + '<div class="hpicks">' + picksHtml(t, g.picks) + '</div></div>').join('')
+    : '<div class="hpicks"><span class="muted tiny">Keine Champions gespeichert</span></div>';
+  return '<div class="hrow' + (ok ? '' : ' bad') + '">' +
+    '<div class="hmeta"><span class="modebadge">' + esc(n.mode) + '</span>' +
+      (ok ? '' : '<span class="pill broken">Unvollständig</span>') +
+      '<span class="hdate">' + esc(fmtDT(n.ts)) + '</span></div>' +
+    '<div class="hgroups">' + body + '</div>' + del + '</div>';
 }
 async function doDel(id) { confirmDel = null; try { await delMatch(id); flash('Runde gelöscht.'); } catch (e) { flash('Löschen fehlgeschlagen.', true); } renderHistory(); }
 
@@ -1201,13 +1517,13 @@ function paintDialog() {
     '<div class="sec-head"><h2>' + (dlg.id ? 'Team bearbeiten' : 'Neues Team') + '</h2></div>' +
     '<label class="eyebrow" for="tname">Teamname</label>' +
     '<input id="tname" class="pname" style="width:100%;margin-top:6px;padding:9px 10px" value="' + esc(dlg.name) + '" placeholder="z. B. Nachtschicht">' +
-    '<div class="eyebrow" style="margin-top:16px">Kader (2 bis 5)</div>' +
+    '<div class="eyebrow" style="margin-top:16px">Kader (2 bis 6)</div>' +
     '<div class="plist">' + dlg.players.map((p, i) =>
       '<div class="pedit"><span class="swatch" style="background:' + p.color + '"></span>' +
       '<input value="' + esc(p.name) + '" placeholder="Name oder Summoner" oninput="dlg.players[' + i + '].name=this.value">' +
       (dlg.players.length > 2 ? '<button class="btn ghost sm" onclick="dlg.players.splice(' + i + ',1);paintDialog()">Raus</button>' : '') +
       '</div>').join('') + '</div>' +
-    (dlg.players.length < 5 ? '<button class="btn ghost sm" onclick="addPlayerRow()">+ Spieler</button>' : '') +
+    (dlg.players.length < 6 ? '<button class="btn ghost sm" onclick="addPlayerRow()">+ Spieler</button>' : '') +
     '<div class="rowend">' +
       (dlg.id ? '<button class="btn danger" onclick="askDeleteTeam()">Team löschen</button>' : '') +
       '<button class="btn ghost" onclick="dlg=null;paintDialog()">Abbrechen</button>' +
