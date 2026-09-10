@@ -1,4 +1,4 @@
-const CACHE = 'arena-logbuch-v2';
+const CACHE = 'arena-logbuch-v3';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './firebase-config.js',
   './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
