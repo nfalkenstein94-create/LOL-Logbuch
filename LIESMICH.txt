@@ -1,60 +1,73 @@
-﻿ARENA LOGBUCH - als App aufs Handy
+ARENA LOGBUCH
 
-Dieser Ordner ist eine fertige Web-App. Er muss einmal ins Netz gestellt
-werden (kostenlos), danach installiert ihr sie euch aufs Handy wie eine
-normale App - mit Symbol auf dem Startbildschirm, ohne Adressleiste,
-und sie laeuft auch ohne Internet.
+Eine einzelne Web-App fuer euer Arena-Logbuch. Liegt auf GitHub Pages,
+laesst sich aufs Handy installieren und laeuft auch ohne Internet.
 
-------------------------------------------------------------------
-SCHRITT 1: Ordner online stellen (einmalig, ca. 3 Minuten)
-------------------------------------------------------------------
+Adresse: https://nfalkenstein94-create.github.io/LOL-Logbuch/
 
-Variante A - GitHub Pages
-  1. Auf github.com ein neues, oeffentliches Repository anlegen,
-     z. B. "arena-logbuch".
-  2. "Add file" -> "Upload files" -> ALLE Dateien aus diesem Ordner
-     hochladen (index.html, sw.js, manifest.webmanifest, die vier
-     icon-*.png) -> "Commit changes".
-  3. Settings -> Pages -> Source: "Deploy from a branch",
-     Branch: main, Ordner: / (root) -> Save.
-  4. Nach ein bis zwei Minuten steht dort die Adresse, etwa
-     https://DEINNAME.github.io/arena-logbuch/
-
-Variante B - Cloudflare Pages oder Netlify
-  Beide bieten "Direct Upload" bzw. "Drop": Ordner ins Browserfenster
-  ziehen, fertig. Adresse wird sofort angezeigt.
-
-Wichtig: Es muss https sein. Ueber file:// oder http funktioniert die
-Installation nicht - das ist eine Regel der Browser, kein Fehler der App.
 
 ------------------------------------------------------------------
-SCHRITT 2: Auf dem Handy installieren
+WAS DIE APP KANN
 ------------------------------------------------------------------
+Eintragen
+  Modus 2v2 oder 3v3 je Runde. Pro Runde koennen mehrere eigene Teams
+  angelegt werden - spielt ihr zu dritt im 2v2, macht das zweite Team
+  einer mit einem fremden Mitspieler ("Random") auf. Jedes Team bekommt
+  seine eigene Platzierung von 1 bis 8.
+  Pro Pick: Regular oder Bravery, dazu unabhaengig davon der
+  Gay-Counter (beides gleichzeitig moeglich).
+  Ein Champion darf pro Runde nur einmal vorkommen. Gespeichert wird
+  erst, wenn alles ausgefuellt ist - was noch fehlt, steht unter dem
+  Formular.
+  Jede Runde ist nachtraeglich bearbeitbar. Speichern und Loeschen
+  lassen sich per "Rueckgaengig" zurueckholen.
 
-Android (Chrome)
-  Adresse oeffnen -> Menue (drei Punkte) -> "App installieren"
-  bzw. "Zum Startbildschirm zufuegen".
+Auswerten
+  Leitzahl ist die Durchschnittsplatzierung, dazu Siegquote (Platz 1),
+  Top-4-Quote, Platzverteilung, Form der letzten Wertungen und Serien.
+  Analyse: Aufstellungen (Paare und Trios), Erkenntnisse - die nur
+  erscheinen, wenn genug Daten da sind -, Rekorde, Champion-Bestenliste
+  nach Ø-Platzierung, Gay-Counter je Spieler.
+  Filter fuer Zeitraum, Modus und Spieler wirken auf alles.
+  Spieler- und Champion-Zeilen sind antippbar und oeffnen Details.
 
-iPhone (Safari - andere Browser koennen das auf iOS nicht)
-  Adresse oeffnen -> Teilen-Symbol -> "Zum Home-Bildschirm".
+Ablage
+  Alle Geraete mit demselben Team-Code sehen dasselbe Logbuch
+  (Firebase/Firestore, siehe firebase-config.js). Ohne Verbindung
+  speichert die App weiter und gleicht spaeter automatisch ab; die
+  Fusszeile zeigt den Zustand. "Sichern" schreibt eine JSON-Datei,
+  "Sicherung laden" spielt sie wieder ein.
 
-Danach liegt das Hextech-Symbol auf dem Startbildschirm und die App
-startet im Vollbild.
 
 ------------------------------------------------------------------
-Wo liegen die Runden
+AKTUALISIEREN
 ------------------------------------------------------------------
-Im Speicher des jeweiligen Geraets. Jeder von euch hat sein eigenes
-Logbuch; die Daten wandern nicht automatisch zwischen euren Handys.
-"Alle Daten loeschen" ganz unten auf der Seite setzt alles zurueck.
+Neue index.html hochladen - fertig. Der Service Worker holt die Seite
+seit Fassung v5 zuerst aus dem Netz und meldet in der App, wenn eine
+neue Fassung bereitsteht ("Neue Fassung verfuegbar - neu laden").
+Ein Hochzaehlen von Hand ist nur noch noetig, wenn sich sw.js selbst
+aendert; dann die Zeile
+
+  const VERSION = 'arena-logbuch-v5';
+
+erhoehen.
+
 
 ------------------------------------------------------------------
-Aktualisieren
+AUF DEM HANDY INSTALLIEREN
 ------------------------------------------------------------------
-Neue index.html hochladen und in sw.js die Zeile
-  const CACHE = 'arena-logbuch-v1';
-auf v2, v3 usw. aendern. Sonst zeigen die Handys weiter die alte
-Fassung aus ihrem Zwischenspeicher.
+iPhone (Safari): Adresse oeffnen -> Teilen -> "Zum Home-Bildschirm".
+Android (Chrome): Menue -> "App installieren".
+
+
+------------------------------------------------------------------
+ALTE RUNDEN
+------------------------------------------------------------------
+Runden aus der ersten Fassung (Sieg / 2. Platz / Niederlage) werden
+weiter gelesen: Sieg wird Platz 1, zweiter Platz wird Platz 2. Bei den
+alten Niederlagen ist der genaue Platz nicht bekannt - sie zaehlen als
+Wertung mit, bleiben aber aus der Ø-Platzierung heraus und stehen mit
+"?" im Verlauf. Ueber "Bearbeiten" lassen sie sich nachtragen.
 
 Champion-Daten: Patch 16.17, alle 173 Champions mit Portrait.
 Arena Logbuch wird nicht von Riot Games unterstuetzt und gibt nicht
