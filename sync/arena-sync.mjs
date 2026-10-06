@@ -143,7 +143,14 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
         await new Promise(r => setTimeout(r, env.ARENA_TEST ? 0 : wait * 1000));
         continue;
       }
-      if (res.status === 401 || res.status === 403) throw new StopError('Riot-Schlüssel abgelaufen oder ungültig');
+      if (res.status === 401 || res.status === 403) {
+        // Form des Schlüssels prüfen, ohne ihn preiszugeben
+        const form = /^RGAPI-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(key);
+        log('Riot lehnt ab (' + res.status + '). Schlüssel: ' + key.length + ' Zeichen, beginnt mit RGAPI-: ' + (key.startsWith('RGAPI-') ? 'ja' : 'nein') + ', Form stimmt: ' + (form ? 'ja' : 'nein'));
+        throw new StopError(form
+          ? 'Riot-Schlüssel abgelaufen oder ungültig (Riot meldet ' + res.status + ', Form des Schlüssels stimmt)'
+          : 'Riot-Schlüssel hat nicht die erwartete Form RGAPI-… (' + key.length + ' Zeichen statt 42)');
+      }
       if (res.status === 404) return null;
       if (res.status !== 200) throw new Error('Riot antwortet mit ' + res.status + ' bei ' + p.split('?')[0]);
       return await res.json();
