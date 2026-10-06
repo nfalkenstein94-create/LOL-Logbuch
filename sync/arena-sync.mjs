@@ -146,6 +146,11 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
       if (res.status === 401 || res.status === 403) {
         // Form des Schlüssels prüfen, ohne ihn preiszugeben
         const form = /^RGAPI-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(key);
+        // Riots eigene Begründung und eine Kennung des Schlüssels (Prüfsumme, lässt keinen Rückschluss zu),
+        // damit sich erkennen lässt, ob ein neu eingetragener Schlüssel auch angekommen ist
+        let grund = ''; try { grund = (await res.text()).replace(/\s+/g, ' ').slice(0, 140); } catch (e) {}
+        let kenn = ''; try { const { createHash } = await import('node:crypto'); kenn = createHash('sha256').update(key).digest('hex').slice(0, 6); } catch (e) {}
+        log('::notice::Riot-Antwort ' + res.status + ': ' + grund + ' | Schlüssel-Kennung ' + kenn);
         log('Riot lehnt ab (' + res.status + '). Schlüssel: ' + key.length + ' Zeichen, beginnt mit RGAPI-: ' + (key.startsWith('RGAPI-') ? 'ja' : 'nein') + ', Form stimmt: ' + (form ? 'ja' : 'nein'));
         throw new StopError(form
           ? 'Riot-Schlüssel abgelaufen oder ungültig (Riot meldet ' + res.status + ', Form des Schlüssels stimmt)'
