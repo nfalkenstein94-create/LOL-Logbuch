@@ -1,0 +1,9 @@
+{
+  "region": "europe",
+  "standardTeam": "Die Boyz",
+  "spieler": [
+    { "name": "Norbert", "riotId": "Rivetime#EUW" },
+    { "name": "David",   "riotId": "idave663#EUW" },
+    { "name": "Manuel",  "riotId": "manu663#1337" }
+  ]
+}

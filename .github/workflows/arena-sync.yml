@@ -1,0 +1,28 @@
+name: Arena-Abgleich
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: arena-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  abgleich:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Neue Arena-Runden eintragen
+        run: node sync/arena-sync.mjs
+        env:
+          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
+          ARENA_STRICT: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}

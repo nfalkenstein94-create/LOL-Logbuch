@@ -299,6 +299,13 @@ tr.click:hover td{background:rgba(200,170,110,.07)}
 .hactions{display:flex;gap:6px;flex:none;margin-left:auto}
 .pill{font-family:var(--fc);text-transform:uppercase;letter-spacing:.12em;font-size:11.5px;font-weight:700;padding:3px 9px;flex:none}
 .pill.broken{background:rgba(110,131,153,.25);color:var(--ink-2);border:1px dashed var(--line)}
+.pill.auto{background:rgba(10,200,185,.14);color:var(--teal);border:1px solid rgba(10,200,185,.45)}
+.hpick .rn{font-size:11px;font-weight:500;color:var(--ink-3)}
+.asg-row{margin-top:14px}
+.asg-row>.eyebrow{display:block;margin-bottom:6px}
+.asg-row .pname{display:block;width:100%;flex:none}
+.asg-check{display:flex;gap:9px;align-items:flex-start;margin-top:14px;font-size:14px;line-height:1.4}
+.asg-check input{margin-top:3px;width:17px;height:17px;flex:none}
 
 /* ---------- Pool ---------- */
 .poolhead{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
@@ -437,7 +444,8 @@ const CHAMPS = [["Aatrox","Aatrox","data:image/webp;base64,UklGRnoDAABXRUJQVlA4I
    ============================================================ */
 const CH_BY_ID = new Map(CHAMPS.map(c => [c[0], c]));
 const champName = id => { const c = CH_BY_ID.get(id); return c ? c[1] : (id ? String(id) : 'Unbekannt'); };
-const champIcon = id => { const c = CH_BY_ID.get(id); return c ? c[2] : ''; };
+const NO_ICON = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#1E2A36"/><text x="32" y="43" font-family="sans-serif" font-size="30" fill="#7C8B9C" text-anchor="middle">?</text></svg>');
+const champIcon = id => { const c = CH_BY_ID.get(id); return c ? c[2] : (id ? NO_ICON : ''); };
 
 const PALETTE = ['#F0C97B', '#0AC8B9', '#9B8CFF', '#FF8A5B', '#5FB8FF', '#F2A2C0'];
 const RANDOM = { id: '__random', name: 'Random', color: '#7C8B9C', random: true };
@@ -480,8 +488,13 @@ function dayLabel(ts) {
 
 /* ---------- Runden-Modell ---------- */
 const validPicks = arr => (Array.isArray(arr) ? arr : [])
-  .filter(pk => pk && pk.c && CH_BY_ID.has(pk.c))
-  .map(pk => ({ p: pk.p || null, c: pk.c, m: pk.m === 'bravery' ? 'bravery' : 'regular', g: !!pk.g }));
+  .filter(pk => pk && pk.c && (CH_BY_ID.has(pk.c) || /^[A-Za-z]{2,24}$/.test(pk.c)))
+  .map(pk => {
+    const o = { p: pk.p || null, c: pk.c, m: pk.m === 'bravery' ? 'bravery' : 'regular', g: !!pk.g };
+    if (pk.rn) o.rn = String(pk.rn);
+    if (pk.rp) o.rp = String(pk.rp);
+    return o;
+  });
 const validPlace = v => { const n = Number(v); return (n >= 1 && n <= 8) ? Math.round(n) : null; };
 
 function normMatch(m) {
@@ -501,6 +514,7 @@ function normMatch(m) {
   return { id: m.id, teamId: m.teamId, ts: m.ts || 0,
     mode: MODES[m.mode] ? m.mode : (size >= 3 ? '3v3' : '2v2'),
     note: typeof m.note === 'string' ? m.note : '',
+    auto: m.src === 'riot', rid: typeof m.rid === 'string' ? m.rid : '',
     groups: keep, pending: !!m._pending };
 }
 const groupOk = g => g.picks.length > 0 && (g.place !== null || g.u);
@@ -520,6 +534,7 @@ const S = {
   ready: false,             // Verbindungsversuch abgeschlossen
   fromCache: false, pending: 0,
   queue: [],
+  sync: null,               // Status der automatischen Eintragung
   ui: { tab: 'stats', range: 'all', fmode: 'all', player: 'all', poolQ: '', poolOnly: false, histQ: '' }
 };
 
@@ -572,6 +587,9 @@ async function connectCloud() {
       col: n => fsMod.collection(store, base + '/' + n),
       doc: n => fsMod.doc(store, base + '/' + n)
     };
+    try {
+      fsMod.onSnapshot(FB.doc('sync/status'), d => { S.sync = d.exists() ? d.data() : null; renderFooter(); }, () => {});
+    } catch (e) {}
     S.mode = 'cloud';
     let gotTeams = false, gotMatches = false;
     const watch = (name, apply) => fsMod.onSnapshot(FB.col(name), { includeMetadataChanges: true },
@@ -1089,9 +1107,9 @@ function editMatch(id) {
   const raw = S.matches.find(m => m.id === id); if (!raw) return;
   const n = normMatch(raw);
   const size = modeSize(n.mode);
-  draft = { mode: n.mode, editId: id, editTs: n.ts,
+  draft = { mode: n.mode, editId: id, editTs: n.ts, src: raw.src || null, rid: raw.rid || null,
     groups: n.groups.map(g => {
-      const slots = g.picks.map(pk => ({ pid: pk.p, champ: pk.c, mode: pk.m, gay: pk.g }));
+      const slots = g.picks.map(pk => ({ pid: pk.p, champ: pk.c, mode: pk.m, gay: pk.g, rn: pk.rn || null, rp: pk.rp || null }));
       while (slots.length < size) slots.push(newSlot(null));
       return { place: g.place, slots: slots };
     }) };
@@ -1189,7 +1207,13 @@ async function saveDraft() {
     if (t.unsaved) { teamId = await putTeam({ id: null, name: t.name, players: t.players }); S.curTeamId = teamId; }
     const rec = { teamId: teamId, ts: draft.editId ? (draft.editTs || Date.now()) : Date.now(), mode: draft.mode,
       groups: draft.groups.map(g => ({ place: g.place, u: false,
-        picks: g.slots.map(s => ({ p: s.pid, c: s.champ, m: s.mode, g: !!s.gay })) })) };
+        picks: g.slots.map(s => {
+          const o = { p: s.pid, c: s.champ, m: s.mode, g: !!s.gay };
+          if (s.rn) o.rn = s.rn;
+          if (s.rp) o.rp = s.rp;
+          return o;
+        }) })) };
+    if (draft.editId && draft.src) { rec.src = draft.src; if (draft.rid) rec.rid = draft.rid; }
     const wasEdit = draft.editId;
     if (wasEdit) {
       await updMatch(wasEdit, rec);
@@ -1541,7 +1565,9 @@ function histRow(t, n) {
   const actions = confirmDel === n.id
     ? '<span class="hactions"><button class="btn danger sm" onclick="doDel(\'' + esc(n.id) + '\')">Wirklich löschen</button>' +
       '<button class="btn ghost sm" onclick="confirmDel=null;render()">Abbrechen</button></span>'
-    : '<span class="hactions"><button class="btn ghost sm" onclick="editMatch(\'' + esc(n.id) + '\')">Bearbeiten</button>' +
+    : '<span class="hactions">' + (n.groups.some(g => g.picks.some(pk => pk.p === RANDOM.id && pk.rn))
+        ? '<button class="btn ghost sm" onclick="openAssign(\'' + esc(n.id) + '\')">Random zuordnen</button>' : '') +
+      '<button class="btn ghost sm" onclick="editMatch(\'' + esc(n.id) + '\')">Bearbeiten</button>' +
       '<button class="btn ghost sm" onclick="confirmDel=\'' + esc(n.id) + '\';render()">Löschen</button></span>';
   const body = n.groups.length
     ? n.groups.map(g => '<div class="hgroup"><span class="medal' + (isTop4(g.place) ? ' top' : '') + '" style="--pc:' + placeColor(g.place) + '" title="' + placeTxt(g.place) + '">' + (g.place || '?') + '</span>' +
@@ -1551,12 +1577,14 @@ function histRow(t, n) {
           return '<button class="hpick" onclick="openChampion(\'' + esc(pk.c) + '\')" title="' + esc(champName(pk.c)) + ' ansehen">' +
             '<span class="ic">' + (ic ? '<img src="' + ic + '" alt="">' : '<span class="cbx-ph" style="width:32px;height:32px">?</span>') +
             (pk.m === 'bravery' ? '<span class="bravtag">B</span>' : '') + (pk.g ? '<span class="gaytag">G</span>' : '') + '</span>' +
-            '<span class="txt"><span class="who" style="color:' + (p ? p.color : 'var(--ink-2)') + '">' + esc(p ? p.name : '?') + '</span><br>' +
+            '<span class="txt"><span class="who" style="color:' + (p ? p.color : 'var(--ink-2)') + '">' + esc(p ? p.name : '?') + '</span>' +
+            (pk.p === RANDOM.id && pk.rn ? ' <span class="rn">' + esc(String(pk.rn).split('#')[0]) + '</span>' : '') + '<br>' +
             '<span class="ch">' + esc(pk.c ? champName(pk.c) : 'kein Champion') + '</span></span></button>';
         }).join('') + '</div></div>').join('')
     : '<div class="hpicks"><span class="muted tiny">Keine Champions gespeichert</span></div>';
   return '<div class="hrow' + (ok ? '' : ' bad') + (hlRound === n.id ? ' hl' : '') + '">' +
     '<div class="hmeta"><span class="modebadge">' + esc(n.mode) + '</span>' +
+      (n.auto ? '<span class="pill auto" title="Automatisch aus dem Spiel übernommen. Pick-Art und Gay-Counter trägst du über „Bearbeiten“ nach.">Auto</span>' : '') +
       (ok ? '' : '<span class="pill broken">Unvollständig</span>') +
       (n.pending ? '<span class="pill broken">wartet</span>' : '') +
       '<span class="hdate">' + esc(fmtTime(n.ts)) + '</span></div>' +
@@ -1705,6 +1733,94 @@ function openChampion(id) {
   );
 }
 
+/* ---------- Fremden Mitspieler zuordnen ---------- */
+let asg = null;
+function openAssign(id) {
+  const raw = S.matches.find(m => m.id === id); if (!raw) return;
+  const n = normMatch(raw);
+  const list = [];
+  n.groups.forEach(g => g.picks.forEach(pk => { if (pk.p === RANDOM.id && pk.rn) list.push({ rn: pk.rn, rp: pk.rp || '', c: pk.c }); }));
+  if (!list.length) { toast('In dieser Runde gibt es keinen fremden Mitspieler mit Riot-Namen.'); return; }
+  asg = { id: id, list: list, i: 0, pid: '__new', name: String(list[0].rn).split('#')[0], always: true };
+  paintAssign();
+}
+function paintAssign() {
+  if (!asg) { closeModal(); return; }
+  const raw = S.matches.find(m => m.id === asg.id);
+  const t = raw ? S.teams.find(x => x.id === raw.teamId) : null;
+  if (!raw || !t) { asg = null; closeModal(); return; }
+  const cur = asg.list[asg.i];
+  const inRound = new Set();
+  (raw.groups || []).forEach(g => (g.picks || []).forEach(pk => { if (pk && pk.p && pk.p !== RANDOM.id) inRound.add(pk.p); }));
+  const free = t.players.filter(p => !inRound.has(p.id));
+  if (asg.pid !== '__new' && !free.some(p => p.id === asg.pid)) asg.pid = '__new';
+  const full = t.players.length >= 6;
+  if (full && asg.pid === '__new') asg.pid = free.length ? free[0].id : '__new';
+  showModal(
+    '<div class="sec-head"><h2>Random zuordnen</h2></div>' +
+    '<p class="tiny muted" style="margin:0">Aus „Random“ wird ein Spieler eures Teams. Das Ergebnis der Runde bleibt gleich.</p>' +
+    (asg.list.length > 1
+      ? '<div class="asg-row"><label class="eyebrow" for="asgWho">Fremder Mitspieler</label><select id="asgWho" class="pname" style="width:100%;padding:10px" onchange="asg.i=+this.value;asg.name=String(asg.list[asg.i].rn).split(\'#\')[0];paintAssign()">' +
+        asg.list.map((x, i) => '<option value="' + i + '"' + (i === asg.i ? ' selected' : '') + '>' + esc(x.rn) + ' (' + esc(champName(x.c)) + ')</option>').join('') + '</select></div>'
+      : '<div class="asg-row"><span class="eyebrow">Fremder Mitspieler</span><span><b>' + esc(cur.rn) + '</b> mit ' + esc(champName(cur.c)) + '</span></div>') +
+    '<div class="asg-row"><label class="eyebrow" for="asgPid">Das war</label><select id="asgPid" class="pname" style="width:100%;padding:10px" onchange="asg.pid=this.value;paintAssign()">' +
+      free.map(p => '<option value="' + esc(p.id) + '"' + (p.id === asg.pid ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') +
+      (full ? '' : '<option value="__new"' + (asg.pid === '__new' ? ' selected' : '') + '>Neuer Spieler …</option>') + '</select></div>' +
+    (asg.pid === '__new' && !full
+      ? '<div class="asg-row"><label class="eyebrow" for="asgName">Name im Logbuch</label><input id="asgName" class="pname" style="width:100%;padding:10px" value="' + esc(asg.name) + '" oninput="asg.name=this.value"></div>' : '') +
+    (full && !free.length ? '<p class="tiny" style="color:var(--loss);margin:12px 0 0">Das Team hat schon sechs Spieler, und alle stehen in dieser Runde.</p>' : '') +
+    ('<label class="asg-check"><input type="checkbox"' + (asg.always ? ' checked' : '') + ' onchange="asg.always=this.checked"><span>Immer so erkennen: frühere Runden mit diesem Mitspieler umstellen und künftige automatisch richtig eintragen</span></label>') +
+    '<div class="rowend"><button class="btn ghost" onclick="asg=null;closeModal()">Abbrechen</button>' +
+      '<button class="btn primary" onclick="saveAssign()"' + (full && !free.length ? ' disabled' : '') + '>Zuordnen</button></div>');
+}
+async function saveAssign() {
+  if (!asg) return;
+  const a = asg, cur = a.list[a.i];
+  const raw = S.matches.find(m => m.id === a.id);
+  const t = raw ? S.teams.find(x => x.id === raw.teamId) : null;
+  if (!raw || !t) { asg = null; closeModal(); return; }
+  let pid = a.pid, label;
+  try {
+    if (pid === '__new') {
+      const name = (a.name || '').trim();
+      if (!name) { toast('Bitte einen Namen eintragen.', 'bad'); return; }
+      const same = t.players.find(p => (p.name || '').trim().toLowerCase() === name.toLowerCase());
+      if (same) pid = same.id;
+      else {
+        if (t.players.length >= 6) { toast('Das Team hat schon sechs Spieler.', 'bad'); return; }
+        pid = uid();
+        const players = t.players.concat([{ id: pid, name: name, color: PALETTE[t.players.length % PALETTE.length] }]);
+        await putTeam({ id: t.id, name: t.name, players: players });
+        if (!FB) { const loc = S.teams.find(x => x.id === t.id); if (loc) loc.players = players; }
+      }
+      label = name;
+    } else {
+      const pl = t.players.find(p => p.id === pid); if (!pl) return;
+      label = pl.name;
+    }
+    asg = null; closeModal();
+    const key = String(cur.rn).trim().toLowerCase();
+    const isHim = pk => pk && pk.p === RANDOM.id && pk.rn && String(pk.rn).trim().toLowerCase() === key;
+    const targets = a.always ? S.matches.filter(m => m.teamId === raw.teamId) : [raw];
+    let changed = 0;
+    for (const m of targets) {
+      if (!Array.isArray(m.groups) || !m.groups.some(g => (g.picks || []).some(isHim))) continue;
+      if (m.id !== raw.id && m.groups.some(g => (g.picks || []).some(pk => pk && pk.p === pid))) continue;   // steht dort schon selbst
+      const body = JSON.parse(JSON.stringify(m)); delete body.id; delete body._pending;
+      body.groups.forEach(g => (g.picks || []).forEach(pk => { if (isHim(pk)) pk.p = pid; }));
+      await storeSet('matches', m.id, body);
+      changed++;
+    }
+    let remembered = false;
+    if (a.always && FB) {
+      try { await FB.setDoc(FB.doc('sync/config'), { aliases: { [key]: label } }, { merge: true }); remembered = true; } catch (e) {}
+    }
+    saveMirror(); render();
+    toast(esc(label) + ' zugeordnet' + (changed > 1 ? ' in ' + changed + ' Runden' : '') + (remembered ? ' und für künftige Runden gemerkt.' : '.') +
+      (a.always && !remembered ? ' Das Merken klappt erst mit Verbindung zum gemeinsamen Logbuch.' : ''));
+  } catch (e) { toast('Zuordnen fehlgeschlagen.', 'bad'); }
+}
+
 /* ---------- Team-Dialog ---------- */
 let dlg = null;
 function openTeamDialog(id) {
@@ -1763,7 +1879,14 @@ function renderFooter() {
   const sync = S.queue.length ? '<span style="color:var(--loss)"><span class="dot" style="background:var(--loss)"></span>' + S.queue.length + ' wartet auf Übertragung</span>'
     : S.mode === 'cloud' ? '<span style="color:var(--teal)"><span class="dot" style="background:var(--teal)"></span>' + (S.fromCache ? 'offline – Stand aus dem Zwischenspeicher' : 'live mit deinem Team verbunden') + '</span>'
     : '<span><span class="dot" style="background:var(--ink-3)"></span>nur auf diesem Gerät</span>';
-  el.innerHTML = '<span>' + tn + (tn === 1 ? ' Team' : ' Teams') + ' · ' + n + (n === 1 ? ' Runde' : ' Runden') + ' · ' + sync + '</span>' +
+  let auto = '';
+  if (S.sync && S.sync.last) {
+    const age = Date.now() - S.sync.last, stale = age > 3 * 3600e3;
+    auto = S.sync.ok === false
+      ? ' · <span style="color:var(--loss)" title="' + esc(S.sync.msg || '') + '">Automatik steht: ' + esc(S.sync.msg || 'Fehler') + '</span>'
+      : ' · <span' + (stale ? ' style="color:var(--loss)"' : '') + ' title="Letzter Abgleich mit Riot">Automatik: zuletzt ' + esc(age < 864e5 && new Date(S.sync.last).toDateString() === new Date().toDateString() ? fmtTime(S.sync.last) : fmtDT(S.sync.last)) + '</span>';
+  }
+  el.innerHTML = '<span>' + tn + (tn === 1 ? ' Team' : ' Teams') + ' · ' + n + (n === 1 ? ' Runde' : ' Runden') + ' · ' + sync + auto + '</span>' +
     (resetArmed
       ? '<span style="display:flex;gap:9px;align-items:center;flex-wrap:wrap"><span>Alle Teams und Runden werden gelöscht.</span>' +
         '<button class="btn danger sm" onclick="resetAll()">Ja, alles löschen</button>' +
@@ -1819,8 +1942,10 @@ async function doImport(input) {
       const n = normMatch(im);
       if (!n || !n.groups.length) continue;
       const map = playerMap[tid] || {};
-      await addMatch({ teamId: tid, ts: im.ts, mode: n.mode,
-        groups: n.groups.map(g => ({ place: g.place, u: !!g.u, picks: g.picks.map(pk => ({ p: map[pk.p] || pk.p, c: pk.c, m: pk.m, g: pk.g })) })) });
+      const recIn = { teamId: tid, ts: im.ts, mode: n.mode,
+        groups: n.groups.map(g => ({ place: g.place, u: !!g.u, picks: g.picks.map(pk => Object.assign({}, pk, { p: map[pk.p] || pk.p })) })) };
+      if (im.src === 'riot') { recIn.src = 'riot'; if (typeof im.rid === 'string') recIn.rid = im.rid; }
+      await addMatch(recIn);
       newRounds++;
     }
     render();

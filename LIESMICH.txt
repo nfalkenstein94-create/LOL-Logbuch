@@ -40,6 +40,33 @@ Ablage
 
 
 ------------------------------------------------------------------
+AUTOMATISCHE EINTRAGUNG
+------------------------------------------------------------------
+Alle zehn Minuten fragt ein Skript (sync/arena-sync.mjs, gestartet von
+GitHub Actions) bei Riot nach neuen Arena-Runden des Kaders und traegt
+sie ins gemeinsame Logbuch ein. Solche Runden tragen im Verlauf das
+Kennzeichen "Auto".
+
+  Wer zum Kader gehoert, steht in sync/spieler.json (Name im Logbuch
+  und Riot-ID mit #Tag).
+  Der Riot-Schluessel liegt als Secret RIOT_API_KEY im Repository
+  (Settings -> Secrets and variables -> Actions). Er steht in keiner
+  Datei.
+  Fremde Mitspieler werden als "Random" eingetragen, ihr Riot-Name
+  steht daneben. Ueber "Random zuordnen" wird daraus ein Spieler des
+  Teams; mit "Immer so erkennen" gilt das auch fuer fruehere und
+  kuenftige Runden.
+  Pick-Art (Regular/Bravery) und Gay-Counter kennt Riot nicht. Beides
+  wird ueber "Bearbeiten" nachgetragen.
+  Die Fusszeile der App zeigt den letzten Abgleich oder den Grund,
+  warum die Automatik steht (zum Beispiel ein abgelaufener Schluessel).
+  Von Hand starten: Reiter Actions -> Arena-Abgleich -> Run workflow.
+
+Der erste Lauf richtet nur ein. Eingetragen werden Runden, die danach
+gespielt werden; aeltere Runden bleiben unberuehrt.
+
+
+------------------------------------------------------------------
 AKTUALISIEREN
 ------------------------------------------------------------------
 Neue index.html hochladen - fertig. Der Service Worker holt die Seite
