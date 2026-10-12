@@ -320,6 +320,8 @@ tr.click:hover td{background:rgba(200,170,110,.07)}
 .rd-head .kd{font-family:var(--fd);font-size:15px;color:var(--gold-hi)}
 .rd-lbl{font-family:var(--fc);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);width:78px;flex:none}
 .augcell{display:inline-flex;align-items:center;gap:8px}
+.mrow.kdarow{grid-template-columns:88px minmax(0,1fr) 310px}
+@media(max-width:600px){.mrow.kdarow{grid-template-columns:78px minmax(0,1fr)}}
 @media(max-width:560px){.rd-lbl{width:100%}.ibox{width:28px;height:28px}}
 .asg-row{margin-top:14px}
 .asg-row>.eyebrow{display:block;margin-bottom:6px}
@@ -1448,6 +1450,24 @@ function modeRow(label, cls, color, rec) {
     '<span class="mbar"><i style="width:' + (rec.g ? p : 0) + '%;background:' + color + '"></i></span>' +
     '<span class="mv">' + (rec.g ? 'Ø ' + avgTxt(rec) + ' · ' + p + ' % Top 4 · ' + rec.g + '×' : 'keine Picks') + '</span></div>';
 }
+/* KDA je Spieler: alle Runden mit Riot-Daten zusammengefasst */
+function kdaBlock(a) {
+  const rows = a.roster.filter(p => !p.random).map(p => ({ p: p, kd: a.byPlayer.get(p.id).kd })).filter(x => x.kd.n);
+  if (!rows.length) return '';
+  rows.forEach(x => { x.r = kdaRatio(x.kd.k, x.kd.d, x.kd.a); });
+  rows.sort((x, y) => y.r - x.r);
+  const max = Math.max.apply(null, rows.map(x => x.r));
+  const tot = rows.reduce((o, x) => { o.k += x.kd.k; o.d += x.kd.d; o.a += x.kd.a; o.n += x.kd.n; o.dmg += x.kd.dmg; return o; }, { k: 0, d: 0, a: 0, n: 0, dmg: 0 });
+  return '<div class="eyebrow-row"><span class="eyebrow">KDA je Spieler</span><span class="tiny muted">(Kills + Assists) ÷ Tode · alle Runden mit Riot-Daten</span></div>' +
+    '<div class="modes">' + rows.map(x =>
+      '<div class="mrow kdarow" title="' + esc(x.p.name) + ': gesamt ' + x.kd.k + ' / ' + x.kd.d + ' / ' + x.kd.a + ' aus ' + plural(x.kd.n, 'Runde', 'Runden') + '">' +
+        '<span class="ml">' + esc(x.p.name) + '</span>' +
+        '<span class="mbar"><i style="width:' + Math.round(x.r / max * 100) + '%;background:' + x.p.color + '"></i></span>' +
+        '<span class="mv"><b class="gold">' + dec1(x.r) + '</b> · Ø ' + dec1(x.kd.k / x.kd.n) + ' / ' + dec1(x.kd.d / x.kd.n) + ' / ' + dec1(x.kd.a / x.kd.n) +
+          ' · ' + thous(x.kd.dmg / x.kd.n) + ' Schaden · ' + x.kd.n + '×</span></div>').join('') + '</div>' +
+    '<p class="tiny muted" style="margin:8px 0 0">Gesamt <b class="gold">' + dec1(kdaRatio(tot.k, tot.d, tot.a)) + '</b> · ' + tot.k + ' Kills, ' + tot.d + ' Tode, ' + tot.a + ' Assists aus ' +
+      plural(tot.n, 'Pick', 'Picks') + '. Von Hand eingetragene Runden haben keine KDA und zählen hier nicht mit.</p>';
+}
 function bilanzHtml() {
   const a = agg();
   const st = a.streaks;
@@ -1480,6 +1500,7 @@ function bilanzHtml() {
       '<span class="tiny muted">längste Top-4-Serie ' + st.bestTop + ' · längste Durststrecke ' + st.bestLow + '</span></div>' +
       '<div class="formdots">' + form.map(e => '<span class="fdot" style="--fc2:' + placeColor(e.place) + '" title="' + placeTxt(e.place) + ' · ' + esc(fmtDT(e.ts)) + '">' + (e.place || '?') + '</span>').join('') + '</div>' +
       '<p class="tiny muted" style="margin:7px 0 0">links die ältere, rechts die neueste Wertung</p>' : '') +
+    kdaBlock(a) +
     '<div class="eyebrow-row"><span class="eyebrow">Nach Pick-Art</span></div>' +
     '<div class="modes">' +
       modeRow('Regular', '', 'var(--gold)', a.mode.regular) +
