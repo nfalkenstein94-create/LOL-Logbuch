@@ -301,6 +301,26 @@ tr.click:hover td{background:rgba(200,170,110,.07)}
 .pill.broken{background:rgba(110,131,153,.25);color:var(--ink-2);border:1px dashed var(--line)}
 .pill.auto{background:rgba(10,200,185,.14);color:var(--teal);border:1px solid rgba(10,200,185,.45)}
 .hpick .rn{font-size:11px;font-weight:500;color:var(--ink-3)}
+.hpick .kda{font-size:11px;color:var(--ink-2);font-variant-numeric:tabular-nums;margin-left:5px}
+/* ---------- Runden-Details: Items, Augments, KDA ---------- */
+.ibox{--ic:var(--line);position:relative;width:30px;height:30px;flex:none;border:1px solid var(--ic);background:#0b1622;display:inline-block}
+.ibox img{width:100%;height:100%;display:block}
+.ibox.pr{--ic:#C59BFF;box-shadow:0 0 0 1px rgba(197,155,255,.35),0 0 8px rgba(197,155,255,.35)}
+.ibox.r0{--ic:#C4D5E4}.ibox.r1{--ic:#E0C288}.ibox.r2{--ic:#C59BFF;box-shadow:0 0 8px rgba(197,155,255,.35)}
+.ibox .ph{display:grid;place-items:center;height:100%;font-size:10px;color:var(--ink-3)}
+.irow{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.rd-group{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.rd-group:first-of-type{border-top:0}
+.rd-picks{flex:1;min-width:0;display:grid;gap:12px}
+.rd-pick{display:grid;grid-template-columns:40px minmax(0,1fr);gap:4px 10px;align-items:center}
+.rd-pick>img{width:40px;height:40px;border:1px solid var(--gold-line);grid-row:1/4}
+.rd-head{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;font-size:13px}
+.rd-head .who{font-weight:600}
+.rd-head .num{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.rd-head .kd{font-family:var(--fd);font-size:15px;color:var(--gold-hi)}
+.rd-lbl{font-family:var(--fc);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);width:78px;flex:none}
+.augcell{display:inline-flex;align-items:center;gap:8px}
+@media(max-width:560px){.rd-lbl{width:100%}.ibox{width:28px;height:28px}}
 .asg-row{margin-top:14px}
 .asg-row>.eyebrow{display:block;margin-bottom:6px}
 .asg-row .pname{display:block;width:100%;flex:none}
@@ -486,6 +506,25 @@ function dayLabel(ts) {
   return d.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long' });
 }
 
+/* ---------- Items, Augments, KDA ---------- */
+const RARITY = [{ n: 'Silber', c: '#C4D5E4' }, { n: 'Gold', c: '#E0C288' }, { n: 'Prisma', c: '#C59BFF' }];
+const TRINKETS = new Set([2052, 3340, 3348, 3363, 3364]);
+const isPrism = id => id >= 440000 && id < 450000;
+const itemInfo = id => (S.lex.it || {})['i' + id] || null;
+const augInfo = id => (S.lex.au || {})['a' + id] || null;
+const itemName = id => { const x = itemInfo(id); return x ? x.n : 'Item ' + id; };
+const augName = id => { const x = augInfo(id); return x ? x.n : 'Augment ' + id; };
+const augRar = id => { const x = augInfo(id); return x ? (x.r || 0) : 0; };
+const kdaRatio = (k, d, a) => (k + a) / Math.max(1, d);
+const kdaTxt = d => d.k + '/' + d.d + '/' + d.a;
+const thous = v => Math.round(v).toLocaleString('de-DE');
+function ibox(url, title, cls) {
+  return '<span class="ibox ' + (cls || '') + '" title="' + esc(title) + '">' +
+    (url ? '<img src="' + esc(url) + '" alt="' + esc(title) + '" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'ph\',textContent:\'?\'}))">' : '<span class="ph">?</span>') + '</span>';
+}
+const itemBox = id => { const x = itemInfo(id); return ibox(x && x.ic, itemName(id) + (isPrism(id) ? ' (Prisma)' : ''), isPrism(id) ? 'pr' : ''); };
+const augBox = id => { const x = augInfo(id); return ibox(x && x.ic, augName(id) + ' · ' + RARITY[augRar(id)].n, 'r' + augRar(id)); };
+
 /* ---------- Runden-Modell ---------- */
 const validPicks = arr => (Array.isArray(arr) ? arr : [])
   .filter(pk => pk && pk.c && (CH_BY_ID.has(pk.c) || /^[A-Za-z]{2,24}$/.test(pk.c)))
@@ -515,6 +554,7 @@ function normMatch(m) {
     mode: MODES[m.mode] ? m.mode : (size >= 3 ? '3v3' : '2v2'),
     note: typeof m.note === 'string' ? m.note : '',
     auto: m.src === 'riot', rid: typeof m.rid === 'string' ? m.rid : '',
+    det: (m.det && typeof m.det === 'object') ? m.det : null,
     groups: keep, pending: !!m._pending };
 }
 const groupOk = g => g.picks.length > 0 && (g.place !== null || g.u);
@@ -527,6 +567,7 @@ const matchOk = n => !!n && n.groups.length > 0 && n.groups.every(groupOk);
 const LS_MIRROR = 'arenaLog.v1';
 const LS_QUEUE = 'arenaLog.queue.v1';
 const LS_UI = 'arenaLog.ui.v1';
+const LS_LEX = 'arenaLog.lex.v1';
 
 const S = {
   teams: [], matches: [], curTeamId: null,
@@ -535,6 +576,7 @@ const S = {
   fromCache: false, pending: 0,
   queue: [],
   sync: null,               // Status der automatischen Eintragung
+  lex: { it: {}, au: {} },  // Namen und Bilder für Items/Augments (vom Abgleich gepflegt)
   ui: { tab: 'stats', range: 'all', fmode: 'all', player: 'all', poolQ: '', poolOnly: false, histQ: '' }
 };
 
@@ -547,6 +589,8 @@ function loadMirror() {
   S.queue = lsGet(LS_QUEUE, []) || [];
   const ui = lsGet(LS_UI, null);
   if (ui) Object.assign(S.ui, ui);
+  const lex = lsGet(LS_LEX, null);
+  if (lex && lex.it) S.lex = lex;
 }
 function saveMirror() { lsSet(LS_MIRROR, { teams: S.teams, matches: S.matches, curTeamId: S.curTeamId }); }
 function saveQueue() { lsSet(LS_QUEUE, S.queue); }
@@ -589,6 +633,10 @@ async function connectCloud() {
     };
     try {
       fsMod.onSnapshot(FB.doc('sync/status'), d => { S.sync = d.exists() ? d.data() : null; renderFooter(); }, () => {});
+      fsMod.onSnapshot(FB.doc('sync/lexikon'), d => {
+        if (!d.exists()) return;
+        const v = d.data(); S.lex = { it: v.it || {}, au: v.au || {} }; lsSet(LS_LEX, S.lex); render();
+      }, () => {});
     } catch (e) {}
     S.mode = 'cloud';
     let gotTeams = false, gotMatches = false;
@@ -746,14 +794,16 @@ function calcStreaks(chrono) {
 let _aggKey = '', _agg = null;
 function agg() {
   const key = [S.curTeamId, S.matches.length, S.ui.range, S.ui.fmode, S.ui.player,
-    S.matches.reduce((a, m) => a + (m.ts || 0) + (m.groups ? m.groups.length : 0), 0)].join('|');
+    S.matches.reduce((a, m) => a + (m.ts || 0) + (m.groups ? m.groups.length : 0) + (m.det ? 0.5 : 0), 0)].join('|');
   if (_agg && _aggKey === key) return _agg;
   const t = currentTeam();
   const list = filteredNorm();
   const valid = list.filter(matchOk);
   const broken = list.filter(n => !matchOk(n));
   const roster = rosterOf(t);
-  const byPlayer = new Map(roster.map(p => [p.id, Object.assign(blank(), { p: p, sqsum: 0, brav: 0, gay: 0, champs: new Map(), mates: new Map() })]));
+  const byPlayer = new Map(roster.map(p => [p.id, Object.assign(blank(), { p: p, sqsum: 0, brav: 0, gay: 0, champs: new Map(), mates: new Map(),
+    kd: { k: 0, d: 0, a: 0, dmg: 0, n: 0 }, augs: new Map(), items: new Map() })]));
+  const byAug = new Map();
   const byChamp = new Map();
   const mode = { regular: blank(), bravery: blank(), gay: blank() };
   const fmt = { '2v2': blank(), '3v3': blank() };
@@ -779,6 +829,15 @@ function agg() {
 
       g.picks.forEach(pk => {
         const rec = byPlayer.get(pk.p);
+        const dt = n.det && n.det[pk.c];
+        if (dt) {
+          (dt.au || []).forEach(id => { if (!byAug.has(id)) byAug.set(id, Object.assign(blank(), { by: new Map() })); const x = byAug.get(id); bump(x, g.place); x.by.set(pk.p, (x.by.get(pk.p) || 0) + 1); });
+          if (rec) {
+            rec.kd.k += dt.k || 0; rec.kd.d += dt.d || 0; rec.kd.a += dt.a || 0; rec.kd.dmg += dt.dmg || 0; rec.kd.n++;
+            (dt.au || []).forEach(id => { if (!rec.augs.has(id)) rec.augs.set(id, blank()); bump(rec.augs.get(id), g.place); });
+            (dt.it || []).forEach(id => { if (!TRINKETS.has(id)) rec.items.set(id, (rec.items.get(id) || 0) + 1); });
+          }
+        }
         if (rec) {
           bump(rec, g.place); if (g.place) rec.sqsum += g.place * g.place;
           if (pk.m === 'bravery') rec.brav++;
@@ -823,7 +882,7 @@ function agg() {
   const shown = roster.filter(p => !p.random || byPlayer.get(p.id).g > 0);
   _aggKey = key;
   _agg = { list: list, valid: valid, broken: broken, entries: entries, chrono: chrono,
-    roster: shown, allRoster: roster, byPlayer: byPlayer, byChamp: byChamp, mode: mode, fmt: fmt,
+    roster: shown, allRoster: roster, byPlayer: byPlayer, byChamp: byChamp, byAug: byAug, mode: mode, fmt: fmt,
     combos: combos, squad: squad, dist: dist, unknown: unknown, total: total, days: days,
     streaks: calcStreaks(chrono), n: valid.length, e: entries.length };
   return _agg;
@@ -1107,7 +1166,7 @@ function editMatch(id) {
   const raw = S.matches.find(m => m.id === id); if (!raw) return;
   const n = normMatch(raw);
   const size = modeSize(n.mode);
-  draft = { mode: n.mode, editId: id, editTs: n.ts, src: raw.src || null, rid: raw.rid || null,
+  draft = { mode: n.mode, editId: id, editTs: n.ts, src: raw.src || null, rid: raw.rid || null, det: raw.det || null,
     groups: n.groups.map(g => {
       const slots = g.picks.map(pk => ({ pid: pk.p, champ: pk.c, mode: pk.m, gay: pk.g, rn: pk.rn || null, rp: pk.rp || null }));
       while (slots.length < size) slots.push(newSlot(null));
@@ -1214,6 +1273,7 @@ async function saveDraft() {
           return o;
         }) })) };
     if (draft.editId && draft.src) { rec.src = draft.src; if (draft.rid) rec.rid = draft.rid; }
+    if (draft.editId && draft.det) rec.det = draft.det;
     const wasEdit = draft.editId;
     if (wasEdit) {
       await updMatch(wasEdit, rec);
@@ -1372,7 +1432,7 @@ function renderMain() {
   const tab = S.ui.tab;
   let h = (tab === 'stats' || tab === 'analysis' || tab === 'history') ? filterBar() : '';
   if (tab === 'stats') h += panel(bilanzHtml()) + panel(spielerHtml());
-  else if (tab === 'analysis') h += panel(analyseHtml()) + panel(championsHtml());
+  else if (tab === 'analysis') h += panel(analyseHtml()) + panel(championsHtml()) + (agg().byAug.size ? panel(augmentsHtml()) : '');
   else if (tab === 'history') h += panel(verlaufHtml());
   else if (tab === 'pool') h += panel(poolHtml());
   else h = '';
@@ -1434,7 +1494,7 @@ function spielerHtml() {
   const a = agg(); const t = currentTeam();
   if (!a.roster.length) return '<div class="sec-head"><h2>Spieler</h2></div><div class="empty">Noch keine Spieler im Kader.</div>';
   return '<div class="sec-head"><h2>Spieler</h2><span class="tiny muted">Zeile antippen für Details</span></div>' +
-    '<div class="scrollx"><table class="resp"><thead><tr><th>Spieler</th><th class="num">Wert.</th><th class="num">Ø Platz</th><th class="num">Siege</th><th class="num">Top 4</th><th class="num">Brav.</th><th class="num">Gay</th><th>Meistgespielt</th></tr></thead><tbody>' +
+    '<div class="scrollx"><table class="resp"><thead><tr><th>Spieler</th><th class="num">Wert.</th><th class="num">Ø Platz</th><th class="num">Siege</th><th class="num">Top 4</th><th class="num">Brav.</th><th class="num">Gay</th><th class="num">Ø KDA</th><th>Meistgespielt</th></tr></thead><tbody>' +
     a.roster.map(p => {
       const r = a.byPlayer.get(p.id);
       const best = [...r.champs.entries()].sort((x, y) => y[1] - x[1])[0];
@@ -1445,6 +1505,7 @@ function spielerHtml() {
         '<td class="num" data-l="Top 4">' + rateCell(pct(r.top, r.g), r.g) + '</td>' +
         '<td class="num tealc" data-l="Bravery">' + (r.brav || '–') + '</td>' +
         '<td class="num rosec" data-l="Gay">' + (r.gay || '–') + '</td>' +
+        '<td class="num" data-l="Ø KDA">' + (r.kd.n ? '<b class="gold" title="Ø ' + dec1(r.kd.k / r.kd.n) + ' / ' + dec1(r.kd.d / r.kd.n) + ' / ' + dec1(r.kd.a / r.kd.n) + ' aus ' + plural(r.kd.n, 'Runde', 'Runden') + ' mit Riot-Daten">' + dec1(kdaRatio(r.kd.k, r.kd.d, r.kd.a)) + '</b>' : '<span class="muted">–</span>') + '</td>' +
         '<td data-l="Meistgespielt">' + (best ? '<span class="chcell"><img src="' + champIcon(best[0]) + '" alt="">' + esc(champName(best[0])) + ' ×' + best[1] + '</span>' : '<span class="muted">–</span>') + '</td></tr>';
     }).join('') + '</tbody></table></div>';
 }
@@ -1525,6 +1586,27 @@ function championsHtml() {
     (rows.some(e => e[1].cnt < MIN) ? '<p class="tiny muted" style="margin:8px 0 0">Blass dargestellt: weniger als ' + MIN + ' Wertungen – dort sagt die Zahl noch nichts.</p>' : '');
 }
 
+function augmentsHtml() {
+  const a = agg(); const t = currentTeam();
+  const MIN = a.byAug.size >= 40 ? 3 : 2;
+  const rows = [...a.byAug.entries()].sort((x, y) => {
+    const rx = x[1].cnt >= MIN, ry = y[1].cnt >= MIN;
+    if (rx !== ry) return rx ? -1 : 1;
+    return (avgOf(x[1]) - avgOf(y[1])) || y[1].g - x[1].g;
+  });
+  return '<div class="sec-head"><h2>Augments</h2><span class="tiny muted">nach Ø-Platzierung · nur Runden mit Riot-Daten</span></div>' +
+    '<div class="scrollx"><table class="resp"><thead><tr><th>Augment</th><th class="num">Gewählt</th><th class="num">Ø Platz</th><th class="num">Siege</th><th class="num">Top 4</th><th>Von</th></tr></thead><tbody>' +
+    rows.map(([id, c]) => '<tr class="' + (c.cnt < MIN ? 'thin' : '') + '"><td><span class="augcell">' + augBox(id) + '<span>' + esc(augName(id)) +
+        ' <span class="tiny" style="color:' + RARITY[augRar(id)].c + '">' + RARITY[augRar(id)].n + '</span></span></span></td>' +
+      '<td class="num" data-l="Gewählt">' + c.g + '</td>' +
+      '<td class="num" data-l="Ø Platz"><b class="gold">' + avgTxt(c) + '</b></td>' +
+      '<td class="num" data-l="Siege">' + c.w + '</td>' +
+      '<td class="num" data-l="Top 4">' + rateCell(pct(c.top, c.g), c.g) + '</td>' +
+      '<td data-l="Von">' + [...c.by.entries()].sort((x, y) => y[1] - x[1]).map(([pid, k]) => { const p = playerById(t, pid); return '<span style="white-space:nowrap"><span class="pdot" style="background:' + (p ? p.color : 'var(--ink-3)') + '"></span>' + esc(p ? p.name : '?') + (k > 1 ? ' ×' + k : '') + '</span>'; }).join(' ') + '</td></tr>').join('') +
+    '</tbody></table></div>' +
+    (rows.some(e => e[1].cnt < MIN) ? '<p class="tiny muted" style="margin:8px 0 0">Blass: weniger als ' + MIN + '× gewählt.</p>' : '');
+}
+
 /* ---------- Verlauf ---------- */
 let confirmDel = null;
 let clearArmed = false;
@@ -1567,6 +1649,7 @@ function histRow(t, n) {
       '<button class="btn ghost sm" onclick="confirmDel=null;render()">Abbrechen</button></span>'
     : '<span class="hactions">' + (n.groups.some(g => g.picks.some(pk => pk.p === RANDOM.id && pk.rn))
         ? '<button class="btn ghost sm" onclick="openAssign(\'' + esc(n.id) + '\')">Random zuordnen</button>' : '') +
+      (n.det ? '<button class="btn ghost sm" onclick="openRound(\'' + esc(n.id) + '\')">Details</button>' : '') +
       '<button class="btn ghost sm" onclick="editMatch(\'' + esc(n.id) + '\')">Bearbeiten</button>' +
       '<button class="btn ghost sm" onclick="confirmDel=\'' + esc(n.id) + '\';render()">Löschen</button></span>';
   const body = n.groups.length
@@ -1579,7 +1662,8 @@ function histRow(t, n) {
             (pk.m === 'bravery' ? '<span class="bravtag">B</span>' : '') + (pk.g ? '<span class="gaytag">G</span>' : '') + '</span>' +
             '<span class="txt"><span class="who" style="color:' + (p ? p.color : 'var(--ink-2)') + '">' + esc(p ? p.name : '?') + '</span>' +
             (pk.p === RANDOM.id && pk.rn ? ' <span class="rn">' + esc(String(pk.rn).split('#')[0]) + '</span>' : '') + '<br>' +
-            '<span class="ch">' + esc(pk.c ? champName(pk.c) : 'kein Champion') + '</span></span></button>';
+            '<span class="ch">' + esc(pk.c ? champName(pk.c) : 'kein Champion') + '</span>' +
+            (n.det && n.det[pk.c] ? '<span class="kda">' + kdaTxt(n.det[pk.c]) + '</span>' : '') + '</span></button>';
         }).join('') + '</div></div>').join('')
     : '<div class="hpicks"><span class="muted tiny">Keine Champions gespeichert</span></div>';
   return '<div class="hrow' + (ok ? '' : ' bad') + (hlRound === n.id ? ' hl' : '') + '">' +
@@ -1660,6 +1744,30 @@ function showModal(html) {
   const first = veil.querySelector('input,button,select');
   if (first) try { first.focus({ preventScroll: true }); } catch (e) {}
 }
+function openRound(id) {
+  const raw = S.matches.find(m => m.id === id); if (!raw) return;
+  const n = normMatch(raw); const t = currentTeam();
+  const det = n.det || {};
+  showModal(
+    '<div class="sec-head"><h2>Runde · ' + esc(fmtDT(n.ts)) + '</h2>' +
+      '<button class="btn ghost sm" onclick="closeModal()">Schließen</button></div>' +
+    '<p class="tiny muted" style="margin:0 0 6px"><span class="modebadge">' + esc(n.mode) + '</span> ' + (n.auto ? 'automatisch aus dem Spiel übernommen' : '') + '</p>' +
+    n.groups.map(g => '<div class="rd-group"><span class="medal' + (isTop4(g.place) ? ' top' : '') + '" style="--pc:' + placeColor(g.place) + '" title="' + placeTxt(g.place) + '">' + (g.place || '?') + '</span>' +
+      '<div class="rd-picks">' + g.picks.map(pk => {
+        const p = playerById(t, pk.p); const d = det[pk.c];
+        const who = (p ? p.name : '?') + (pk.p === RANDOM.id && pk.rn ? ' (' + String(pk.rn).split('#')[0] + ')' : '');
+        return '<div class="rd-pick"><img src="' + (champIcon(pk.c) || NO_ICON) + '" alt="">' +
+          '<div class="rd-head"><span class="who" style="color:' + (p ? p.color : 'var(--ink-2)') + '">' + esc(who) + '</span>' +
+            '<span class="muted">' + esc(champName(pk.c)) + (pk.m === 'bravery' ? ' · Bravery' : '') + (pk.g ? ' · Gay' : '') + '</span>' +
+            (d ? '<span class="kd" title="Kills / Tode / Assists">' + kdaTxt(d) + '</span><span class="num">KDA ' + dec1(kdaRatio(d.k, d.d, d.a)) + '</span>' +
+              '<span class="num">' + thous(d.dmg || 0) + ' Schaden</span><span class="num">' + thous(d.gold || 0) + ' Gold</span>' : '<span class="tiny muted">keine Riot-Daten</span>') + '</div>' +
+          (d ? '<div class="irow"><span class="rd-lbl">Augments</span>' + ((d.au || []).length ? d.au.map(augBox).join('') : '<span class="tiny muted">keine</span>') + '</div>' +
+            '<div class="irow"><span class="rd-lbl">Items</span>' + ((d.it || []).length ? d.it.map(itemBox).join('') : '<span class="tiny muted">keine</span>') + '</div>' : '') +
+          '</div>';
+      }).join('') + '</div></div>').join('') +
+    '<p class="tiny muted" style="margin:12px 0 0">Rahmenfarbe der Augments: Silber, Gold, Prisma. Lila umrandete Items sind Prisma-Items. Die Werte-Boni aus den Ambossen liefert Riot nicht mit.</p>'
+  );
+}
 function openPlayer(pid) {
   const a = agg(); const t = currentTeam();
   const p = playerById(t, pid); const r = a.byPlayer.get(pid);
@@ -1677,7 +1785,14 @@ function openPlayer(pid) {
       tile('Ø Platz', avgTxt(r), (seOf(r) ? '± ' + dec1(seOf(r)) : '')) +
       tile('Siege', r.w, pct(r.w, r.g) + ' %') +
       tile('Top 4', r.top, pct(r.top, r.g) + ' %') +
+      (r.kd.n ? tile('Ø KDA', dec1(kdaRatio(r.kd.k, r.kd.d, r.kd.a)), dec1(r.kd.k / r.kd.n) + ' / ' + dec1(r.kd.d / r.kd.n) + ' / ' + dec1(r.kd.a / r.kd.n)) +
+        tile('Ø Schaden', thous(r.kd.dmg / r.kd.n), 'an Champions · ' + plural(r.kd.n, 'Runde', 'Runden')) : '') +
     '</div>' +
+    (r.augs.size ? '<div class="eyebrow-row"><span class="eyebrow">Lieblings-Augments</span><span class="tiny muted">wie oft gewählt · Ø Platz</span></div><div class="chips">' +
+      [...r.augs.entries()].sort((x, y) => y[1].g - x[1].g || (avgOf(x[1]) - avgOf(y[1]))).slice(0, 10).map(([id, rec]) =>
+        '<span class="chip">' + augBox(id) + '<span class="chip-txt"><span class="chip-name">' + esc(augName(id)) + '</span><span class="chip-sub">' + rec.g + '× · Ø ' + avgTxt(rec) + '</span></span></span>').join('') + '</div>' : '') +
+    (r.items.size ? '<div class="eyebrow-row"><span class="eyebrow">Häufigste Items</span></div><div class="irow">' +
+      [...r.items.entries()].sort((x, y) => y[1] - x[1]).slice(0, 14).map(([id, c]) => '<span title="' + esc(itemName(id)) + ' · ' + c + '×">' + itemBox(id) + '</span>').join('') + '</div>' : '') +
     '<div class="eyebrow-row"><span class="eyebrow">Platzverteilung</span></div>' +
     '<div class="pdist">' + dist.map((v, i) => '<div class="pcol" title="' + placeTxt(i + 1) + ': ' + v + '×"><span class="pcv">' + (v || '') + '</span>' +
       '<span class="pcb"><i style="height:' + Math.round(v / maxD * 100) + '%;background:' + placeColor(i + 1) + '"></i></span>' +
@@ -1945,6 +2060,7 @@ async function doImport(input) {
       const recIn = { teamId: tid, ts: im.ts, mode: n.mode,
         groups: n.groups.map(g => ({ place: g.place, u: !!g.u, picks: g.picks.map(pk => Object.assign({}, pk, { p: map[pk.p] || pk.p })) })) };
       if (im.src === 'riot') { recIn.src = 'riot'; if (typeof im.rid === 'string') recIn.rid = im.rid; }
+      if (im.det && typeof im.det === 'object') recIn.det = im.det;
       await addMatch(recIn);
       newRounds++;
     }
