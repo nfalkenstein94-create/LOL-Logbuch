@@ -164,6 +164,14 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
     throw new Error('Riot bremst weiter (429).');
   };
 
+  // Fehlersuche: ein Spiel vollständig in sync/debug ablegen (ARENA_DUMP=EUW1_…)
+  if (env.ARENA_DUMP) {
+    const m = await riot('/lol/match/v5/matches/' + env.ARENA_DUMP.trim());
+    await setDoc('/sync/debug', { at: now, id: env.ARENA_DUMP, json: JSON.stringify(m) });
+    log('::notice::Spiel ' + env.ARENA_DUMP + ' abgelegt (' + JSON.stringify(m).length + ' Zeichen)');
+    return { dump: true };
+  }
+
   try {
     // Kader auflösen
     const byPuuid = new Map();
