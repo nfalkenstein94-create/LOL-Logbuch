@@ -1464,7 +1464,7 @@ function kdaBlock(a) {
         '<span class="ml">' + esc(x.p.name) + '</span>' +
         '<span class="mbar"><i style="width:' + Math.round(x.r / max * 100) + '%;background:' + x.p.color + '"></i></span>' +
         '<span class="mv"><b class="gold">' + dec1(x.r) + '</b> · Ø ' + dec1(x.kd.k / x.kd.n) + ' / ' + dec1(x.kd.d / x.kd.n) + ' / ' + dec1(x.kd.a / x.kd.n) +
-          ' · ' + thous(x.kd.dmg / x.kd.n) + ' Schaden · ' + x.kd.n + '×</span></div>').join('') + '</div>' +
+          ' · ' + thous(x.kd.dmg / x.kd.n) + ' Schaden · ' + plural(x.kd.n, 'Runde', 'Runden') + '</span></div>').join('') + '</div>' +
     '<p class="tiny muted" style="margin:8px 0 0">Gesamt <b class="gold">' + dec1(kdaRatio(tot.k, tot.d, tot.a)) + '</b> · ' + tot.k + ' Kills, ' + tot.d + ' Tode, ' + tot.a + ' Assists aus ' +
       plural(tot.n, 'Pick', 'Picks') + '. Von Hand eingetragene Runden haben keine KDA und zählen hier nicht mit.</p>';
 }
