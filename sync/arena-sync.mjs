@@ -11,7 +11,8 @@ import path from 'node:path';
 
 const ARENA_QUEUES = [1700, 1710];          // Arena, Arena mit 16 Spielern
 const RANDOM_ID = '__random';
-const LOOKBACK_MS = 3 * 24 * 3600e3;
+const LOOKBACK_MS = 7 * 24 * 3600e3;
+const LIST_COUNT = 20;
 const SEEN_MAX = 600;
 
 class StopError extends Error {
@@ -198,12 +199,14 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
     // Neue Spiele suchen
     const since = Math.floor(Math.max(state.start, now - LOOKBACK_MS) / 1000);
     const ids = new Set();
+    // Ohne Warteschlangen-Filter: Riot führt Arena nicht immer unter derselben Kennung.
+    // Ob es Arena ist, entscheidet buildRecord am Spielmodus (CHERRY); alles andere wird
+    // als gesehen vermerkt und nicht erneut abgerufen.
     for (const puuid of byPuuid.keys()) {
-      for (const q of ARENA_QUEUES) {
-        const list = await riot('/lol/match/v5/matches/by-puuid/' + puuid + '/ids?queue=' + q + '&startTime=' + since + '&count=20');
-        (list || []).forEach(id => { if (!seen.has(id)) ids.add(id); });
-      }
+      const list = await riot('/lol/match/v5/matches/by-puuid/' + puuid + '/ids?startTime=' + since + '&count=' + LIST_COUNT);
+      (list || []).forEach(id => { if (!seen.has(id)) ids.add(id); });
     }
+    const overview = [];
     const ctx = { byPuuid, aliases, teams, champId, standardTeam: String(cfg.standardTeam || '').trim().toLowerCase() };
     const found = [];
     for (const id of ids) {
@@ -212,6 +215,7 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
       const end = (m.info && (m.info.gameEndTimestamp || m.info.gameCreation)) || 0;
       if (end && end < state.start) { seen.add(id); continue; }
       const r = buildRecord(m, ctx);
+      overview.push(id + ' ' + ((m.info && m.info.gameMode) || '?') + '/' + ((m.info && m.info.queueId) || '?') + ' ' + new Date(end).toISOString().slice(0, 16) + (r.skip ? ' – ' + r.skip : ' – Arena'));
       if (r.skip) { log(id + ': übersprungen, ' + r.skip); seen.add(id); continue; }
       found.push({ id, r });
     }
@@ -227,6 +231,7 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
       else throw new Error('Runde nicht speicherbar (' + res.status + ')');
       seen.add(id);
     }
+    log('::notice::Abgleich: ' + ids.size + ' neue Spiel-ID(s) geprüft, ' + found.length + ' Arena' + (overview.length ? ' | ' + overview.join(' | ') : ''));
     await setDoc('/sync/state', { start: state.start, seen: [...seen].slice(-SEEN_MAX) });
     await status(true, added ? added + (added === 1 ? ' Runde' : ' Runden') + ' eingetragen' : 'nichts Neues', added);
     log(added ? added + ' neue Runde(n) eingetragen.' : 'Nichts Neues.');
