@@ -99,12 +99,46 @@ export function buildRecord(match, ctx) {
     return { place: place >= 1 && place <= 8 ? place : null, u: false, picks };
   }).sort((a, b) => (a.place || 9) - (b.place || 9));
 
+  // Einzelwerte je Pick (Schlüssel: Champion – pro Runde eindeutig)
+  const det = {};
+  own.forEach(members => members.forEach(p => {
+    const nz = a => a.filter(x => Number(x) > 0).map(Number);
+    det[ctx.champId(p.championName)] = {
+      k: p.kills || 0, d: p.deaths || 0, a: p.assists || 0,
+      dmg: p.totalDamageDealtToChampions || 0, gold: p.goldEarned || 0,
+      it: nz([0, 1, 2, 3, 4, 5, 6].map(i => p['item' + i])),
+      au: nz([1, 2, 3, 4, 5, 6].map(i => p['playerAugment' + i]))
+    };
+  }));
+
   const size = Math.max(...groups.map(g => g.picks.length));
   const ts = info.gameEndTimestamp || ((info.gameCreation || 0) + (info.gameDuration || 0) * 1000) || Date.now();
   return {
-    record: { teamId: team.id, ts, mode: size >= 3 ? '3v3' : '2v2', groups, src: 'riot', rid: match.metadata && match.metadata.matchId || '' },
+    record: { teamId: team.id, ts, mode: size >= 3 ? '3v3' : '2v2', groups, det, src: 'riot', rid: match.metadata && match.metadata.matchId || '' },
     team: team.name
   };
+}
+
+/* ---------- Namen und Bilder für Items und Augments (CommunityDragon, deutsch) ---------- */
+const CD = 'https://raw.communitydragon.org/latest/';
+export async function loadLexicon(fetchImpl) {
+  const get = async u => { const r = await fetchImpl(u); if (r.status !== 200) throw new Error('CommunityDragon ' + r.status); return r.json(); };
+  const [items, arena] = await Promise.all([
+    get(CD + 'plugins/rcp-be-lol-game-data/global/de_de/v1/items.json'),
+    get(CD + 'cdragon/arena/de_de.json')
+  ]);
+  const it = new Map(items.map(x => [x.id, { n: x.name, ic: x.iconPath ? CD + 'plugins/rcp-be-lol-game-data/global/default/' + x.iconPath.replace(/^\/lol-game-data\/assets\//i, '').toLowerCase() : '' }]));
+  const au = new Map((arena.augments || []).map(x => [x.id, { n: x.name, r: x.rarity || 0, ic: x.iconSmall ? CD + 'game/' + x.iconSmall.toLowerCase() : '' }]));
+  return { it, au };
+}
+export function lexiconFor(dets, lex, have) {
+  const out = { it: Object.assign({}, have.it || {}), au: Object.assign({}, have.au || {}) };
+  let added = 0;
+  dets.forEach(det => Object.values(det || {}).forEach(d => {
+    (d.it || []).forEach(id => { const k = 'i' + id; if (!out.it[k] && lex.it.has(id)) { out.it[k] = lex.it.get(id); added++; } });
+    (d.au || []).forEach(id => { const k = 'a' + id; if (!out.au[k] && lex.au.has(id)) { out.au[k] = lex.au.get(id); added++; } });
+  }));
+  return { out, added };
 }
 
 /* ---------- Ablauf ---------- */
@@ -239,6 +273,32 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
       else throw new Error('Runde nicht speicherbar (' + res.status + ')');
       seen.add(id);
     }
+    // Ältere Auto-Runden ohne Einzelwerte nachfüllen (nur das Feld det, Bearbeitungen bleiben)
+    let filled = 0;
+    const dets = found.map(f => f.r.record.det);
+    if (!probe) {
+      const ml = await fs('GET', '/matches?pageSize=300');
+      const olds = ((ml.json && ml.json.documents) || [])
+        .map(d => ({ path: '/matches/' + d.name.split('/').pop(), f: fromFields(d.fields || {}) }))
+        .filter(x => x.f.src === 'riot' && x.f.rid && !x.f.det).slice(0, 10);
+      for (const o of olds) {
+        const m = await riot('/lol/match/v5/matches/' + o.f.rid);
+        const r = m && buildRecord(m, ctx);
+        if (!r || r.skip) continue;
+        const res = await fs('PATCH', o.path + '?updateMask.fieldPaths=det', { fields: { det: toValue(r.record.det) } });
+        if (res.status === 200) { filled++; dets.push(r.record.det); }
+      }
+    }
+    if (dets.length && !probe) {
+      try {
+        const lex = await loadLexicon(fetchImpl);
+        const have = (await getDoc('/sync/lexikon')) || {};
+        const { out, added: n } = lexiconFor(dets, lex, have);
+        if (n) await setDoc('/sync/lexikon', out);
+      } catch (e) { log('Namensliste nicht aktualisiert: ' + e.message); }
+    }
+    if (filled) log(filled + ' ältere Runde(n) um Einzelwerte ergänzt.');
+
     log('::notice::Abgleich: ' + ids.size + ' neue Spiel-ID(s) geprüft, ' + found.length + ' Arena' + (overview.length ? ' | ' + overview.join(' | ') : ''));
     await setDoc('/sync/state', { start: state.start, seen: [...seen].slice(-SEEN_MAX) });
     await status(true, added ? added + (added === 1 ? ' Runde' : ' Runden') + ' eingetragen' : 'nichts Neues', added);
