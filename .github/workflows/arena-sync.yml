@@ -1,34 +1,74 @@
 name: Arena-Abgleich
 
+# Warum so gebaut:
+# GitHub startet Zeitplan-Läufe nur nach Lust und Laune (statt alle 10 Minuten
+# oft nur alle 3–7 Stunden). Deshalb läuft der Abgleich als Dauerschleife:
+# Ein Lauf prüft alle 3 Minuten bei Riot und startet am Ende selbst den
+# nächsten Lauf. Der Zeitplan ist nur noch ein Notanker, der die Kette wieder
+# anwirft, falls sie einmal reißt.
+
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
+      schleife:
+        description: 'Dauerschleife (wird von der Automatik gesetzt – von Hand leer lassen)'
+        required: false
+        default: ''
       dump:
         description: 'Nur zur Fehlersuche: Spiel-ID, die vollstaendig abgelegt wird'
         required: false
         default: ''
 
+# Dauerschleife und Handstart getrennt: ein Handstart wartet nie auf die Schleife.
+# Pro Gruppe läuft höchstens ein Lauf, ein weiterer wartet – so gibt es nie zwei Schleifen.
 concurrency:
-  group: arena-sync
+  group: arena-sync-${{ (github.event_name == 'schedule' || github.event.inputs.schleife == 'ja') && 'schleife' || 'einzeln' }}
   cancel-in-progress: false
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   abgleich:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 350
+    env:
+      SCHLEIFE: ${{ (github.event_name == 'schedule' || github.event.inputs.schleife == 'ja') && '1' || '' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
+
       - name: Neue Arena-Runden eintragen
-        run: node sync/arena-sync.mjs
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           ARENA_DUMP: ${{ github.event.inputs.dump }}
-          ARENA_STRICT: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
+          ARENA_STRICT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.schleife != 'ja' && '1' || '' }}
+        run: |
+          if [ -z "$SCHLEIFE" ]; then
+            ARENA_NACHFUELLEN=1 node sync/arena-sync.mjs
+            exit $?
+          fi
+          # Dauerschleife: rund 5,5 Stunden, alle 3 Minuten ein Abgleich
+          ende=$(( $(date +%s) + 330*60 ))
+          erster=1
+          while :; do
+            if [ -n "$erster" ]; then ARENA_NACHFUELLEN=1 node sync/arena-sync.mjs || true; erster=
+            else node sync/arena-sync.mjs || true; fi
+            [ "$(date +%s)" -ge "$ende" ] && break
+            sleep 180
+          done
+
+      - name: Naechsten Lauf starten
+        if: ${{ env.SCHLEIFE == '1' && !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X POST "repos/${{ github.repository }}/actions/workflows/arena-sync.yml/dispatches" \
+            -f ref="${{ github.ref_name }}" -f 'inputs[schleife]=ja' \
+            && echo "Naechster Lauf angestossen." \
+            || echo "::warning::Naechster Lauf nicht angestossen – der Zeitplan startet die Kette spaetestens zur naechsten vollen Stunde neu."

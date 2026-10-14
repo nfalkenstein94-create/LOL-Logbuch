@@ -42,10 +42,16 @@ Ablage
 ------------------------------------------------------------------
 AUTOMATISCHE EINTRAGUNG
 ------------------------------------------------------------------
-Alle zehn Minuten fragt ein Skript (sync/arena-sync.mjs, gestartet von
+Alle drei Minuten fragt ein Skript (sync/arena-sync.mjs, gestartet von
 GitHub Actions) bei Riot nach neuen Arena-Runden des Kaders und traegt
 sie ins gemeinsame Logbuch ein. Solche Runden tragen im Verlauf das
 Kennzeichen "Auto".
+
+  Der Abgleich laeuft als Dauerschleife: Jeder Lauf prueft rund
+  5,5 Stunden lang alle drei Minuten und startet am Ende selbst den
+  naechsten. Grund: GitHub fuehrt reine Zeitplan-Laeufe oft nur alle
+  paar Stunden aus. Der stuendliche Zeitplan dient nur noch dazu, die
+  Kette wieder anzuwerfen, falls sie einmal abreisst.
 
   Wer zum Kader gehoert, steht in sync/spieler.json (Name im Logbuch
   und Riot-ID mit #Tag).

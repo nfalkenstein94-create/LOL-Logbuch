@@ -237,6 +237,7 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
       }
     }
     const seen = new Set(state.seen || []);
+    const seenVorher = seen.size;
 
     // Neue Spiele suchen
     const since = Math.floor(Math.max(state.start, now - LOOKBACK_MS) / 1000);
@@ -276,7 +277,9 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
     // Ältere Auto-Runden ohne Einzelwerte nachfüllen (nur das Feld det, Bearbeitungen bleiben)
     let filled = 0;
     const dets = found.map(f => f.r.record.det);
-    if (!probe) {
+    // Nur wenn es Neues gibt oder beim ersten Durchgang einer Schleife – sonst würde jeder
+    // 3-Minuten-Abgleich das ganze Logbuch lesen und das Gratiskontingent von Firestore sprengen.
+    if (!probe && (found.length || env.ARENA_NACHFUELLEN)) {
       const ml = await fs('GET', '/matches?pageSize=300');
       const olds = ((ml.json && ml.json.documents) || [])
         .map(d => ({ path: '/matches/' + d.name.split('/').pop(), f: fromFields(d.fields || {}) }))
@@ -300,7 +303,7 @@ export async function run({ fetchImpl = fetch, env = process.env, now = Date.now
     if (filled) log(filled + ' ältere Runde(n) um Einzelwerte ergänzt.');
 
     log('::notice::Abgleich: ' + ids.size + ' neue Spiel-ID(s) geprüft, ' + found.length + ' Arena' + (overview.length ? ' | ' + overview.join(' | ') : ''));
-    await setDoc('/sync/state', { start: state.start, seen: [...seen].slice(-SEEN_MAX) });
+    if (seen.size !== seenVorher) await setDoc('/sync/state', { start: state.start, seen: [...seen].slice(-SEEN_MAX) });
     await status(true, added ? added + (added === 1 ? ' Runde' : ' Runden') + ' eingetragen' : 'nichts Neues', added);
     log(added ? added + ' neue Runde(n) eingetragen.' : 'Nichts Neues.');
     return { added };
