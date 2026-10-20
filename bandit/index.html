@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fragen-Bandit BLS 3/26</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Share+Tech+Mono&display=swap">
+<style>
+  :root{
+    --bg:#0b1411; --felt:#123d2b; --panel:#0e1b16; --line:#24402f;
+    --gold:#d4af37; --red:#b3122e; --black:#141414;
+    --text:#f2efe1; --muted:#9db3a5;
+    --disp:"Chakra Petch",system-ui,sans-serif; --mono:"Share Tech Mono",ui-monospace,monospace;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:radial-gradient(ellipse at 50% 20%,#14543a 0%,#0b2e1f 55%,#07160f 100%);
+       color:var(--text);font-family:var(--mono);display:flex;flex-direction:column;align-items:center;
+       padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+       padding-block:18px;min-height:100%}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);
+     font-size:clamp(22px,5vw,38px);margin:4px 0 0;text-shadow:0 3px 0 #000;text-align:center}
+  .sub{color:var(--muted);font-style:italic;margin:4px 0 16px;text-align:center}
+  .stage{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%;max-width:1150px}
+  .machinebox{width:min(94vw,520px)}
+
+  .slot{position:relative;margin:0 auto;width:fit-content;max-width:100%;
+        background:linear-gradient(#8a1426,#3d0710);border:5px solid var(--gold);border-radius:26px;
+        padding:18px 70px 24px 22px;box-shadow:0 20px 44px rgba(0,0,0,.55)}
+  .stitle{text-align:center;color:var(--gold);font-family:var(--disp);font-weight:700;letter-spacing:.22em;
+          font-size:clamp(16px,3.4vw,22px);margin-bottom:14px;text-shadow:0 2px 0 #000}
+  .window{background:#111;padding:12px;border-radius:14px;position:relative;border:2px solid #000}
+  .reel{height:150px;overflow:hidden;border-radius:10px;position:relative;background:linear-gradient(#cfcfcf,#fff 28%,#fff 72%,#cfcfcf)}
+  .strip{position:absolute;left:0;right:0;top:0;will-change:transform}
+  .cell{height:150px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:0 10px}
+  .cell .no{width:48px;height:48px;border-radius:50%;background:var(--red);color:#fff;font-family:var(--disp);
+            font-weight:700;font-size:24px;display:flex;align-items:center;justify-content:center;border:3px solid var(--gold)}
+  .cell .tag{font-family:var(--disp);font-weight:600;color:#1a1205;font-size:14px;letter-spacing:.14em;text-transform:uppercase}
+  .payline{position:absolute;left:8px;right:8px;top:50%;height:150px;transform:translateY(-50%);
+           border:3px solid var(--gold);border-radius:12px;pointer-events:none;box-shadow:0 0 16px rgba(212,175,55,.75)}
+  .lever{position:absolute;right:14px;top:30px;width:38px;height:270px;cursor:pointer}
+  .stick{position:absolute;left:15px;top:20px;width:8px;height:120px;background:linear-gradient(90deg,#888,#eee,#888);border-radius:4px;transform-origin:bottom center;transition:transform .25s}
+  .knob{position:absolute;left:0;top:0;width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff9a9a,#b3122e);transition:transform .25s;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+  .lever.pull .stick{transform:scaleY(-1)}
+  .lever.pull .knob{transform:translateY(222px)}
+
+  .controls{display:flex;gap:14px;justify-content:center;margin-top:16px;flex-wrap:wrap;align-items:center}
+  .btn{font:inherit;font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:.06em;text-transform:uppercase;
+       padding:13px 30px;border-radius:999px;border:2px solid var(--gold);background:linear-gradient(#ecd06a,#a8841f);
+       color:#1a1205;cursor:pointer;box-shadow:0 4px 0 #5c4710}
+  .btn:active{transform:translateY(2px);box-shadow:0 2px 0 #5c4710}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.ghost{background:transparent;color:var(--gold);box-shadow:none;border-color:var(--line);font-size:14px;padding:9px 16px}
+  label{color:var(--muted);font-size:14px;display:flex;gap:6px;align-items:center;cursor:pointer}
+
+  .side{width:min(94vw,500px)}
+  .result{background:rgba(0,0,0,.4);border:2px solid var(--gold);border-radius:16px;padding:22px 24px;min-height:150px;margin-bottom:18px}
+  .result.pop{animation:pop .5s ease}
+  @keyframes pop{0%{transform:scale(.93)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+  .result .head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .result .no{flex:none;width:46px;height:46px;border-radius:50%;background:var(--red);color:#fff;border:2px solid var(--gold);
+              font-family:var(--disp);font-weight:700;font-size:22px;display:flex;align-items:center;justify-content:center}
+  .result .tag{font-family:var(--disp);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-size:14px}
+  .result p{margin:0;font-size:22px;line-height:1.45}
+  .result .idle{color:var(--muted);font-style:italic;font-size:17px}
+
+  ol{list-style:none;padding:0;margin:0;display:grid;gap:7px}
+  li{display:flex;gap:11px;align-items:flex-start;padding:9px 11px;border-radius:10px;background:rgba(0,0,0,.24);font-size:14px;line-height:1.4;transition:.3s}
+  li .dot{flex:none;width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;border:1px solid var(--gold);
+          font-family:var(--disp);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  li.done{opacity:.4;text-decoration:line-through}
+  li.hit{outline:2px solid var(--gold);background:rgba(212,175,55,.16);opacity:1;text-decoration:none}
+  footer{color:var(--muted);font-size:12px;text-align:center;padding-top:14px;max-width:760px;line-height:1.5}
+</style>
+</head>
+<body>
+<h1>Fragen-Bandit · BLS 3/26</h1>
+<div class="sub">Hebel ziehen – der Bandit zieht die nächste Diskussionsfrage fürs Cluster.</div>
+
+<div class="stage">
+  <div class="machinebox">
+    <div class="slot">
+      <div class="stitle">★ Cyber &amp; Parlamentsvorbehalt ★</div>
+      <div class="window"><div class="reel"><div class="strip" id="strip"></div></div><div class="payline"></div></div>
+      <div class="lever" id="lever"><div class="stick"></div><div class="knob"></div></div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="spin">Hebel ziehen</button>
+      <button class="btn ghost" id="reset">Zurücksetzen</button>
+    </div>
+    <div class="controls">
+      <label><input type="checkbox" id="lock" checked> Gezogene Fragen sperren</label>
+      <label><input type="checkbox" id="sound" checked> Ton</label>
+    </div>
+  </div>
+  <div class="side">
+    <div class="result" id="result"><p class="idle">Noch keine Frage gezogen – Hebel ziehen (oder Leertaste).</p></div>
+    <ol id="list"></ol>
+  </div>
+</div>
+<footer>Fragenpool: die vier Fragen für Berlin plus vier vertiefende Fragen zum Vortrag. Fragen ganz unten im Code änderbar.</footer>
+
+<script>
+/* ===== Diskussionsfragen (Nr. 1–8) – hier anpassbar ===== */
+const FRAGEN = [
+  {tag:"Gesetz",    text:"Plant die Bundesregierung eine gesetzliche Grundlage für Cyberoperationen der Bundeswehr – analog zum BND-Gesetz?"},
+  {tag:"Kontrolle", text:"Wie wird der Verteidigungsausschuss über Cyberoperationen außerhalb mandatierter Einsätze unterrichtet?"},
+  {tag:"Zuständig", text:"Wer handelt bei staatlich gesteuerten Cyberangriffen unterhalb der Schwelle – BKA, BSI oder die Teilstreitkraft CIR?"},
+  {tag:"Reichweite",text:"Wie werden Cyberwirkungen außerhalb des Mandatsgebiets und in nicht zustimmenden Staaten behandelt – etwa zur Vorbereitung einer Evakuierung?"},
+  {tag:"Gesetz?",   text:"Braucht die Bundeswehr ein eigenes Cyber-Einsatzgesetz – oder schützt uns genau diese Lücke vor Eskalation?"},
+  {tag:"Schwelle",  text:"Ab welcher Wirkung ist eine Cyberoperation „bewaffnet“? Wo würdet ihr die Schwelle ziehen?"},
+  {tag:"Mandat",    text:"Parlamentsvorbehalt im Cyberraum – Bremse oder Rückversicherung?"},
+  {tag:"Attribution",text:"Darf die Bundeswehr „zurückschlagen“, wenn der Angreifer nicht sicher zuzuordnen ist?"}
+];
+/* ======================================================== */
+
+const N=FRAGEN.length, H=150;
+const $=s=>document.querySelector(s);
+const strip=$("#strip"), lever=$("#lever"), spinBtn=$("#spin"), resetBtn=$("#reset");
+const lockBox=$("#lock"), soundBox=$("#sound"), resultEl=$("#result"), listEl=$("#list");
+let done=new Set(), lastHit=-1, pos=0, spinning=false;
+
+/* Walze füllen (viele Wiederholungen für sauberes Scrollen) */
+strip.innerHTML=[...Array(64)].map((_,j)=>{const i=j%N;
+  return `<div class="cell"><div class="no">${i+1}</div><div class="tag">${FRAGEN[i].tag}</div></div>`;}).join("");
+function setPos(s,dur){ strip.style.transition=dur?`transform ${dur}ms cubic-bezier(.12,.72,.2,1)`:"none";
+  strip.style.transform=`translateY(${-(s)*H}px)`; }
+pos=8; setPos(pos,0);
+
+/* Ton */
+let actx;
+function tick(f=1900,d=.02,v=.07,t="square"){ if(!soundBox.checked) return;
+  actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+  const o=actx.createOscillator(),g=actx.createGain(); o.type=t; o.frequency.value=f;
+  g.gain.setValueAtTime(v,actx.currentTime); g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);
+  o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime+d); }
+
+function renderList(){
+  listEl.innerHTML="";
+  FRAGEN.forEach((f,i)=>{ const li=document.createElement("li");
+    if(done.has(i)) li.classList.add("done"); if(i===lastHit) li.classList.add("hit");
+    li.innerHTML=`<span class="dot">${i+1}</span><span></span>`; li.lastChild.textContent=f.text; listEl.appendChild(li); });
+}
+function idle(t){ resultEl.innerHTML='<p class="idle"></p>'; resultEl.firstChild.textContent=t; }
+
+function spin(){
+  if(spinning) return;
+  const avail=[...Array(N).keys()].filter(i=>!(lockBox.checked&&done.has(i)));
+  if(!avail.length){ idle("Alle Fragen gezogen – „Zurücksetzen“ für eine neue Runde."); return; }
+  spinning=true; spinBtn.disabled=true; lastHit=-1; renderList(); idle("…");
+  const target=avail[Math.floor(Math.random()*avail.length)];
+  lever.classList.add("pull"); tick(300,.1,.18,"triangle"); setTimeout(()=>lever.classList.remove("pull"),450);
+  pos=pos%N+N; setPos(pos,0); void strip.offsetHeight;
+  const landing=40+target, dur=4200;
+  setPos(landing,dur);
+  const rattle=setInterval(()=>tick(1600+Math.random()*700,.015,.05),80);
+  setTimeout(()=>{ clearInterval(rattle); tick(220,.12,.3,"triangle"); },dur-150);
+  setTimeout(()=>{ pos=landing; show(target); spinning=false; spinBtn.disabled=false; },dur+120);
+}
+function show(i){
+  done.add(i); lastHit=i; tick(660,.25,.2,"triangle"); setTimeout(()=>tick(990,.35,.2,"triangle"),160);
+  resultEl.innerHTML=`<div class="head"><span class="no">${i+1}</span><span class="tag">${FRAGEN[i].tag}</span></div><p></p>`;
+  resultEl.querySelector("p").textContent=FRAGEN[i].text;
+  resultEl.classList.remove("pop"); void resultEl.offsetWidth; resultEl.classList.add("pop");
+  renderList();
+}
+spinBtn.onclick=spin; lever.onclick=spin;
+resetBtn.onclick=()=>{ if(spinning) return; done.clear(); lastHit=-1; renderList(); idle("Neue Runde – Hebel ziehen."); };
+lockBox.onchange=renderList;
+document.addEventListener("keydown",e=>{ if((e.code==="Space"||e.code==="Enter")&&e.target.tagName!=="BUTTON"){ e.preventDefault(); spin(); }});
+renderList();
+</script>
+</body>
+</html>
