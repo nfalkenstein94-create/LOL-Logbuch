@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BLS 3/26 Alarm</title>
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Chakra+Petch:wght@600;700&display=swap">
+<style>
+  :root{
+    --bg:#07090b; --panel:#0e1317; --line:#1d2b24;
+    --fg:#c9f2d8; --muted:#5f7d6c;
+    --green:#17c964; --amber:#ffb000; --red:#ff2a2a; --redglow:rgba(255,42,42,.55);
+    --mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
+    --disp:"Chakra Petch","Share Tech Mono",system-ui,sans-serif;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg); font-family:var(--mono);
+    display:flex; flex-direction:column;
+    padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));
+    padding-top:max(14px,env(safe-area-inset-top,0px));
+    padding-bottom:max(14px,env(safe-area-inset-bottom,0px));
+    overflow-x:hidden;
+  }
+  img{max-width:100%}
+  [hidden]{display:none!important}
+  .wrap{width:100%; max-width:560px; margin:0 auto; flex:1 1 auto; display:flex; flex-direction:column; min-height:0}
+  .brand{display:flex; align-items:center; gap:10px; color:var(--muted); font-size:.82rem; letter-spacing:.18em; text-transform:uppercase}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--muted); flex:none}
+  .dot.on{background:var(--green); box-shadow:0 0 10px var(--green)}
+  .dot.warn{background:var(--amber); box-shadow:0 0 10px var(--amber)}
+  h1{font-family:var(--disp); font-weight:700; font-size:clamp(1.5rem,6vw,2.1rem); line-height:1.05; margin:.4em 0 .1em; text-wrap:balance; letter-spacing:.02em}
+  .lead{color:var(--muted); font-size:.95rem; line-height:1.5; max-width:46ch}
+  .demo-tag{display:inline-block; margin-top:4px; font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--amber); border:1px solid var(--line); border-radius:999px; padding:3px 10px}
+
+  .cards{display:grid; gap:14px; margin-top:24px}
+  @media(min-width:460px){.cards{grid-template-columns:1fr 1fr}}
+  .card{appearance:none; text-align:left; cursor:pointer; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; color:var(--fg); font-family:var(--mono); display:flex; flex-direction:column; gap:8px; transition:border-color .15s, transform .08s}
+  .card:hover{border-color:var(--green)} .card:active{transform:translateY(1px)}
+  .card .ico{font-size:1.7rem; line-height:1}
+  .card .ttl{font-family:var(--disp); font-weight:600; font-size:1.12rem}
+  .card .sub{color:var(--muted); font-size:.85rem; line-height:1.45}
+
+  .screen{flex:1 1 auto; display:flex; flex-direction:column; min-height:0}
+  .top{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px}
+  .back{appearance:none; background:transparent; border:1px solid var(--line); color:var(--muted); font-family:var(--mono); font-size:.82rem; padding:7px 12px; border-radius:8px; cursor:pointer}
+  .back:hover{color:var(--fg); border-color:var(--muted)}
+  .status{display:flex; align-items:center; gap:9px; font-size:.8rem; color:var(--muted); letter-spacing:.06em}
+
+  .stage{flex:1 1 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; text-align:center; padding:18px 0}
+
+  .bigbtn{appearance:none; cursor:pointer; font-family:var(--disp); font-weight:700; border-radius:50%; width:min(70vw,250px); aspect-ratio:1; max-width:100%;
+    border:3px solid var(--red); color:#fff; background:radial-gradient(circle at 50% 38%,#ff5a5a,#c20000 62%,#7a0000);
+    box-shadow:0 0 0 6px rgba(255,42,42,.12), 0 14px 40px var(--redglow); font-size:clamp(1.3rem,5vw,1.8rem); letter-spacing:.06em; text-transform:uppercase;
+    display:flex; align-items:center; justify-content:center; line-height:1.1; transition:transform .08s, box-shadow .15s}
+  .bigbtn:hover{box-shadow:0 0 0 6px rgba(255,42,42,.2), 0 16px 48px var(--redglow)}
+  .bigbtn:active{transform:scale(.97)}
+  .bigbtn.fire{width:min(54vw,200px)}
+  .arm{border-color:var(--green); background:radial-gradient(circle at 50% 38%,#4bffa0,#0f9e4e 62%,#0a6a35); box-shadow:0 0 0 6px rgba(23,201,100,.12), 0 14px 40px rgba(23,201,100,.4)}
+
+  .hint{color:var(--muted); font-size:.9rem; line-height:1.5; max-width:42ch}
+  .kbd{display:inline-block; border:1px solid var(--line); border-bottom-width:3px; border-radius:6px; padding:1px 8px; color:var(--fg); font-size:.85em}
+  .pill{font-family:var(--disp); font-weight:600; letter-spacing:.14em; text-transform:uppercase; font-size:.95rem; padding:8px 16px; border-radius:999px; border:1px solid var(--line)}
+  .pill.armed{color:var(--green); border-color:var(--green)}
+  .pill.idle{color:var(--amber); border-color:var(--amber)}
+
+  .row{display:flex; gap:12px; flex-wrap:wrap; justify-content:center}
+  .ghost{appearance:none; cursor:pointer; background:transparent; border:1px solid var(--line); color:var(--fg); font-family:var(--mono); font-size:.9rem; padding:11px 18px; border-radius:10px}
+  .ghost:hover{border-color:var(--muted)} .ghost:active{transform:translateY(1px)}
+
+  /* Angriffspult */
+  .console{flex:1 1 auto; display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center; padding-top:4px; min-height:0}
+  .c-head{align-self:stretch; font-size:.8rem; color:var(--green); border:1px solid var(--line); border-radius:8px; padding:8px 12px; text-align:left; overflow-x:auto; white-space:nowrap}
+  .c-head .blink{animation:bl 1s steps(1) infinite}
+  @keyframes bl{50%{opacity:0}}
+  .hacktiles{display:flex; gap:7px; flex-wrap:wrap; justify-content:center; max-height:96px; overflow:hidden}
+  .htile{width:24px; height:34px; border-radius:5px; border:1px solid var(--line); color:var(--muted); display:flex; align-items:center; justify-content:center; font-size:.9rem; background:var(--panel)}
+  .htile.hacked{border-color:var(--red); color:#fff; background:radial-gradient(circle at 50% 35%,#ff6a6a,#7a0000); box-shadow:0 0 12px var(--redglow); animation:pop .35s}
+  @keyframes pop{0%{transform:scale(.3)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+  .c-metric{display:flex; flex-direction:column; align-items:center; gap:2px}
+  .c-num{font-family:var(--disp); font-weight:700; font-size:clamp(2.6rem,12vw,3.6rem); line-height:1; color:var(--red); text-shadow:0 0 18px var(--redglow); font-variant-numeric:tabular-nums}
+  .c-lbl{font-size:.74rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted)}
+  .c-log{align-self:stretch; height:88px; overflow:hidden; background:#05080a; border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:.74rem; line-height:1.55; color:#7fe6a2; text-align:left; margin:0; white-space:pre-wrap; word-break:break-all}
+
+  #alarm{position:fixed; inset:0; z-index:40; display:none; align-items:center; justify-content:center; background:#120000}
+  #alarm.on{display:flex}
+  #glitch{position:absolute; inset:0; width:100%; height:100%; display:block}
+  .alarm-ui{position:relative; z-index:2; text-align:center; padding:24px;
+    padding-top:max(24px,env(safe-area-inset-top,0px)); padding-bottom:max(24px,env(safe-area-inset-bottom,0px));
+    display:flex; flex-direction:column; align-items:center; gap:14px}
+  .skull{font-size:clamp(3rem,16vw,6rem); line-height:1; filter:drop-shadow(0 0 18px var(--red)); animation:thrum .5s steps(2) infinite}
+  .alarm-ui h2{font-family:var(--disp); font-weight:700; color:#fff; font-size:clamp(1.8rem,8vw,3.4rem); margin:0; letter-spacing:.04em; text-shadow:0 0 20px var(--red),0 0 40px var(--red); line-height:1}
+  .alarm-ui .sysline{font-family:var(--mono); color:#ff6b6b; font-size:clamp(.95rem,4vw,1.4rem); letter-spacing:.22em}
+  .alarm-ui .code{color:#ffd0d0; font-size:.8rem; letter-spacing:.3em; opacity:.8}
+  .stop{appearance:none; cursor:pointer; margin-top:10px; font-family:var(--disp); font-weight:700; font-size:1.05rem; letter-spacing:.14em; text-transform:uppercase;
+    background:#fff; color:#b00000; border:0; border-radius:12px; padding:15px 30px; box-shadow:0 8px 30px rgba(0,0,0,.5)}
+  .stop:active{transform:translateY(1px)}
+  @keyframes thrum{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+  @media (prefers-reduced-motion:reduce){ .skull{animation:none} }
+
+  footer{color:var(--muted); font-size:.74rem; text-align:center; padding-top:14px; line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- HOME -->
+  <section id="home" class="screen">
+    <div class="brand"><span class="dot" id="homeDot"></span><span>Übungs-Buzzer · Lehrvorführung</span></div>
+    <h1>Alarm-Demo „BLS 3/26"</h1>
+    <p class="lead">Ein Signal, viele Geräte reagieren gleichzeitig. Bühnen-Effekt für die Präsentation — kein echter Zugriff auf irgendein Gerät.</p>
+    <span class="demo-tag">Demonstration / kein echter Angriff</span>
+    <div class="cards">
+      <button class="card" data-role="rx">
+        <span class="ico">📱</span>
+        <span class="ttl">Mitmachen (Handy)</span>
+        <span class="sub">Hier tippen, „scharf schalten", Handy hinlegen. Beim Signal schreit es los.</span>
+      </button>
+      <button class="card" data-role="tx">
+        <span class="ico">💀</span>
+        <span class="ttl">Angriffspult</span>
+        <span class="sub">Für dich am Vortragsrechner. Eine Taste kapert alle verbundenen Handys.</span>
+      </button>
+    </div>
+    <footer>Alle öffnen denselben Link im Handy-Browser — kein Login nötig. Code: <b id="codeShow">—</b></footer>
+  </section>
+
+  <!-- RECEIVER -->
+  <section id="rx" class="screen" hidden>
+    <div class="top">
+      <button class="back" data-home>‹ zurück</button>
+      <div class="status"><span class="dot" id="rxLink"></span><span id="rxLinkTxt">verbinde …</span></div>
+    </div>
+    <div class="stage">
+      <div class="pill idle" id="rxPill">Nicht scharf</div>
+      <button class="bigbtn arm" id="armBtn">Scharf<br>schalten</button>
+      <p class="hint" id="rxHint">Einmal tippen gibt den Ton frei. Danach Handy mit sichtbarem Bildschirm hinlegen und warten.</p>
+      <div class="row"><button class="ghost" id="testBtn" hidden>▶ Ton testen (3 s)</button></div>
+    </div>
+    <footer>Lässt sich der Ton testen, klappt er auch im Ernstfall. Bildschirm anlassen — gesperrte Handys bleiben still.</footer>
+  </section>
+
+  <!-- TRIGGER -->
+  <section id="tx" class="screen" hidden>
+    <div class="top">
+      <button class="back" data-home>‹ zurück</button>
+      <div class="status"><span class="dot" id="txLink"></span><span id="txLinkTxt">verbinde …</span></div>
+    </div>
+    <div class="console">
+      <div class="c-head">root@bls326:~# ./infiltrate --net=hoersaal<span class="blink">_</span></div>
+      <div class="hacktiles" id="hackTiles"></div>
+      <div class="c-metric">
+        <span class="c-num" id="peerCount">0</span>
+        <span class="c-lbl">gehackte Handys</span>
+      </div>
+      <pre class="c-log" id="hackLog"></pre>
+      <button class="bigbtn fire" id="fireBtn">Zugriff<br>erzwingen</button>
+      <p class="hint">Taste oder <span class="kbd">Leertaste</span> feuert an alle übernommenen Geräte.</p>
+      <div class="row"><button class="ghost" id="clearBtn">Verbindungen kappen</button></div>
+    </div>
+    <footer>Übernommen werden nur Handys, die selbst „scharf" geschaltet sind — reine Vorführung.</footer>
+  </section>
+</div>
+
+<!-- ALARM -->
+<div id="alarm" role="alertdialog" aria-label="Alarm">
+  <canvas id="glitch"></canvas>
+  <div class="alarm-ui">
+    <div class="skull">☠</div>
+    <div class="sysline">SYSTEM KOMPROMITTIERT</div>
+    <h2>ZUGRIFF VERWEIGERT</h2>
+    <div class="sysline">BLS&nbsp;3/26</div>
+    <div class="code" id="alarmCode">NODE 00 · —</div>
+    <button class="stop" id="stopBtn">Entwarnung</button>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const show = id => ["home","rx","tx"].forEach(k => $("#"+k).hidden = (k!==id));
+let role=null, armed=false;
+
+/* ---------- Einsatzcode (teilt den Kanal; steckt im Link #code) ---------- */
+const CODE = (location.hash.replace(/[^A-Za-z0-9]/g,"") || "BLS326").toUpperCase().slice(0,16);
+const TOPIC = "bw-uebung-alarm/" + CODE;
+$("#codeShow").textContent = CODE;
+
+/* ---------- Audio: WebAudio-Sirene ---------- */
+let actx=null, siren=null, vibLoop=null, testTimer=null;
+function ensureCtx(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(actx&&actx.state==="suspended") actx.resume(); return actx; }
+function startSiren(){
+  const c=ensureCtx(); if(!c||siren) return;
+  const osc=c.createOscillator(), lfo=c.createOscillator(), lfoG=c.createGain(), g=c.createGain();
+  osc.type="sawtooth"; lfo.type="sine"; lfo.frequency.value=3.2; lfoG.gain.value=430; osc.frequency.value=760;
+  lfo.connect(lfoG); lfoG.connect(osc.frequency);
+  g.gain.value=0.0001; g.gain.exponentialRampToValueAtTime(0.5, c.currentTime+0.05);
+  osc.connect(g); g.connect(c.destination); osc.start(); lfo.start();
+  siren={osc,lfo,g};
+  try{ navigator.vibrate && navigator.vibrate([400,120,400,120,600]); }catch(e){}
+  vibLoop=setInterval(()=>{ try{ navigator.vibrate && navigator.vibrate([400,120,400,120,600]); }catch(e){} },2200);
+}
+function stopSiren(){
+  if(siren){ try{ siren.g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime+0.08); siren.osc.stop(actx.currentTime+0.1); siren.lfo.stop(actx.currentTime+0.1);}catch(e){} siren=null; }
+  if(vibLoop){ clearInterval(vibLoop); vibLoop=null; } try{ navigator.vibrate && navigator.vibrate(0);}catch(e){}
+}
+
+/* ---------- Bildschirm an ---------- */
+let wake=null;
+async function keepAwake(){ try{ wake=await navigator.wakeLock.request("screen"); }catch(e){} }
+function releaseAwake(){ try{ wake&&wake.release(); wake=null; }catch(e){} }
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&armed) keepAwake(); });
+
+/* ---------- Glitch-Canvas ---------- */
+let rafId=null;
+function runGlitch(){
+  const cv=$("#glitch"), x=cv.getContext("2d");
+  const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const size=()=>{ cv.width=innerWidth; cv.height=innerHeight; }; size(); addEventListener("resize",size);
+  const glyphs="BLS3/26▚▞░▒█<>#@$%&01".split(""); const fs=16;
+  let drops=Array(Math.ceil(cv.width/fs)).fill(0).map(()=>Math.random()*cv.height/fs); let t=0;
+  (function frame(){
+    const cols=Math.ceil(cv.width/fs); while(drops.length<cols) drops.push(0);
+    x.fillStyle="rgba(10,0,0,0.18)"; x.fillRect(0,0,cv.width,cv.height);
+    x.font=fs+"px 'Share Tech Mono', monospace";
+    for(let i=0;i<cols;i++){ x.fillStyle=Math.random()<0.04?"#fff":"#ff2a2a";
+      x.fillText(glyphs[(Math.random()*glyphs.length)|0], i*fs, drops[i]*fs);
+      if(drops[i]*fs>cv.height && Math.random()>0.975) drops[i]=0; drops[i]+= reduce?0.3:1; }
+    if(!reduce && Math.random()<0.12){ x.fillStyle="rgba(255,255,255,0.05)"; x.fillRect(0,Math.random()*cv.height,cv.width,2+Math.random()*40); }
+    if(((++t)&31)===0) $("#alarmCode").textContent="NODE "+String((Math.random()*90+10)|0)+" · "+["BREACH","EXFIL","ROOT","LOCKED","0xDEAD"][(Math.random()*5)|0];
+    rafId=requestAnimationFrame(frame);
+  })();
+}
+function stopGlitch(){ if(rafId){ cancelAnimationFrame(rafId); rafId=null; } }
+
+function fireAlarm(){ if($("#alarm").classList.contains("on")) return; $("#alarm").classList.add("on"); startSiren(); runGlitch(); }
+function stopAlarm(){ $("#alarm").classList.remove("on"); stopSiren(); stopGlitch(); }
+
+/* ---------- Rollen ---------- */
+document.querySelectorAll(".card").forEach(b=> b.onclick=()=> setRole(b.dataset.role));
+document.querySelectorAll("[data-home]").forEach(b=> b.onclick=()=>{ if(role==="rx") setArmed(false); role=null; show("home"); });
+function setRole(r){ role=r; show(r); if(r==="rx") setArmed(false); if(r==="tx") initConsole(); }
+
+/* Empfänger */
+$("#armBtn").onclick=()=> setArmed(!armed);
+function setArmed(v){
+  armed=v;
+  const pill=$("#rxPill"), btn=$("#armBtn"), test=$("#testBtn");
+  if(v){
+    ensureCtx();
+    try{ const g=actx.createGain(); g.gain.value=0.0001; const o=actx.createOscillator(); o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+0.02);}catch(e){}
+    keepAwake();
+    pill.textContent="Scharf — warte auf Signal"; pill.className="pill armed";
+    btn.textContent="Entschärfen"; btn.classList.remove("arm"); test.hidden=false;
+    sendBeat();
+  } else {
+    stopAlarm(); releaseAwake();
+    pill.textContent="Nicht scharf"; pill.className="pill idle";
+    btn.innerHTML="Scharf<br>schalten"; btn.classList.add("arm"); test.hidden=true;
+  }
+}
+$("#testBtn").onclick=()=>{ fireAlarm(); clearTimeout(testTimer); testTimer=setTimeout(stopAlarm,3000); };
+
+/* ---------- Angriffspult ---------- */
+const peers=new Map();           // id -> letzter Kontakt (ms)
+let shownCount=0, logLines=[];
+function hlog(s){ const ts=new Date().toLocaleTimeString("de-DE",{hour12:false});
+  logLines.unshift("["+ts+"] "+s); logLines=logLines.slice(0,6); $("#hackLog").textContent=logLines.join("\n"); }
+function initConsole(){ peers.clear(); shownCount=0; logLines=[]; $("#hackLog").textContent=""; $("#peerCount").textContent="0"; renderTiles(0);
+  hlog("Scanne Netzwerk auf aktive Ziele …"); }
+function renderTiles(n){
+  const box=$("#hackTiles"); const slots=Math.max(8, Math.ceil(n/8)*8); let h="";
+  for(let i=0;i<slots;i++) h+='<span class="htile'+(i<n?' hacked':'')+'">'+(i<n?'☠':'▯')+'</span>';
+  box.innerHTML=h;
+}
+function animateCount(to){
+  const el=$("#peerCount"); let from=shownCount; if(from===to){ shownCount=to; return; }
+  const step=from<to?1:-1, dur=360, t0=performance.now(), d=Math.abs(to-from);
+  (function f(now){ const p=Math.min((now-t0)/dur,1); el.textContent=String(from+Math.round(step*d*p));
+    if(p<1) requestAnimationFrame(f); else el.textContent=String(to); })(t0);
+  shownCount=to;
+}
+function refreshPeers(){
+  const now=Date.now(); let n=0;
+  peers.forEach((t,id)=>{ if(now-t>7000) peers.delete(id); else n++; });
+  if(role==="tx"){ if(n!==shownCount){ if(n>shownCount) hlog("＋ Gerät übernommen · 10.26."+((Math.random()*254+1)|0)+"."+((Math.random()*254+1)|0)); animateCount(n); renderTiles(n); } }
+}
+setInterval(refreshPeers, 1500);
+
+function triggerAll(){
+  pub(TOPIC+"/cmd","alarm");
+  if(!connected) fireAlarm();     // ohne Verbindung wenigstens lokal
+  hlog("⚡ PAYLOAD GESENDET → "+shownCount+" Geräte");
+  const b=$("#fireBtn"); b.style.transform="scale(.92)"; setTimeout(()=>b.style.transform="",120);
+}
+$("#fireBtn").onclick=triggerAll;
+$("#clearBtn").onclick=()=>{ pub(TOPIC+"/cmd","stop"); stopAlarm(); hlog("Verbindungen gekappt."); };
+$("#stopBtn").onclick=stopAlarm;
+
+addEventListener("keydown",e=>{
+  if($("#alarm").classList.contains("on") && e.code==="Escape"){ e.preventDefault(); stopAlarm(); return; }
+  if(role==="tx" && (e.code==="Space"||e.code==="Enter")){ e.preventDefault(); triggerAll(); }
+});
+
+/* ---------- MQTT (öffentlicher Broker, kein Login) ---------- */
+const myId=Math.random().toString(36).slice(2,9);
+let client=null, connected=false;
+function setLink(ok){ connected=ok; const txt=ok?"live verbunden":"verbinde …";
+  ["#rxLink","#txLink"].forEach(s=>$(s).className="dot "+(ok?"on":"warn"));
+  $("#rxLinkTxt").textContent=txt; $("#txLinkTxt").textContent=txt; $("#homeDot").className="dot "+(ok?"on":"warn"); }
+function pub(topic,msg){ try{ client && connected && client.publish(topic,msg); }catch(e){} }
+function sendBeat(){ if(armed) pub(TOPIC+"/beat", myId); }
+setInterval(sendBeat, 2500);
+
+try{
+  client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt", {connectTimeout:8000, reconnectPeriod:3000, clean:true});
+  client.on("connect", ()=>{ setLink(true); client.subscribe(TOPIC+"/cmd"); client.subscribe(TOPIC+"/beat"); if(armed) sendBeat(); if(role==="tx") hlog("Broker verbunden. Lausche auf Ziele …"); });
+  client.on("reconnect", ()=> setLink(false));
+  client.on("close", ()=> setLink(false));
+  client.on("error", ()=> setLink(false));
+  client.on("message", (t,payload)=>{
+    const m=payload.toString();
+    if(t===TOPIC+"/cmd"){ if(m==="alarm") fireAlarm(); else if(m==="stop") stopAlarm(); }
+    else if(t===TOPIC+"/beat"){ if(m!==myId) peers.set(m, Date.now()); }
+  });
+}catch(e){ setLink(false); }
+</script>
+</body>
+</html>
