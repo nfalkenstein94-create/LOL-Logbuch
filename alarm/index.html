@@ -178,6 +178,28 @@
   </div>
 </div>
 
+<!-- QR-EINSTIEG: ganzer Bildschirm = Scharf-Knopf (ein Tipp gibt den Ton frei) -->
+<style>
+  #qrGate{position:fixed; inset:0; z-index:30; display:none; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+    background:radial-gradient(circle at 50% 45%,#0f2a1b,#07090b 70%); color:#c9f2d8; text-align:center; cursor:pointer;
+    padding:24px; padding-top:max(24px,env(safe-area-inset-top,0px)); padding-bottom:max(24px,env(safe-area-inset-bottom,0px));
+    font-family:"Share Tech Mono",ui-monospace,Menlo,monospace; -webkit-tap-highlight-color:transparent; user-select:none}
+  #qrGate.on{display:flex}
+  #qrGate .ring{width:min(62vw,240px); aspect-ratio:1; border-radius:50%; border:3px solid #17c964; display:flex; align-items:center; justify-content:center;
+    font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:clamp(1.4rem,6vw,2rem); letter-spacing:.06em; text-transform:uppercase; line-height:1.1;
+    background:radial-gradient(circle at 50% 38%,#4bffa0,#0f9e4e 62%,#0a6a35); color:#fff; box-shadow:0 0 0 8px rgba(23,201,100,.14),0 0 50px rgba(23,201,100,.45);
+    animation:gatePulse 1.4s ease-in-out infinite}
+  #qrGate .t1{font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:1.3rem; letter-spacing:.08em}
+  #qrGate .t2{color:#5f7d6c; font-size:.9rem; line-height:1.5; max-width:30ch}
+  @keyframes gatePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @media (prefers-reduced-motion:reduce){ #qrGate .ring{animation:none} }
+</style>
+<div id="qrGate" role="button" aria-label="Tippen zum Scharfschalten">
+  <div class="t1">BLS 3/26 · Übung</div>
+  <div class="ring">Tippen</div>
+  <div class="t2">Einmal irgendwo tippen — dann ist dein Handy scharf.<br>Bildschirm anlassen, Ton laut.</div>
+</div>
+
 <script>
 const $ = s => document.querySelector(s);
 const show = id => ["home","rx","tx"].forEach(k => $("#"+k).hidden = (k!==id));
@@ -303,6 +325,17 @@ addEventListener("keydown",e=>{
   if($("#alarm").classList.contains("on") && e.code==="Escape"){ e.preventDefault(); stopAlarm(); return; }
   if(role==="tx" && (e.code==="Space"||e.code==="Enter")){ e.preventDefault(); triggerAll(); }
 });
+
+/* ---------- QR-Einstieg: ?s (oder ?scharf) springt direkt zum Empfänger ---------- */
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(!(q.has("s")||q.has("scharf"))) return;
+  setRole("rx");
+  const gate=$("#qrGate"); gate.classList.add("on");
+  const go=e=>{ e&&e.preventDefault(); gate.classList.remove("on"); if(!armed) setArmed(true); };
+  gate.addEventListener("click",go,{once:true});
+  gate.addEventListener("touchend",go,{once:true,passive:false});
+})();
 
 /* ---------- MQTT (öffentlicher Broker, kein Login) ---------- */
 const myId=Math.random().toString(36).slice(2,9);
