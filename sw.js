@@ -3,9 +3,9 @@
    alles andere aus dem Zwischenspeicher und wird im Hintergrund erneuert.
    Dadurch bekommt ihr neue Fassungen automatisch – die App meldet sich,
    sobald eine bereitsteht. */
-const VERSION = 'arena-logbuch-v5';
+const VERSION = 'arena-logbuch-v6';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './firebase-config.js',
-  './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
+  './three-arena.min.js', './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => Promise.all(
