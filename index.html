@@ -580,7 +580,7 @@ const AV_W = 240, AV_H = 288;
 
 function av3dLoad() {
   if (AV3D.loading) return AV3D.loading;
-  AV3D.loading = import('./three-arena.min.js').then(T => { AV3D.T = T; av3dInit(); AV3D.ok = true; render(); })
+  AV3D.loading = (window.AV3D_THREE ? Promise.resolve(window.AV3D_THREE) : import('./three-arena.min.js')).then(T => { AV3D.T = T; av3dInit(); AV3D.ok = true; render(); })
     .catch(e => { console.warn('3D-Figuren nicht verfügbar', e); AV3D.failed = true; render(); });
   return AV3D.loading;
 }
