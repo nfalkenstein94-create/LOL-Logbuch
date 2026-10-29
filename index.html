@@ -467,7 +467,7 @@ footer{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:s
 .pod.empty .pod-kda{color:var(--ink-3)}
 .pod-info:hover .pod-name{color:var(--gold-hi)}
 @keyframes podRise{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
-.pod{animation:podRise .45s ease-out both}.pod.p1{animation-delay:.16s}.pod.p2{animation-delay:.1s}.pod.p3{animation-delay:.05s}
+.podium.intro .pod{animation:podRise .45s ease-out both}.podium.intro .pod.p1{animation-delay:.16s}.podium.intro .pod.p2{animation-delay:.1s}.podium.intro .pod.p3{animation-delay:.05s}
 @media(max-width:480px){
   .pod-row{gap:4px}
   .pod-av{width:48px;height:48px}.pod.p1 .pod-av{width:58px;height:58px}
@@ -498,6 +498,113 @@ footer{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:s
 .mini-av .avimg,.mini-av .avph{width:26px}
 .mini-av .avph span{font-size:10px}
 .lk-quote{margin:-4px 0 12px;font-family:var(--fd);font-style:italic;color:var(--gold-hi);font-size:15px}
+
+/* ============ Überarbeitung: Bühne, Kennzahlen, Spiel ============ */
+.podium{padding:16px 10px 0;margin:4px 0 16px;
+  background:radial-gradient(60% 70% at 50% 18%,rgba(240,217,168,.16),transparent 70%),
+    radial-gradient(90% 60% at 50% 100%,rgba(10,200,185,.10),transparent 70%),linear-gradient(180deg,#132a42,#0a1624 78%)}
+.pod-stage{position:relative;overflow:visible}
+.pod-stage::after{content:"";position:absolute;left:4%;right:4%;bottom:0;height:22px;background:radial-gradient(50% 100% at 50% 100%,rgba(200,170,110,.28),transparent 70%);pointer-events:none}
+.pod-step{position:relative;box-shadow:inset 0 10px 0 -2px rgba(255,255,255,.07),inset 0 -24px 30px -20px rgba(0,0,0,.6)}
+.pod-step::before{content:"";position:absolute;left:10px;right:10px;top:0;height:1px;background:rgba(255,255,255,.35)}
+.pod.me .pod-name::after{content:"du";margin-left:5px;font-family:var(--fc);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#0d1a26;background:var(--pc);padding:1px 4px;vertical-align:2px}
+.pod{position:relative}
+.pod-figbtn{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.pod-bang{position:absolute;left:50%;top:38%;z-index:5;pointer-events:none;font-family:var(--fd);font-weight:700;font-size:18px;color:#fff6d8;
+  text-shadow:0 0 12px rgba(255,170,60,.9),0 2px 0 #7a3b0e;white-space:nowrap;animation:bang 1.05s ease-out forwards}
+@keyframes bang{0%{transform:translate(-50%,0) scale(.3) rotate(-8deg);opacity:0}18%{transform:translate(-50%,-8px) scale(1.25) rotate(4deg);opacity:1}
+  70%{transform:translate(-50%,-22px) scale(1);opacity:1}100%{transform:translate(-50%,-34px) scale(.9);opacity:0}}
+.pgame{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 -10px;padding:10px 14px 12px;border-top:1px solid var(--gold-line);background:rgba(3,10,18,.55);font-size:12.5px;color:var(--ink-2)}
+.pg-k{font-family:var(--fc);text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:700;color:var(--gold)}
+.pg-q{flex:1 1 200px}
+.pg-who{display:flex;flex-wrap:wrap;gap:6px}
+.chipbtn{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);padding:3px 10px 3px 4px;font-size:13px;color:var(--ink);background:var(--panel)}
+.chipbtn:hover{border-color:var(--pc);color:var(--gold-hi)}
+.chipbtn .mini-av{margin-right:4px}
+.pg-me{display:inline-flex;align-items:center;gap:6px}
+.pg-me b{color:var(--ink);font-weight:600}
+.pg-ammo{display:inline-flex;align-items:baseline;gap:4px;font-family:var(--fd);font-size:17px;color:var(--gold-hi);padding:0 8px;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.pg-ammo small{font-family:var(--fc);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.pg-x{font-size:11px;color:var(--ink-3);text-decoration:underline;text-underline-offset:2px}
+.pg-x:hover{color:var(--gold-hi)}
+.pg-btns{display:inline-flex;gap:6px;margin-left:auto}
+.pg-btns .btn[disabled]{opacity:.4;cursor:not-allowed}
+.pg-feed{flex:1 1 100%;font-size:12px;color:var(--ink-3)}
+.pg-feed b{color:var(--ink-2);font-weight:600}
+@media(max-width:560px){.pg-btns{margin-left:0;width:100%}.pg-btns .btn{flex:1}}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.kpi{background:linear-gradient(180deg,var(--panel-2),var(--panel));padding:11px 13px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.kpi .k{font-family:var(--fc);text-transform:uppercase;letter-spacing:.13em;font-size:11px;color:var(--ink-3);font-weight:600;white-space:nowrap}
+.kpi .v{font-family:var(--fd);font-size:28px;line-height:1.1;color:var(--gold-hi);font-variant-numeric:tabular-nums}
+.kpi .s{font-size:11.5px;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi.lead{background:linear-gradient(180deg,rgba(200,170,110,.18),var(--panel))}
+.kpi.lead .v{color:#fff2cf}
+.facts{display:flex;flex-wrap:wrap;gap:6px 18px;padding:9px 2px 0;font-size:12.5px;color:var(--ink-2)}
+.fact{display:inline-flex;gap:6px;align-items:baseline}
+.fact .k{font-family:var(--fc);text-transform:uppercase;letter-spacing:.12em;font-size:10.5px;color:var(--ink-3);font-weight:600}
+.fact b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 26px}
+.duo .pdist{height:96px}
+@media(max-width:760px){.duo{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.kpi{padding:9px 8px}.kpi .v{font-size:21px}.kpi .k{font-size:10px;letter-spacing:.08em}.kpi .s{font-size:10.5px}}
+.more-row{margin:8px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:space-between}
+
+/* Kopfzeile mit Symbolen */
+.btn .bi{width:15px;height:15px;fill:currentColor;vertical-align:-3px;margin-right:7px}
+@media(max-width:700px){
+  .teambar{flex-wrap:nowrap}
+  .teambar .sel{flex:1 1 auto;min-width:0}
+  .teambar .btn{flex:none;width:44px;height:44px;padding:0;display:grid;place-items:center}
+  .teambar .btn .bl{display:none}
+  .teambar .btn .bi{margin:0;width:18px;height:18px}
+  header.top{flex-wrap:nowrap;flex-direction:column;align-items:stretch}
+}
+/* Filter auf dem Handy: eine wischbare Zeile */
+@media(max-width:700px){
+  .filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:8px 10px;gap:8px;margin-bottom:12px}
+  .filters::-webkit-scrollbar{display:none}
+  .filters .fgroup{width:auto;flex:none;flex-wrap:nowrap}
+  .filters .flabel{display:none}
+  .filters .seg{flex-wrap:nowrap}
+  .filters .seg button{padding:8px 10px;font-size:11.5px}
+  .filters .sel{min-width:112px!important;min-height:38px;padding:6px 10px;font-size:15px}
+  .fnote{flex:none;white-space:nowrap;margin-left:4px}
+}
+/* Verlauf: Symbol-Knöpfe */
+.ibtn{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line);color:var(--ink-3);background:rgba(3,10,18,.4)}
+.ibtn svg{width:16px;height:16px;fill:currentColor}
+.ibtn:hover{color:var(--gold-hi);border-color:var(--gold-line)}
+.ibtn.del:hover{color:#e2807e;border-color:rgba(192,65,63,.55)}
+.hactions{gap:4px}
+@media(max-width:700px){
+  .hrow{padding:10px 10px;gap:8px 10px}
+  .hmeta{order:1}
+  .hactions{order:2;margin-left:auto;width:auto}
+  .hactions .btn{flex:none}
+  .hgroups{order:3}
+  .ibtn{width:38px;height:38px}
+}
+/* Spieler-Tabelle: kompakte Karten auf dem Handy */
+@media(max-width:700px){
+  table.pt tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 8px;padding:9px 10px}
+  table.pt td{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:1px;padding:0;text-align:left;font-size:14px}
+  table.pt td::before{font-size:9.5px;letter-spacing:.08em}
+  table.pt td:first-child{grid-column:1/-1;flex-direction:row;align-items:center;margin:0 0 2px;padding:0 0 6px}
+  table.pt td.num{text-align:left}
+  table.pt .rate{justify-content:flex-start}
+  table.pt .ratebar{display:none}
+  table.pt td[data-l="Meistgespielt"]{grid-column:span 1;min-width:0}
+  table.pt td[data-l="Meistgespielt"]::before{content:"Champion"}
+  table.pt td[data-l="Wertungen"]::before{content:"Wert."}
+  table.pt td[data-l="Meistgespielt"] .chcell{font-size:12px;gap:5px;max-width:100%;overflow:hidden}
+  table.pt td[data-l="Meistgespielt"] .chcell img{width:22px;height:22px}
+}
+/* Rahmen etwas edler */
+.frame>.inner{box-shadow:inset 0 1px 0 rgba(240,217,168,.08)}
+.sec-head h2{letter-spacing:.02em}
+footer #resetAllBtn,footer .danger{opacity:.75}
+
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
@@ -518,8 +625,8 @@ footer{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:s
     </div>
     <div class="teambar">
       <select class="sel" id="teamSel" aria-label="Team auswählen"></select>
-      <button class="btn ghost" id="editTeam">Team bearbeiten</button>
-      <button class="btn" id="newTeam">Neues Team</button>
+      <button class="btn ghost" id="editTeam" title="Team bearbeiten"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16.8V20h3.2l9.4-9.4-3.2-3.2zM19.7 7.5a1 1 0 0 0 0-1.4l-1.8-1.8a1 1 0 0 0-1.4 0l-1.5 1.5 3.2 3.2z"/></svg><span class="bl">Team bearbeiten</span></button>
+      <button class="btn" id="newTeam" title="Neues Team"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"/></svg><span class="bl">Neues Team</span></button>
     </div>
   </header>
 
@@ -575,7 +682,7 @@ const AVATARS = [
   { id: 'koch', name: 'Pinguin-Pirat', hint: 'Watschelt, plündert, feiert' }
 ];
 const AV_BY_ID = new Map(AVATARS.map(a => [a.id, a]));
-const AV3D = { ok: false, failed: false, loading: null, T: null, R: null, scene: null, cam: null, figs: new Map(), thumbs: new Map(), spins: new Map(), raf: 0, last: 0 };
+const AV3D = { ok: false, failed: false, loading: null, T: null, R: null, scene: null, cam: null, figs: new Map(), thumbs: new Map(), spins: new Map(), acts: new Map(), raf: 0, last: 0 };
 const AV_W = 240, AV_H = 288;
 
 function av3dLoad() {
@@ -916,15 +1023,16 @@ function av3dFig(id) {
   if (!AV3D.figs.has(id)) {
     const k = avKit(AV3D.T); const g = (AV_BUILD[id] || AV_BUILD.fuchs)(k);
     const wrap = new AV3D.T.Group(); wrap.add(g); wrap.userData.inner = g;
+    ['armL', 'armR'].forEach(n => { const a = g.userData[n]; if (a) a.userData.bx = a.rotation.x; });
     AV3D.figs.set(id, wrap);
   }
   return AV3D.figs.get(id);
 }
 /* eine Figur in einer Pose zeichnen */
-function av3dPose(wrap, t, mode, spin) {
+function av3dPose(wrap, t, mode, spin, act) {
   const g = wrap.userData.inner, u = g.userData;
   const ph = t * 1.0;
-  let y = 0, ry = Math.sin(ph * .7) * .32, arms = 0, rz = 0;
+  let y = 0, ry = Math.sin(ph * .7) * .32, arms = 0, rz = 0, fwd = 0, rx = 0;
   if (mode === 'idle') { y = u.float ? .12 + Math.sin(ph * 2) * .1 : Math.abs(Math.sin(ph * 2.2)) * .04; }
   if (mode === 'win') {
     const c = (t % 3.2) / 3.2;
@@ -933,18 +1041,25 @@ function av3dPose(wrap, t, mode, spin) {
   }
   if (mode === 'still') { ry = .38; y = u.float ? .12 : 0; }
   if (u.waddle && mode !== 'still') rz = Math.sin(ph * 4) * .07;
+  if (act) {
+    const p = act.p, d = act.d || 1, s = Math.sin(Math.min(1, p) * Math.PI);
+    if (act.m === 'push') { ry = d * Math.PI / 2 * Math.min(1, p * 3) * (p > .75 ? (1 - p) * 4 : 1); fwd = s * 1.5; rz = -d * s * .25; y = 0; }
+    if (act.m === 'hit') { arms = .6 + Math.sin(p * 30) * .3; rz = d * Math.sin(p * 18) * .35 * (1 - p); }
+    if (act.m === 'fall') { arms = 1; rz = d * Math.min(1, p * 2.5) * 1.3 * (p > .6 ? Math.max(0, (1 - p) * 2.5) : 1); rx = Math.sin(p * 24) * .2 * (1 - p); }
+  }
   if (spin != null) ry += spin * Math.PI * 2;
-  wrap.position.y = y; wrap.rotation.y = ry; wrap.rotation.z = rz;
+  wrap.position.y = y; wrap.rotation.y = ry; wrap.rotation.z = rz; wrap.rotation.x = rx;
   if (u.squish) { const s = mode === 'still' ? 1 : 1 + Math.sin(ph * 3) * .04; g.scale.set(1 / Math.sqrt(s), s, 1 / Math.sqrt(s)); }
   ['armL', 'armR'].forEach((n, i) => {
     const a = u[n]; if (!a) return; const side = i ? 1 : -1;
     a.rotation.z = (a.userData.base || 0) + side * (arms * 2.2 + (mode === 'idle' ? Math.sin(ph * 2 + i) * .06 : 0));
+    a.rotation.x = (a.userData.bx || 0) - fwd;
   });
   if (u.head) u.head.rotation.z = mode === 'still' ? 0 : Math.sin(ph * 1.3) * .06;
 }
-function av3dDraw(id, t, mode, spin) {
+function av3dDraw(id, t, mode, spin, act) {
   const w = av3dFig(id);
-  AV3D.scene.add(w); av3dPose(w, t, mode, spin);
+  AV3D.scene.add(w); av3dPose(w, t, mode, spin, act);
   AV3D.R.render(AV3D.scene, AV3D.cam);
   AV3D.scene.remove(w);
   return AV3D.R.domElement;
@@ -967,7 +1082,9 @@ function av3dLoop(now) {
     const id = cv.dataset.av, key = cv.dataset.k || id;
     let spin = null; const s0 = AV3D.spins.get(key);
     if (s0) { const p = (now - s0) / 1100; if (p >= 1) AV3D.spins.delete(key); else spin = 1 - Math.pow(1 - p, 3); }
-    const src = av3dDraw(id, t + i * 1.7, cv.dataset.m || 'idle', spin);
+    let act = AV3D.acts.get(key);
+    if (act) { const p = (now - act.t0) / (act.m === 'fall' ? 2300 : 900); if (p >= 1) { AV3D.acts.delete(key); act = null; } else act = { m: act.m, d: act.d, p: p }; }
+    const src = av3dDraw(id, t + i * 1.7, cv.dataset.m || 'idle', spin, act);
     const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, cv.width, cv.height); ctx.drawImage(src, 0, 0, cv.width, cv.height);
   });
 }
@@ -984,6 +1101,147 @@ function avatarLive(id, key, mode, cls) {
   if (!AV3D.ok) return avatarImg(id, cls);
   setTimeout(av3dKick, 0);
   return '<canvas class="av3d ' + (cls || '') + '" width="' + AV_W + '" height="' + AV_H + '" data-av="' + esc(id) + '" data-k="' + esc(key) + '" data-m="' + (mode || 'idle') + '" aria-hidden="true"></canvas>';
+}
+
+/* ============================================================
+   Podest-Gerangel: Figuren schubsen sich gegenseitig vom Treppchen.
+   Schubser verdient man durch gespielte Runden – je besser der Platz,
+   desto mehr. Gezählt wird im Team-Dokument unter pokes, damit alle
+   Geräte dieselben Zahlen sehen und Schubser live mitbekommen.
+   ============================================================ */
+const POKE_START = 3;
+const pokeEarn = place => place === 1 ? 3 : (place && place <= 4) ? 2 : 1;
+const LS_ME = 'arenaLog.me.v1';
+let podBusyUntil = 0, pokeSeen = Date.now() - 15000, podIntroDone = false;
+function meId() { const t = currentTeam(); const m = lsGet(LS_ME, {}) || {}; const id = t && m[t.id]; return t && t.players.some(p => p.id === id) ? id : ''; }
+function setMe(pid) { const t = currentTeam(); if (!t) return; const m = lsGet(LS_ME, {}) || {}; m[t.id] = pid; lsSet(LS_ME, m); render(); }
+function pokeCounts(t) { return (t && t.pokes && t.pokes.c) || {}; }
+function pokeEarned(pid) {
+  let n = POKE_START;
+  teamMatchesRaw().map(normMatch).filter(matchOk).forEach(m => m.groups.forEach(g => { if (g.picks.some(pk => pk.p === pid)) n += pokeEarn(g.place); }));
+  return n;
+}
+function pokesLeft(pid) { const c = pokeCounts(currentTeam())[pid] || {}; return Math.max(0, pokeEarned(pid) - (c.g || 0)); }
+
+/* Nachbarn in der Anzeige-Reihenfolge des Podests */
+function podNeighbor(pid, dir) {
+  const els = [...document.querySelectorAll('.pod[data-pid]')];
+  const i = els.findIndex(e => e.dataset.pid === pid);
+  const j = i + dir;
+  return i >= 0 && j >= 0 && j < els.length ? els[j].dataset.pid : '';
+}
+async function doPoke(dir) {
+  const me = meId(); if (!me) return;
+  if (Date.now() < podBusyUntil) return;
+  const to = podNeighbor(me, dir);
+  if (!to) { toast('Da steht niemand – du würdest ins Leere schubsen.'); return; }
+  if (pokesLeft(me) < 1) { toast('Keine Schubser mehr. Spielt eine Runde – jede Wertung bringt neue.', 'bad'); return; }
+  const fell = Math.random() < .6;
+  const t = currentTeam();
+  const ev = { by: me, to: to, ts: Date.now(), f: fell, d: dir };
+  pokeSeen = ev.ts;
+  playPoke(ev);
+  /* lokal sofort mitzählen, damit die Anzeige stimmt */
+  const c = Object.assign({}, pokeCounts(t));
+  c[me] = Object.assign({ g: 0, t: 0, f: 0 }, c[me]); c[me].g++;
+  c[to] = Object.assign({ g: 0, t: 0, f: 0 }, c[to]); c[to].t++; if (fell) c[to].f++;
+  t.pokes = { c: c, last: ev };
+  try {
+    if (FB && !t.unsaved) {
+      const inc = FB.inc;
+      const data = { pokes: { last: ev, c: { [me]: { g: inc(1) }, [to]: inc ? { t: inc(1), f: inc(fell ? 1 : 0) } : c[to] } } };
+      if (!inc) data.pokes.c[me] = c[me];
+      setTimeout(() => FB.setDoc(FB.doc('teams/' + t.id), data, { merge: true }).catch(() => toast('Schubser konnte nicht gespeichert werden.', 'bad')), 50);
+    } else if (!t.unsaved) { queueWrite('merge', 'teams', t.id, { pokes: t.pokes }); saveMirror(); }
+  } catch (e) {}
+}
+/* von anderen Geräten: neuen Schubser erkannt */
+function checkPokes() {
+  const t = currentTeam(); const ev = t && t.pokes && t.pokes.last;
+  if (!ev || !ev.ts || ev.ts <= pokeSeen) return;
+  pokeSeen = ev.ts;
+  if (Date.now() - ev.ts > 20000) return;
+  setTimeout(() => {
+    playPoke(ev);
+    if (ev.to === meId()) { const p = playerById(t, ev.by); toast((p ? p.name : 'Jemand') + (ev.f ? ' hat dich vom Treppchen geschubst!' : ' hat dich geschubst – du hast standgehalten.')); }
+  }, 80);
+}
+function playPoke(ev) {
+  if (S.ui.tab !== 'stats') return;
+  const A = document.querySelector('.pod[data-pid="' + ev.by + '"] .pod-figbtn');
+  const B = document.querySelector('.pod[data-pid="' + ev.to + '"] .pod-figbtn');
+  if (!A || !B || !A.animate) return;
+  podBusyUntil = Date.now() + 2900;
+  setTimeout(() => render(), 2950);
+  const ra = A.getBoundingClientRect(), rb = B.getBoundingClientRect();
+  const dx = (rb.left + rb.width / 2) - (ra.left + ra.width / 2), dy = (rb.bottom) - (ra.bottom);
+  const dir = dx >= 0 ? 1 : -1;
+  AV3D.acts.set('pod-' + ev.by, { m: 'push', t0: performance.now(), d: dir });
+  A.animate([{ transform: 'none' }, { transform: 'translate(' + dx * .18 + 'px,0) rotate(' + (-dir * 4) + 'deg)', offset: .3 },
+    { transform: 'translate(' + (dx * .62) + 'px,' + (dy * .6) + 'px) rotate(' + (dir * 8) + 'deg)', offset: .48 }, { transform: 'none' }],
+    { duration: 900, easing: 'cubic-bezier(.3,.6,.3,1)' });
+  setTimeout(() => {
+    AV3D.acts.set('pod-' + ev.to, { m: ev.f ? 'fall' : 'hit', t0: performance.now(), d: dir });
+    const bang = document.createElement('span'); bang.className = 'pod-bang'; bang.textContent = ev.f ? 'SCHUBS!' : 'Bonk!';
+    const pod = B.closest('.pod'); pod.appendChild(bang);
+    setTimeout(() => bang.remove(), 1100);
+    if (ev.f) {
+      B.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dir * 34 + 'px,-14px) rotate(' + dir * 40 + 'deg)', offset: .18 },
+        { transform: 'translate(' + dir * 60 + 'px,90px) rotate(' + dir * 110 + 'deg)', opacity: 0, offset: .42 },
+        { transform: 'translate(0,-70px)', opacity: 0, offset: .7 }, { transform: 'translate(0,-70px)', opacity: 1, offset: .74 },
+        { transform: 'translate(0,6px)', offset: .9 }, { transform: 'none', opacity: 1 }], { duration: 2300, easing: 'ease-in-out' });
+      const crown = B.querySelector('.pod-crown');
+      if (crown) crown.animate([{ transform: 'translateX(-50%)' }, { transform: 'translate(' + (dir * 80 - 50) + '%,-60px) rotate(' + dir * 200 + 'deg)', opacity: .9, offset: .35 },
+        { transform: 'translate(' + (dir * 120 - 50) + '%,140px) rotate(' + dir * 400 + 'deg)', opacity: 0, offset: .6 }, { transform: 'translateX(-50%)', opacity: 0, offset: .8 }, { transform: 'translateX(-50%)', opacity: 1 }], { duration: 2300 });
+    } else {
+      B.animate([{ transform: 'none' }, { transform: 'translateX(' + dir * 12 + 'px) rotate(' + dir * 14 + 'deg)' }, { transform: 'rotate(' + -dir * 9 + 'deg)' },
+        { transform: 'rotate(' + dir * 5 + 'deg)' }, { transform: 'none' }], { duration: 800, easing: 'ease-out' });
+    }
+  }, 410);
+}
+/* Wischen auf der eigenen Figur */
+let podSwipe = null, podTapBlock = false;
+function podDown(e, pid) { podSwipe = { x: e.clientX, y: e.clientY, pid: pid }; }
+function podUp(e, pid) {
+  const s = podSwipe; podSwipe = null;
+  if (!s || s.pid !== pid) return;
+  const dx = e.clientX - s.x;
+  if (Math.abs(dx) > 34 && Math.abs(dx) > Math.abs(e.clientY - s.y)) {
+    podTapBlock = true; setTimeout(() => { podTapBlock = false; }, 400);
+    if (pid !== meId()) { toast(meId() ? 'Schubsen kannst du nur mit deiner eigenen Figur.' : 'Wähle zuerst unter dem Podest, wer du bist.'); return; }
+    doPoke(dx > 0 ? 1 : -1);
+  }
+}
+function podTap(pid, hasAv) {
+  if (podTapBlock) return;
+  if (hasAv) av3dSpin('pod-' + pid); else openLook(pid);
+}
+
+function rel(ts) {
+  const s = Math.round((Date.now() - ts) / 1000);
+  if (s < 60) return 'gerade eben'; const m = Math.round(s / 60); if (m < 60) return 'vor ' + m + ' Min.';
+  const h = Math.round(m / 60); if (h < 24) return 'vor ' + h + ' Std.'; return fmtDate(ts);
+}
+function pokeBarHtml() {
+  const t = currentTeam(); if (!t) return '';
+  const real = t.players.filter(p => !p.random); if (real.length < 2) return '';
+  const me = meId();
+  if (!me) return '<div class="pgame"><span class="pg-k">Gerangel</span><span class="pg-q">Wer bist du? Dann kannst du andere vom Treppchen schubsen.</span>' +
+    '<span class="pg-who">' + real.map(p => '<button class="chipbtn" style="--pc:' + p.color + '" onclick="setMe(\'' + esc(p.id) + '\')">' + playerMark(t, p) + esc(p.name) + '</button>').join('') + '</span></div>';
+  const left = pokesLeft(me), c = pokeCounts(t), last = t.pokes && t.pokes.last;
+  const l = podNeighbor(me, -1), r = podNeighbor(me, 1);
+  const nm = id => { const p = playerById(t, id); return p ? p.name : '?'; };
+  const most = (k) => real.map(p => [p, (c[p.id] || {})[k] || 0]).sort((a, b) => b[1] - a[1])[0];
+  const mg = most('g'), mf = most('f');
+  return '<div class="pgame">' +
+    '<span class="pg-k">Gerangel</span>' +
+    '<span class="pg-me">' + playerMark(t, playerById(t, me)) + '<b>' + esc(nm(me)) + '</b><span class="pg-ammo" title="Jede Wertung bringt Schubser: Platz 1 drei, Top 4 zwei, sonst einen.">' + left + '<small>Schubser</small></span>' +
+      '<button class="pg-x" onclick="setMe(\'\')" title="Spieler wechseln" aria-label="Spieler wechseln">wechseln</button></span>' +
+    '<span class="pg-btns"><button class="btn sm" ' + (l && left ? '' : 'disabled ') + 'onclick="doPoke(-1)" aria-label="Nach links schubsen">◀ ' + (l ? esc(nm(l)) : '–') + '</button>' +
+      '<button class="btn sm" ' + (r && left ? '' : 'disabled ') + 'onclick="doPoke(1)" aria-label="Nach rechts schubsen">' + (r ? esc(nm(r)) : '–') + ' ▶</button></span>' +
+    '<span class="pg-feed">' + (last && last.by ? '<b>' + esc(nm(last.by)) + '</b> ' + (last.f ? 'schubste' : 'rempelte') + ' <b>' + esc(nm(last.to)) + '</b>' + (last.f ? ' vom Treppchen' : '') + ' · ' + rel(last.ts) : 'Noch niemand geschubst. Wisch deine Figur zur Seite oder nimm die Pfeile.') +
+      (mg && mg[1] ? ' · Rüpel: <b>' + esc(mg[0].name) + '</b> (' + mg[1] + ')' : '') + (mf && mf[1] ? ' · Am öftesten gefallen: <b>' + esc(mf[0].name) + '</b> (' + mf[1] + ')' : '') + '</span>' +
+    '</div>';
 }
 
 const PALETTE = ['#F0C97B', '#0AC8B9', '#9B8CFF', '#FF8A5B', '#5FB8FF', '#F2A2C0'];
@@ -1146,7 +1404,7 @@ async function connectCloud() {
     } catch (e) { store = fsMod.getFirestore(app); }
     const base = 'logs/' + code;
     FB = {
-      addDoc: fsMod.addDoc, setDoc: fsMod.setDoc, deleteDoc: fsMod.deleteDoc,
+      addDoc: fsMod.addDoc, setDoc: fsMod.setDoc, deleteDoc: fsMod.deleteDoc, inc: fsMod.increment,
       col: n => fsMod.collection(store, base + '/' + n),
       doc: n => fsMod.doc(store, base + '/' + n)
     };
@@ -1179,7 +1437,7 @@ async function connectCloud() {
 function afterCloudData() {
   if (!S.teams.length) applySeed();
   if (!S.teams.find(t => t.id === S.curTeamId)) { S.curTeamId = S.teams[0] ? S.teams[0].id : null; resetDraft(); }
-  saveMirror(); render();
+  saveMirror(); render(); checkPokes();
 }
 
 /* ---------- Schreiben ---------- */
@@ -1951,6 +2209,7 @@ function panel(inner) { return '<section class="frame"><div class="inner">' + in
 function renderMain() {
   const el = byId('mainContent');
   const tab = S.ui.tab;
+  if (tab === 'stats' && Date.now() < podBusyUntil && el.querySelector('.podium')) return;
   let h = (tab === 'stats' || tab === 'analysis' || tab === 'history') ? filterBar() : '';
   if (tab === 'stats') h += panel(bilanzHtml()) + panel(spielerHtml());
   else if (tab === 'analysis') h += panel(analyseHtml()) + panel(championsHtml()) + (agg().byAug.size ? panel(augmentsHtml()) : '');
@@ -2100,11 +2359,11 @@ function podiumHtml(a) {
     const fig = av ? avatarLive(av, 'pod-' + x.p.id, slot === 1 && x.rank ? 'win' : 'idle', 'pod-svg') :
       '<span class="pod-av"><span class="hx"><i' + (img ? ' style="background-image:url(\'' + img + '\')">' : '>' + esc(x.p.name.charAt(0))) + '</i></span></span>';
     const label = x.rank ? 'Platz ' + x.rank : 'ohne Riot-Daten';
-    return '<div class="pod p' + slot + (x.rank ? '' : ' nokda') + '" style="--pc:' + x.p.color + '">' +
+    return '<div class="pod p' + slot + (x.rank ? '' : ' nokda') + (x.p.id === meId() ? ' me' : '') + '" data-pid="' + id + '" style="--pc:' + x.p.color + '">' +
       '<button type="button" class="pod-look" onclick="openLook(\'' + id + '\')" aria-label="Spruch und Figur von ' + esc(x.p.name) + ' ändern">' +
         (l.q ? '<span class="pod-bw"><span class="pod-bub" title="' + esc(l.q) + '">' + esc(l.q) + '</span></span>' : '<span class="pod-bw add"><span class="pod-bub add">+ Spruch</span></span>') +
       '</button>' +
-      '<button type="button" class="pod-look pod-figbtn" onclick="' + (av ? 'av3dSpin(\'pod-' + id + '\')' : 'openLook(\'' + id + '\')') + '" aria-label="' + (av ? 'Figur drehen' : 'Figur wählen') + '">' +
+      '<button type="button" class="pod-look pod-figbtn" onpointerdown="podDown(event,\'' + id + '\')" onpointerup="podUp(event,\'' + id + '\')" onclick="podTap(\'' + id + '\',' + (av ? 1 : 0) + ')" aria-label="' + (av ? 'Figur drehen' : 'Figur wählen') + '">' +
         '<span class="pod-fig">' + (slot === 1 && x.rank ? crown : '') + fig + (av ? '' : '<span class="pod-pick">Figur</span>') + '</span>' +
       '</button>' +
       '<button type="button" class="pod-info" onclick="openPlayer(\'' + id + '\')" ' +
@@ -2116,10 +2375,11 @@ function podiumHtml(a) {
         '<span class="pod-step" style="' + h + '">' + (x.rank || '·') + '</span>' +
       '</button></div>';
   };
-  return '<div class="podium"><div class="podium-h"><span class="eyebrow">Podest · beste KDA</span>' +
-    '<span class="tiny muted">Blase antippen: Spruch &amp; Figur · Figur antippen: dreht sich</span></div>' +
-    '<div class="pod-row" style="grid-template-columns:' + order.map(s => s === 1 ? '1.15fr' : '1fr').join(' ') + ';max-width:' + Math.min(140 * n, 760) + 'px">' +
-      order.map(cell).join('') + '</div></div>';
+  const intro = !podIntroDone; if (intro) setTimeout(() => { podIntroDone = true; }, 900);
+  return '<div class="podium' + (intro ? ' intro' : '') + '"><div class="podium-h"><span class="eyebrow">Podest · beste KDA</span>' +
+    '<span class="tiny muted">Blase: Spruch &amp; Figur · Figur zur Seite wischen: schubsen</span></div>' +
+    '<div class="pod-stage"><div class="pod-row" style="grid-template-columns:' + order.map(s => s === 1 ? '1.15fr' : '1fr').join(' ') + ';max-width:' + Math.min(140 * n, 760) + 'px">' +
+      order.map(cell).join('') + '</div></div>' + pokeBarHtml() + '</div>';
 }
 function bilanzHtml() {
   const a = agg();
@@ -2127,49 +2387,52 @@ function bilanzHtml() {
   const form = a.entries.slice(0, 14).reverse();
   const maxDist = Math.max.apply(null, a.dist.concat([1]));
   const se = seOf(a.total);
+  const kpi = (k, v, sub, cls) => '<div class="kpi' + (cls ? ' ' + cls : '') + '"><span class="k">' + k + '</span><span class="v">' + v + '</span><span class="s">' + sub + '</span></div>';
+  const fact = (k, v) => '<span class="fact"><span class="k">' + k + '</span><b>' + v + '</b></span>';
   return '<div class="sec-head"><h2>Bilanz</h2><span class="tiny muted">' + esc(currentTeam() ? currentTeam().name : '') + '</span></div>' +
     podiumHtml(a) +
     (a.broken.length ? '<div class="notice warn"><div><b>' + plural(a.broken.length, 'unvollständige Runde', 'unvollständige Runden') + '.</b> Zählen nicht mit – im Verlauf kannst du sie bearbeiten oder löschen.</div></div>' : '') +
     (!a.n ? '<div class="empty">Noch keine Runde im gewählten Zeitraum.</div>' :
-    '<div class="tiles">' +
-      tile('Runden', a.n, a.n ? 'seit ' + fmtDate(a.chrono[0].ts) : '–') +
-      tile('Ø Platz', avgTxt(a.total), (se ? '± ' + dec1(se) + ' · ' : '') + 'aus ' + plural(a.total.cnt, 'Wertung', 'Wertungen')) +
-      tile('Siege', a.total.w, pct(a.total.w, a.total.g) + ' % aller Wertungen') +
-      tile('Top 4', a.total.top, pct(a.total.top, a.total.g) + ' % der Wertungen') +
-      tile('Serie', st.n || 0, st.kind === 'top' ? 'Top 4 in Folge' : st.kind ? 'außerhalb Top 4' : '–') +
-      tile('Abende', a.days.length, a.days.length ? 'zuletzt ' + dayLabel(a.days[0].ts) : '–') +
-      tile('Bravery', a.mode.bravery.g, a.mode.bravery.cnt ? 'Ø Platz ' + avgTxt(a.mode.bravery) : 'keine Picks') +
-      tile('Gay-Counter', a.mode.gay.g, a.mode.gay.cnt ? 'Ø Platz ' + avgTxt(a.mode.gay) : 'nie angeklickt') +
+    '<div class="kpis">' +
+      kpi('Ø Platz', avgTxt(a.total), (se ? '± ' + dec1(se) : 'aus ' + a.total.cnt), 'lead') +
+      kpi('Siege', a.total.w, pct(a.total.w, a.total.g) + ' %') +
+      kpi('Top 4', a.total.top, pct(a.total.top, a.total.g) + ' %') +
+      kpi('Runden', a.n, 'seit ' + new Date(a.chrono[0].ts).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })) +
     '</div>' +
-    '<div class="eyebrow-row"><span class="eyebrow">Platzverteilung</span>' +
-      (a.unknown ? '<span class="tiny muted">' + a.unknown + '× Platz unbekannt (alte Runden)</span>' : '') + '</div>' +
-    '<div class="pdist">' + a.dist.map((v, i) => {
-      const n = i + 1;
-      return '<div class="pcol" title="' + placeTxt(n) + ': ' + v + '×">' +
-        '<span class="pcv">' + (v || '') + '</span>' +
-        '<span class="pcb"><i style="height:' + Math.round(v / maxDist * 100) + '%;background:' + placeColor(n) + '"></i></span>' +
-        '<span class="pcl' + (isTop4(n) ? ' top' : '') + '">' + n + '</span></div>';
-    }).join('') + '</div>' +
-    (form.length ? '<div class="eyebrow-row"><span class="eyebrow">Form · letzte ' + form.length + '</span>' +
-      '<span class="tiny muted">längste Top-4-Serie ' + st.bestTop + ' · längste Durststrecke ' + st.bestLow + '</span></div>' +
-      '<div class="formdots">' + form.map(e => '<span class="fdot" style="--fc2:' + placeColor(e.place) + '" title="' + placeTxt(e.place) + ' · ' + esc(fmtDT(e.ts)) + '">' + (e.place || '?') + '</span>').join('') + '</div>' +
-      '<p class="tiny muted" style="margin:7px 0 0">links die ältere, rechts die neueste Wertung</p>' : '') +
-    kdaBlock(a) +
-    '<div class="eyebrow-row"><span class="eyebrow">Nach Pick-Art</span></div>' +
+    '<div class="facts">' +
+      fact('Serie', (st.n || 0) + (st.kind === 'top' ? '× Top 4' : st.kind ? '× außerhalb' : '')) +
+      fact('Abende', a.days.length + (a.days.length ? ' · zuletzt ' + dayLabel(a.days[0].ts) : '')) +
+      fact('Bravery', a.mode.bravery.g ? a.mode.bravery.g + '× · Ø ' + avgTxt(a.mode.bravery) : '–') +
+      fact('Gay', a.mode.gay.g ? a.mode.gay.g + '× · Ø ' + avgTxt(a.mode.gay) : '–') +
+    '</div>' +
+    '<div class="duo">' +
+      '<div><div class="eyebrow-row"><span class="eyebrow">Platzverteilung</span>' +
+        (a.unknown ? '<span class="tiny muted">' + a.unknown + '× unbekannt</span>' : '') + '</div>' +
+      '<div class="pdist">' + a.dist.map((v, i) => {
+        const n = i + 1;
+        return '<div class="pcol" title="' + placeTxt(n) + ': ' + v + '×">' +
+          '<span class="pcv">' + (v || '') + '</span>' +
+          '<span class="pcb"><i style="height:' + Math.round(v / maxDist * 100) + '%;background:' + placeColor(n) + '"></i></span>' +
+          '<span class="pcl' + (isTop4(n) ? ' top' : '') + '">' + n + '</span></div>';
+      }).join('') + '</div></div>' +
+      (form.length ? '<div><div class="eyebrow-row"><span class="eyebrow">Form · letzte ' + form.length + '</span>' +
+        '<span class="tiny muted">beste Serie ' + st.bestTop + ' · Durststrecke ' + st.bestLow + '</span></div>' +
+        '<div class="formdots">' + form.map(e => '<span class="fdot" style="--fc2:' + placeColor(e.place) + '" title="' + placeTxt(e.place) + ' · ' + esc(fmtDT(e.ts)) + '">' + (e.place || '?') + '</span>').join('') + '</div>' +
+        '<p class="tiny muted" style="margin:7px 0 0">älteste links, neueste rechts</p></div>' : '') +
+    '</div>' +
+    '<div class="eyebrow-row"><span class="eyebrow">Nach Pick-Art</span><span class="tiny muted">Gay zählt zusätzlich zu Regular oder Bravery</span></div>' +
     '<div class="modes">' +
       modeRow('Regular', '', 'var(--gold)', a.mode.regular) +
       modeRow('Bravery', 'tealc', 'var(--teal)', a.mode.bravery) +
       modeRow('Gay', 'rosec', 'var(--rose)', a.mode.gay) +
-    '</div>' +
-    ((a.fmt['2v2'].g && a.fmt['3v3'].g) ? '<div class="modes" style="margin-top:9px">' +
-      modeRow('2v2', '', 'var(--second)', a.fmt['2v2']) + modeRow('3v3', '', 'var(--second)', a.fmt['3v3']) + '</div>' : '') +
-    '<p class="tiny muted" style="margin:8px 0 0">Gay-Picks zählen zusätzlich – sie stecken je nach Runde auch in Regular oder Bravery.</p>');
+      ((a.fmt['2v2'].g && a.fmt['3v3'].g) ? modeRow('2v2', '', 'var(--second)', a.fmt['2v2']) + modeRow('3v3', '', 'var(--second)', a.fmt['3v3']) : '') +
+    '</div>');
 }
 function spielerHtml() {
   const a = agg(); const t = currentTeam();
   if (!a.roster.length) return '<div class="sec-head"><h2>Spieler</h2></div><div class="empty">Noch keine Spieler im Kader.</div>';
   return '<div class="sec-head"><h2>Spieler</h2><span class="tiny muted">Zeile antippen für Details</span></div>' +
-    '<div class="scrollx"><table class="resp"><thead><tr><th>Spieler</th><th class="num">Wert.</th><th class="num">Ø Platz</th><th class="num">Siege</th><th class="num">Top 4</th><th class="num">Brav.</th><th class="num">Gay</th><th class="num">Ø KDA</th><th>Meistgespielt</th></tr></thead><tbody>' +
+    '<div class="scrollx"><table class="resp pt"><thead><tr><th>Spieler</th><th class="num">Wert.</th><th class="num">Ø Platz</th><th class="num">Siege</th><th class="num">Top 4</th><th class="num">Brav.</th><th class="num">Gay</th><th class="num">Ø KDA</th><th>Meistgespielt</th></tr></thead><tbody>' +
     a.roster.map(p => {
       const r = a.byPlayer.get(p.id);
       const best = [...r.champs.entries()].sort((x, y) => y[1] - x[1])[0];
@@ -2206,7 +2469,7 @@ function analyseHtml() {
       '<td class="num" data-l="Ø Platz"><b class="gold">' + avgTxt(c) + '</b></td>' +
       '<td class="num" data-l="Siege">' + c.w + '</td>' +
       '<td class="num" data-l="Top 4">' + rateCell(pct(c.top, c.g), c.g) + '</td></tr>';
-  }).join('');
+  }).slice(0, S.ui.allCombos ? 999 : 6).join('');
 
   const gayRank = a.roster.filter(p => a.byPlayer.get(p.id).gay > 0).sort((x, y) => a.byPlayer.get(y.id).gay - a.byPlayer.get(x.id).gay);
   const maxGay = gayRank.length ? a.byPlayer.get(gayRank[0].id).gay : 0;
@@ -2217,7 +2480,8 @@ function analyseHtml() {
       '<div class="cards">' + ins.map(i => '<div class="card ' + (i.kind || '') + '"><span class="ct">' + esc(i.t) + '</span>' + i.h + '</div>').join('') + '</div>' : '') +
     '<div class="eyebrow-row"><span class="eyebrow">Aufstellungen</span><span class="tiny muted">wer stand zusammen im Team</span></div>' +
     (comboRows ? '<div class="scrollx"><table class="resp"><thead><tr><th>Aufstellung</th><th class="num">Wert.</th><th class="num">Ø Platz</th><th class="num">Siege</th><th class="num">Top 4</th></tr></thead><tbody>' + comboRows + '</tbody></table></div>' +
-      '<p class="tiny muted" style="margin:8px 0 0">Blasse Zeilen haben noch zu wenige Wertungen für eine Aussage.</p>'
+      '<p class="tiny muted more-row">Blasse Zeilen haben noch zu wenige Wertungen für eine Aussage.' +
+        (combos.length > 6 ? ' <button class="btn ghost sm" onclick="S.ui.allCombos=!S.ui.allCombos;saveUi();render()">' + (S.ui.allCombos ? 'Weniger zeigen' : 'Alle ' + combos.length + ' zeigen') + '</button>' : '') + '</p>'
       : '<div class="empty">Noch keine Runde mit zwei Leuten aus dem Kader im selben Team.</div>') +
     ((a.squad.full.cnt && a.squad.random.cnt) ? '<p class="tiny muted" style="margin:10px 0 0">Nur eigener Kader: <b class="gold">Ø ' + avgTxt(a.squad.full) + '</b> aus ' + a.squad.full.g +
       ' · mit fremdem Mitspieler: <b class="gold">Ø ' + avgTxt(a.squad.random) + '</b> aus ' + a.squad.random.g + '</p>' : '') +
@@ -2323,10 +2587,10 @@ function histRow(t, n) {
     ? '<span class="hactions"><button class="btn danger sm" onclick="doDel(\'' + esc(n.id) + '\')">Wirklich löschen</button>' +
       '<button class="btn ghost sm" onclick="confirmDel=null;render()">Abbrechen</button></span>'
     : '<span class="hactions">' + (n.groups.some(g => g.picks.some(pk => pk.p === RANDOM.id && pk.rn))
-        ? '<button class="btn ghost sm" onclick="openAssign(\'' + esc(n.id) + '\')">Random zuordnen</button>' : '') +
-      (n.det ? '<button class="btn ghost sm" onclick="openRound(\'' + esc(n.id) + '\')">Details</button>' : '') +
-      '<button class="btn ghost sm" onclick="editMatch(\'' + esc(n.id) + '\')">Bearbeiten</button>' +
-      '<button class="btn ghost sm" onclick="confirmDel=\'' + esc(n.id) + '\';render()">Löschen</button></span>';
+        ? '<button class="ibtn" title="Random zuordnen" aria-label="Random zuordnen" onclick="openAssign(\'' + esc(n.id) + '\')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 8c0-3.3 3.6-6 8-6s8 2.7 8 6z"/></svg></button>' : '') +
+      (n.det ? '<button class="ibtn" title="Details" aria-label="Details" onclick="openRound(\'' + esc(n.id) + '\')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 4.2a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM13.3 17h-2.6v-6.2h2.6z"/></svg></button>' : '') +
+      '<button class="ibtn" title="Bearbeiten" aria-label="Bearbeiten" onclick="editMatch(\'' + esc(n.id) + '\')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16.8V20h3.2l9.4-9.4-3.2-3.2zM19.7 7.5a1 1 0 0 0 0-1.4l-1.8-1.8a1 1 0 0 0-1.4 0l-1.5 1.5 3.2 3.2z"/></svg></button>' +
+      '<button class="ibtn del" title="Löschen" aria-label="Löschen" onclick="confirmDel=\'' + esc(n.id) + '\';render()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8l1 2h4v2H3V6h4zm-2 6h12l-1 10H7z"/></svg></button></span>';
   const body = n.groups.length
     ? n.groups.map(g => '<div class="hgroup"><span class="medal' + (isTop4(g.place) ? ' top' : '') + '" style="--pc:' + placeColor(g.place) + '" title="' + placeTxt(g.place) + '">' + (g.place || '?') + '</span>' +
         '<div class="hpicks">' + g.picks.map(pk => {
