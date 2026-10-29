@@ -419,32 +419,81 @@ footer{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:s
 /* ---------- KDA-Podest ---------- */
 .podium{margin:4px 0 20px;padding:16px 10px 0;border:1px solid var(--gold-line);clip-path:var(--bevel);
   background:radial-gradient(120% 90% at 50% 0,rgba(200,170,110,.16),transparent 60%),linear-gradient(180deg,var(--panel-2),var(--panel))}
-.podium-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:0 6px 12px}
-.pod-row{display:grid;grid-template-columns:1fr 1.12fr 1fr;align-items:end;gap:8px;max-width:520px;margin:0 auto}
-.pod{display:flex;flex-direction:column;align-items:center;min-width:0;background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer}
-.pod[disabled]{cursor:default}
-.pod-av{position:relative;width:62px;height:62px;margin-bottom:6px}
-.pod.p1 .pod-av{width:78px;height:78px}
+.podium-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:0 6px 12px;flex-wrap:wrap}
+.pod-row{display:grid;align-items:end;gap:6px;margin:0 auto}
+.pod{display:flex;flex-direction:column;align-items:center;min-width:0}
+.pod-look,.pod-info{display:flex;flex-direction:column;align-items:center;width:100%;min-width:0;background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer}
+.pod-fig{position:relative;display:flex;justify-content:center;align-items:flex-end;width:100%;margin-bottom:4px}
+.avsvg{display:block;width:100%;height:auto;overflow:visible}
+.pod-svg{max-width:84px;filter:drop-shadow(0 0 10px color-mix(in srgb,var(--pc) 35%,transparent))}
+.pod.p1 .pod-svg{max-width:100px}
+.pod-look:hover .pod-svg{transform:translateY(-2px)}
+.pod-svg{transition:transform .15s}
+.pod-av{position:relative;width:62px;height:62px;margin:8px 0 2px}
+.pod.p1 .pod-av{width:76px;height:76px}
 .pod-av .hx{position:absolute;inset:0;clip-path:var(--hex);background:var(--pc,var(--gold))}
 .pod-av .hx i{position:absolute;inset:3px;clip-path:var(--hex);background:var(--panel-3) center/cover no-repeat;display:flex;align-items:center;justify-content:center;
   font-family:var(--fd);font-style:normal;font-size:22px;color:var(--gold-hi)}
-.pod-crown{position:absolute;left:50%;top:-20px;transform:translateX(-50%);width:30px;height:20px;filter:drop-shadow(0 0 6px rgba(240,217,168,.55))}
+.pod-pick{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);font-family:var(--fc);text-transform:uppercase;letter-spacing:.1em;font-size:9.5px;font-weight:700;
+  background:var(--panel);border:1px solid var(--gold-line);color:var(--gold);padding:1px 5px;white-space:nowrap}
+.pod-crown{position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:28px;height:19px;z-index:2;filter:drop-shadow(0 0 6px rgba(240,217,168,.55))}
+.pod-bub{position:relative;display:block;max-width:100%;margin:0 0 9px;padding:5px 7px;background:#F3EAD6;color:#1a1408;border-radius:9px;
+  font-size:11.5px;line-height:1.28;font-weight:600;text-align:center;overflow-wrap:anywhere;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.pod-bw{position:relative;display:block;max-width:100%;margin:0 0 9px}
+.pod-bw .pod-bub{margin:0}
+.pod-bw::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top-color:#F3EAD6}
+.pod-bw.add::after{display:none}
+.pod-bub.add{background:transparent;color:var(--ink-3);border:1px dashed var(--line-2);font-weight:500;box-shadow:none}
+.pod-look:hover .pod-bub.add{color:var(--gold-hi);border-color:var(--gold-line)}
 .pod-name{font-family:var(--fd);font-size:14px;color:var(--ink);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pod.p1 .pod-name{font-size:16px;color:var(--gold-hi)}
-.pod-kda{font-family:var(--fd);font-size:22px;line-height:1.15;color:var(--gold-hi);font-variant-numeric:tabular-nums}
-.pod.p1 .pod-kda{font-size:28px}
-.pod-sub{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;margin-bottom:8px;white-space:nowrap}
-.pod-step{width:100%;display:flex;align-items:flex-start;justify-content:center;padding-top:8px;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%,0 10px);
-  font-family:var(--fd);font-weight:700;font-size:30px;line-height:1;border-top:2px solid var(--sc)}
-.pod.p1 .pod-step{height:96px;--sc:var(--win);color:var(--win);background:linear-gradient(180deg,rgba(224,194,136,.32),rgba(224,194,136,.06))}
-.pod.p2 .pod-step{height:68px;--sc:var(--second);color:var(--second);background:linear-gradient(180deg,rgba(196,213,228,.24),rgba(196,213,228,.05))}
-.pod.p3 .pod-step{height:46px;--sc:var(--third);color:var(--third);background:linear-gradient(180deg,rgba(205,139,78,.26),rgba(205,139,78,.05))}
+.pod.p1 .pod-name{font-size:15.5px;color:var(--gold-hi)}
+.pod-kda{font-family:var(--fd);font-size:21px;line-height:1.15;color:var(--gold-hi);font-variant-numeric:tabular-nums}
+.pod.p1 .pod-kda{font-size:27px}
+.pod-sub{font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums;margin-bottom:8px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.pod-step{width:100%;display:flex;align-items:flex-start;justify-content:center;padding-top:7px;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%,0 10px);
+  font-family:var(--fd);font-weight:700;font-size:28px;line-height:1;border-top:2px solid var(--sc);
+  --sc:var(--rest);color:var(--rest);background:linear-gradient(180deg,rgba(124,139,156,.22),rgba(124,139,156,.04))}
+.pod.p1 .pod-step{--sc:var(--win);color:var(--win);background:linear-gradient(180deg,rgba(224,194,136,.32),rgba(224,194,136,.06))}
+.pod.p2 .pod-step{--sc:var(--second);color:var(--second);background:linear-gradient(180deg,rgba(196,213,228,.24),rgba(196,213,228,.05))}
+.pod.p3 .pod-step{--sc:var(--third);color:var(--third);background:linear-gradient(180deg,rgba(205,139,78,.26),rgba(205,139,78,.05))}
+.pod.p4 .pod-step{--sc:var(--fourth);color:var(--fourth);background:linear-gradient(180deg,rgba(10,200,185,.2),rgba(10,200,185,.04))}
+.pod.p4 .pod-step,.pod.p5 .pod-step,.pod.p6 .pod-step{font-size:20px;padding-top:5px}
+.pod.nokda .pod-kda{color:var(--ink-3)}
 .pod.empty .pod-av .hx{background:var(--line-2)}
 .pod.empty .pod-kda{color:var(--ink-3)}
-.pod:not([disabled]):hover .pod-name{color:var(--gold-hi)}
+.pod-info:hover .pod-name{color:var(--gold-hi)}
 @keyframes podRise{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
-.pod{animation:podRise .45s ease-out both}.pod.p1{animation-delay:.12s}.pod.p3{animation-delay:.06s}
-@media(max-width:420px){.pod-av{width:52px;height:52px}.pod.p1 .pod-av{width:64px;height:64px}.pod-kda{font-size:19px}.pod.p1 .pod-kda{font-size:24px}.pod-sub{font-size:10.5px}}
+.pod{animation:podRise .45s ease-out both}.pod.p1{animation-delay:.16s}.pod.p2{animation-delay:.1s}.pod.p3{animation-delay:.05s}
+@media(max-width:480px){
+  .pod-row{gap:4px}
+  .pod-av{width:48px;height:48px}.pod.p1 .pod-av{width:58px;height:58px}
+  .pod-kda{font-size:17px}.pod.p1 .pod-kda{font-size:22px}
+  .pod-name{font-size:12.5px}.pod.p1 .pod-name{font-size:13.5px}
+  .pod-sub{font-size:9.5px}
+  .pod-bub{font-size:10.5px;padding:4px 5px}
+  .pod-step{font-size:22px}
+}
+/* Figur-Dialog */
+.lk-top{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:end}
+.lk-prev{display:flex;flex-direction:column;align-items:center;min-height:150px;justify-content:flex-end}
+.lk-prev .avsvg{max-width:110px}
+.lk-none{display:grid;place-items:center;width:64px;height:64px;clip-path:var(--hex);background:var(--panel-3);color:var(--ink-3);font-family:var(--fd);font-size:24px}
+.lk-form{display:flex;flex-direction:column;min-width:0}
+.lk-q{width:100%;margin-top:6px;background:var(--bg-deep);border:1px solid var(--line);color:var(--ink);padding:9px 10px;resize:vertical;font-size:16px;line-height:1.35}
+.lk-q:focus{border-color:var(--gold-line);outline:none}
+.lk-row{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.lk-row .tiny{margin-right:auto}
+.lk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:6px;margin-top:8px}
+.lk-av{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px 5px;border:1px solid var(--line);background:rgba(3,10,18,.45);color:var(--ink-2);font-size:11px;line-height:1.2;text-align:center}
+.lk-av .avsvg{max-width:62px}
+.lk-av .lk-none{width:44px;height:44px;margin:8px 0;font-size:18px}
+.lk-av:hover{border-color:var(--gold-line);color:var(--ink)}
+.lk-av[aria-checked="true"]{border-color:var(--gold);background:rgba(200,170,110,.16);color:var(--gold-hi);box-shadow:inset 0 0 0 1px var(--gold)}
+@media(max-width:480px){.lk-top{grid-template-columns:92px minmax(0,1fr);gap:10px}.lk-prev .avsvg{max-width:88px}}
+.mini-av{display:inline-block;width:22px;height:26px;vertical-align:-7px;margin-right:6px}
+.mini-av .avsvg{width:22px}
+.lk-quote{margin:-4px 0 12px;font-family:var(--fd);font-style:italic;color:var(--gold-hi);font-size:15px}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
@@ -497,6 +546,249 @@ const CH_BY_ID = new Map(CHAMPS.map(c => [c[0], c]));
 const champName = id => { const c = CH_BY_ID.get(id); return c ? c[1] : (id ? String(id) : 'Unbekannt'); };
 const NO_ICON = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#1E2A36"/><text x="32" y="43" font-family="sans-serif" font-size="30" fill="#7C8B9C" text-anchor="middle">?</text></svg>');
 const champIcon = id => { const c = CH_BY_ID.get(id); return c ? c[2] : (id ? NO_ICON : ''); };
+
+/* ============================================================
+   Spielfiguren: eigene Chibi-Zeichnungen, angelehnt an typische
+   Arena-Archetypen – keine Riot-Grafiken, keine Champion-Namen.
+   ============================================================ */
+const AV_OUT = '#0b1520';
+function avHuman(o) {
+  /* gemeinsamer Körper: Beine, Rumpf, Arme, Kopf, Augen */
+  const s = o.skin || '#F3D2B3', m = o.main, m2 = o.main2 || m, leg = o.leg || '#2a3446', boot = o.boot || '#1a2230';
+  const eye = o.eye || '#3BA7FF';
+  let g = '';
+  g += '<rect x="39" y="90" width="9" height="20" rx="4" fill="' + leg + '"/><rect x="52" y="90" width="9" height="20" rx="4" fill="' + leg + '"/>';
+  g += '<rect x="37" y="105" width="12" height="7" rx="3.5" fill="' + boot + '"/><rect x="51" y="105" width="12" height="7" rx="3.5" fill="' + boot + '"/>';
+  g += '<path d="M33 96 Q34 70 50 68 Q66 70 67 96 Z" fill="' + m + '"/>';
+  g += '<path d="M44 69 L50 80 L56 69 Q50 67 44 69Z" fill="' + m2 + '"/>';
+  g += '<path d="M44 92 h12 v4 h-12z" fill="' + (o.belt || m2) + '" opacity=".85"/>';
+  g += '<ellipse cx="31" cy="83" rx="5.5" ry="9" fill="' + m + '" transform="rotate(14 31 83)"/><circle cx="29.5" cy="91" r="4" fill="' + (o.glove || s) + '"/>';
+  g += '<ellipse cx="69" cy="83" rx="5.5" ry="9" fill="' + m + '" transform="rotate(-14 69 83)"/><circle cx="70.5" cy="91" r="4" fill="' + (o.glove || s) + '"/>';
+  g += '<circle cx="50" cy="46" r="23" fill="' + s + '"/>';
+  if (!o.noFace) {
+    g += '<ellipse cx="41.5" cy="49" rx="4.2" ry="5.4" fill="#fff"/><ellipse cx="58.5" cy="49" rx="4.2" ry="5.4" fill="#fff"/>';
+    g += '<ellipse cx="42" cy="50" rx="3" ry="4.2" fill="' + eye + '"/><ellipse cx="58" cy="50" rx="3" ry="4.2" fill="' + eye + '"/>';
+    g += '<circle cx="42" cy="50.5" r="1.6" fill="' + AV_OUT + '"/><circle cx="58" cy="50.5" r="1.6" fill="' + AV_OUT + '"/>';
+    g += '<circle cx="43.2" cy="48" r="1.1" fill="#fff"/><circle cx="59.2" cy="48" r="1.1" fill="#fff"/>';
+    g += o.mouth || '<path d="M46 58 Q50 61 54 58" stroke="#7a3b2e" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
+    if (o.blush !== false) g += '<ellipse cx="36" cy="56" rx="3" ry="1.6" fill="#ff8a8a" opacity=".35"/><ellipse cx="64" cy="56" rx="3" ry="1.6" fill="#ff8a8a" opacity=".35"/>';
+  }
+  return g;
+}
+const AVATARS = [
+  { id: 'fuchs', name: 'Fuchsgeist', hint: 'Charmante Magierin mit Fuchsohren',
+    svg: () => {
+      let g = '';
+      [[-38, '#F7F1F5'], [-14, '#F0E4EC'], [12, '#F7F1F5']].forEach(([r, c]) => {
+        g += '<path d="M50 92 C 30 90, 10 80, 12 60 C 22 70, 36 78, 52 84 Z" fill="' + c + '" stroke="#E7A9C8" stroke-width="1.2" transform="rotate(' + r + ' 50 90)"/>';
+      });
+      g += avHuman({ main: '#C9306B', main2: '#F4E9EF', eye: '#F2C14E', leg: '#7a1c42', boot: '#4a0f28', glove: '#F3D2B3' });
+      g += '<path d="M27 46 Q26 20 50 20 Q74 20 73 46 Q70 32 60 30 Q50 38 40 30 Q30 32 27 46Z" fill="#5b1b3a"/>';
+      g += '<path d="M27 46 Q24 62 30 72 Q30 56 33 46Z M73 46 Q76 62 70 72 Q70 56 67 46Z" fill="#5b1b3a"/>';
+      g += '<path d="M30 30 L26 6 L42 22Z" fill="#5b1b3a"/><path d="M31 26 L29 12 L38 22Z" fill="#E7A9C8"/>';
+      g += '<path d="M70 30 L74 6 L58 22Z" fill="#5b1b3a"/><path d="M69 26 L71 12 L62 22Z" fill="#E7A9C8"/>';
+      g += '<circle cx="76" cy="88" r="7" fill="#7FE7FF" opacity=".35"/><circle cx="76" cy="88" r="4.5" fill="#BDF4FF"/>';
+      return g;
+    } },
+  { id: 'wind', name: 'Windklinge', hint: 'Wandernder Schwertkämpfer',
+    svg: () => {
+      let g = '<path d="M64 70 Q86 64 92 52 Q84 72 66 78Z" fill="#B23A3A"/>';
+      g += avHuman({ main: '#2F4E7A', main2: '#C9D6E6', eye: '#6B4A2B', leg: '#1d2b40', boot: '#3a2a1c', belt: '#B23A3A' });
+      g += '<path d="M27 44 Q28 22 50 22 Q72 22 73 44 Q66 30 50 32 Q36 30 27 44Z" fill="#2a2020"/>';
+      g += '<path d="M44 24 Q50 4 62 10 Q54 12 56 24Z" fill="#2a2020"/>';
+      g += '<path d="M27 44 L22 60 L31 50Z M73 44 L80 62 L69 50Z" fill="#2a2020"/>';
+      g += '<path d="M36 54 L33 58 M64 54 L67 58" stroke="#c99" stroke-width="0"/>';
+      g += '<rect x="71" y="56" width="3" height="40" rx="1.2" fill="#DDE6F0" transform="rotate(28 72 90)"/>';
+      g += '<rect x="67" y="86" width="10" height="3" rx="1" fill="#8a6a3a" transform="rotate(28 72 90)"/>';
+      return g;
+    } },
+  { id: 'pilz', name: 'Pilzpfadfinder', hint: 'Winziger Späher mit Blasrohr',
+    svg: () => {
+      let g = '';
+      g += avHuman({ main: '#5E8F3E', main2: '#C8A56A', skin: '#EAC9A0', eye: '#1F7A3A', leg: '#4a6a2e', boot: '#6b4a2b', blush: true });
+      g += '<path d="M28 40 L4 26 L30 52Z" fill="#EAC9A0"/><path d="M27 41 L10 30 L29 49Z" fill="#E8A88F"/>';
+      g += '<path d="M72 40 L96 26 L70 52Z" fill="#EAC9A0"/><path d="M73 41 L90 30 L71 49Z" fill="#E8A88F"/>';
+      g += '<path d="M22 38 Q50 6 78 38 Q50 30 22 38Z" fill="#6E9A45"/><ellipse cx="50" cy="38" rx="31" ry="5" fill="#557a33"/>';
+      g += '<path d="M58 18 Q66 8 72 16 Q64 14 60 22Z" fill="#E04B4B"/>';
+      g += '<rect x="18" y="74" width="4" height="28" rx="2" fill="#8a6a3a" transform="rotate(-24 20 88)"/>';
+      return g;
+    } },
+  { id: 'frost', name: 'Frostbogen', hint: 'Bogenschützin aus dem ewigen Eis',
+    svg: () => {
+      let g = '<path d="M30 70 Q26 96 32 108 L68 108 Q74 96 70 70Z" fill="#2B4E86"/>';
+      g += avHuman({ main: '#4F7CC9', main2: '#E8F1FA', eye: '#7FC8FF', skin: '#F6DCC7', leg: '#2B3E66', boot: '#E8F1FA' });
+      g += '<path d="M26 48 Q24 18 50 16 Q76 18 74 48 Q70 30 50 28 Q30 30 26 48Z" fill="#E8F1FA"/>';
+      g += '<path d="M26 48 Q22 70 28 84 L33 50Z M74 48 Q78 70 72 84 L67 50Z" fill="#E8F1FA"/>';
+      g += '<path d="M40 32 Q50 24 60 32 Q50 36 40 32Z" fill="#F4F4F4"/>';
+      g += '<path d="M80 60 Q96 86 80 112" stroke="#9FE3FF" stroke-width="3.5" fill="none" stroke-linecap="round"/>';
+      g += '<path d="M80 60 L80 112" stroke="#E8F1FA" stroke-width="1"/>';
+      g += '<path d="M76 84 L94 84 L90 80 M94 84 L90 88" stroke="#9FE3FF" stroke-width="2" fill="none"/>';
+      return g;
+    } },
+  { id: 'fels', name: 'Felsriese', hint: 'Unaufhaltsamer Brocken aus Stein',
+    svg: () => {
+      let g = '';
+      g += '<path d="M34 92 L30 112 L46 112 L46 94Z M66 92 L70 112 L54 112 L54 94Z" fill="#6A5A4E"/>';
+      g += '<path d="M24 66 L36 54 L64 54 L78 66 L74 98 L26 98Z" fill="#8C7766"/>';
+      g += '<path d="M36 54 L50 62 L64 54 L60 74 L40 74Z" fill="#A08A77"/>';
+      g += '<path d="M14 62 L28 58 L30 82 L16 90 L10 76Z" fill="#7A6656"/><path d="M86 62 L72 58 L70 82 L84 90 L90 76Z" fill="#7A6656"/>';
+      g += '<path d="M28 34 L38 18 L62 18 L72 34 L68 56 L32 56Z" fill="#9A8471"/>';
+      g += '<path d="M38 18 L50 10 L62 18Z" fill="#B49C86"/>';
+      g += '<path d="M36 38 L46 36 L46 42 L37 42Z M54 36 L64 38 L63 42 L54 42Z" fill="#FFB347"/>';
+      g += '<path d="M42 50 L58 50" stroke="#4d3f35" stroke-width="2.2" stroke-linecap="round"/>';
+      g += '<path d="M40 64 L48 82 M60 66 L54 86 M30 30 L38 40" stroke="#FFB347" stroke-width="1.4" opacity=".7"/>';
+      return g;
+    } },
+  { id: 'laterne', name: 'Laternenwächter', hint: 'Unheimlicher Seelensammler',
+    svg: () => {
+      let g = '<path d="M30 60 Q22 100 26 112 L74 112 Q78 100 70 60Z" fill="#1E2B2A"/>';
+      g += '<path d="M30 60 Q50 54 70 60 L72 96 Q50 90 28 96Z" fill="#2E4240"/>';
+      g += '<path d="M24 46 Q22 14 50 12 Q78 14 76 46 Q78 64 70 70 L30 70 Q22 64 24 46Z" fill="#26322F"/>';
+      g += '<path d="M32 48 Q32 30 50 30 Q68 30 68 48 Q66 62 50 64 Q34 62 32 48Z" fill="#0A0F0E"/>';
+      g += '<path d="M40 46 L46 48 L40 50Z M60 46 L54 48 L60 50Z" fill="#6CFFB5"/>';
+      g += '<path d="M44 56 L56 56" stroke="#6CFFB5" stroke-width="1.2" opacity=".7"/>';
+      g += '<path d="M18 74 Q14 84 20 92" stroke="#7F8C8A" stroke-width="2" fill="none" stroke-dasharray="3 2"/>';
+      g += '<circle cx="20" cy="100" r="11" fill="#6CFFB5" opacity=".18"/>';
+      g += '<path d="M14 94 L26 94 L28 106 L12 106Z" fill="#3a4a46"/><path d="M16 96 L24 96 L25 104 L15 104Z" fill="#6CFFB5"/>';
+      g += '<path d="M14 94 L20 89 L26 94" fill="#3a4a46"/>';
+      return g;
+    } },
+  { id: 'ritter', name: 'Schildritter', hint: 'Treuer Krieger mit Riesenschwert',
+    svg: () => {
+      let g = '<path d="M30 70 Q24 96 30 108 L70 108 Q76 96 70 70Z" fill="#2D57A8"/>';
+      g += avHuman({ main: '#C9D2DC', main2: '#E6C25A', eye: '#3B6FD1', leg: '#5F6B78', boot: '#3B4552', belt: '#2D57A8' });
+      g += '<path d="M27 44 Q27 22 50 22 Q73 22 73 44 Q68 32 58 34 Q60 28 52 28 Q44 34 36 32 Q30 36 27 44Z" fill="#5a3a22"/>';
+      g += '<path d="M22 64 Q30 58 38 66 L36 74 Q28 72 22 64Z M78 64 Q70 58 62 66 L64 74 Q72 72 78 64Z" fill="#E6C25A"/>';
+      g += '<path d="M74 22 L80 22 L80 92 L77 98 L74 92Z" fill="#E3EAF2"/><path d="M76.5 26 L76.5 90" stroke="#B9C4D0" stroke-width="1"/>';
+      g += '<rect x="69" y="90" width="16" height="4" rx="1.5" fill="#E6C25A"/><rect x="75" y="94" width="4" height="10" rx="1.5" fill="#5a3a22"/>';
+      return g;
+    } },
+  { id: 'faust', name: 'Stahlfaust', hint: 'Prügelt erst und fragt später',
+    svg: () => {
+      let g = avHuman({ main: '#3B2E4E', main2: '#E64A8B', eye: '#E64A8B', skin: '#F2CFB8', leg: '#2a2236', boot: '#1c1626', glove: '#3B2E4E',
+        mouth: '<path d="M45 58 Q50 57 55 59" stroke="#7a3b2e" stroke-width="1.6" fill="none" stroke-linecap="round"/>' });
+      g += '<path d="M26 44 Q26 20 50 20 Q74 20 74 44 Q72 34 64 30 L58 38 L56 30 L46 38 L42 30 Q30 34 26 44Z" fill="#F06BA8"/>';
+      g += '<path d="M26 44 Q22 30 32 22 L34 34Z" fill="#F06BA8"/>';
+      g += '<path d="M60 50 L66 46 M60 52 L67 52" stroke="#C04A7a" stroke-width="1.2" opacity=".0"/>';
+      g += '<rect x="12" y="80" width="18" height="18" rx="5" fill="#C9D2DC"/><rect x="12" y="80" width="18" height="6" rx="3" fill="#E64A8B"/>';
+      g += '<rect x="70" y="80" width="18" height="18" rx="5" fill="#C9D2DC"/><rect x="70" y="80" width="18" height="6" rx="3" fill="#E64A8B"/>';
+      g += '<path d="M16 90 h10 M74 90 h10" stroke="#8A96A3" stroke-width="1.4"/>';
+      return g;
+    } },
+  { id: 'funke', name: 'Funkenmagier', hint: 'Kleiner Zauberer mit großem Ego',
+    svg: () => {
+      let g = '<path d="M30 70 Q24 100 28 112 L72 112 Q76 100 70 70Z" fill="#3E2A7A"/>';
+      g += avHuman({ main: '#5B3FB0', main2: '#F2C14E', skin: '#2A2140', eye: '#FFD45C', leg: '#2A2140', boot: '#2A2140', glove: '#2A2140', blush: false,
+        mouth: '<path d="M45 57 Q50 60 55 57" stroke="#FFD45C" stroke-width="1.4" fill="none" stroke-linecap="round"/>' });
+      g += '<path d="M18 36 Q50 30 82 36 Q50 44 18 36Z" fill="#3E2A7A"/>';
+      g += '<path d="M30 36 Q36 20 48 12 Q62 2 74 8 Q60 10 62 22 Q66 30 70 36Z" fill="#5B3FB0"/>';
+      g += '<path d="M31 34 Q50 28 69 34" stroke="#F2C14E" stroke-width="2.4" fill="none"/>';
+      g += '<rect x="80" y="54" width="3.5" height="52" rx="1.6" fill="#6b4a2b"/>';
+      g += '<circle cx="81.7" cy="52" r="6" fill="#FFD45C" opacity=".35"/><path d="M81.7 44 L84 50 L90 52 L84 54 L81.7 60 L79.4 54 L73.4 52 L79.4 50Z" fill="#FFE58A"/>';
+      return g;
+    } },
+  { id: 'mond', name: 'Mondklinge', hint: 'Kriegerin im Zeichen der Sichel',
+    svg: () => {
+      let g = '';
+      g += avHuman({ main: '#3A3F6E', main2: '#D8DDF0', eye: '#9FB3FF', skin: '#EFD9CC', leg: '#262A4C', boot: '#D8DDF0' });
+      g += '<path d="M25 48 Q22 18 50 16 Q78 18 75 48 Q72 30 58 28 Q50 34 40 28 Q28 32 25 48Z" fill="#E9ECF7"/>';
+      g += '<path d="M25 48 Q20 76 26 96 L33 52Z M75 48 Q80 76 74 96 L67 52Z" fill="#E9ECF7"/>';
+      g += '<path d="M44 30 A7 7 0 1 0 56 30 A5.5 5.5 0 1 1 44 30Z" fill="#9FB3FF"/>';
+      g += '<path d="M70 70 A20 20 0 0 1 86 104 A16 16 0 0 0 70 70Z" fill="#D8DDF0" stroke="#9FB3FF" stroke-width="1"/>';
+      return g;
+    } },
+  { id: 'schatten', name: 'Schattenklinge', hint: 'Maskierter Ninja aus dem Nichts',
+    svg: () => {
+      let g = '<path d="M30 66 Q14 72 10 62 Q18 60 30 60Z" fill="#B3262C"/>';
+      g += avHuman({ main: '#1F242E', main2: '#B3262C', eye: '#E23C3C', skin: '#2B313C', leg: '#171B22', boot: '#0E1116', glove: '#171B22', blush: false, mouth: '' });
+      g += '<path d="M27 40 Q28 22 50 22 Q72 22 73 40Z" fill="#3A404C"/>';
+      g += '<path d="M28 40 L72 40 L70 46 L30 46Z" fill="#B3262C"/>';
+      g += '<path d="M30 52 Q50 64 70 52 L70 66 Q50 72 30 66Z" fill="#3A404C"/>';
+      g += '<path d="M14 92 L4 78 L18 88Z M86 92 L96 78 L82 88Z" fill="#C9D2DC"/>';
+      g += '<path d="M24 22 L32 30 M76 22 L68 30" stroke="#C9D2DC" stroke-width="2.4" stroke-linecap="round"/>';
+      return g;
+    } },
+  { id: 'chaos', name: 'Chaoskanone', hint: 'Durchgeknallt mit Raketenwerfer',
+    svg: () => {
+      let g = '';
+      g += '<path d="M30 40 Q10 60 18 104 Q22 82 30 64Z M70 40 Q90 60 82 104 Q78 82 70 64Z" fill="#3E7CE0"/>';
+      g += avHuman({ main: '#2A2E3A', main2: '#E64A8B', eye: '#E64A8B', skin: '#F4DCCF', leg: '#3E7CE0', boot: '#2A2E3A',
+        mouth: '<path d="M44 57 Q50 64 56 57 Z" fill="#7a2b3e"/>' });
+      g += '<path d="M26 44 Q26 20 50 20 Q74 20 74 44 Q68 30 60 34 L56 26 L50 34 L44 26 L40 34 Q32 30 26 44Z" fill="#3E7CE0"/>';
+      g += '<rect x="58" y="66" width="38" height="12" rx="5" fill="#E64A8B" transform="rotate(-18 77 72)"/>';
+      g += '<path d="M90 60 L100 56 L98 70Z" fill="#FFD45C" transform="rotate(-18 77 72)"/>';
+      g += '<circle cx="66" cy="78" r="3" fill="#2A2E3A"/>';
+      return g;
+    } },
+  { id: 'leere', name: 'Leerenschlund', hint: 'Frisst alles, auch eure LP',
+    svg: () => {
+      let g = '';
+      g += '<path d="M34 96 L28 112 M42 98 L40 112 M58 98 L60 112 M66 96 L72 112" stroke="#4B2C7A" stroke-width="6" stroke-linecap="round"/>';
+      g += '<ellipse cx="50" cy="72" rx="32" ry="30" fill="#5C3796"/>';
+      g += '<path d="M24 54 Q22 30 34 22 Q36 36 40 44Z M76 54 Q78 30 66 22 Q64 36 60 44Z" fill="#7E52C2"/>';
+      g += '<ellipse cx="50" cy="78" rx="20" ry="13" fill="#1A0D2E"/>';
+      g += '<path d="M32 74 L36 80 L40 72 L44 82 L48 72 L52 82 L56 72 L60 82 L64 72 L68 80" stroke="#F2E9FF" stroke-width="2.4" fill="none" stroke-linejoin="round"/>';
+      g += '<circle cx="40" cy="54" r="6" fill="#C9F24E"/><circle cx="60" cy="54" r="6" fill="#C9F24E"/>';
+      g += '<circle cx="41" cy="55" r="2.6" fill="#1A0D2E"/><circle cx="59" cy="55" r="2.6" fill="#1A0D2E"/>';
+      g += '<path d="M40 30 L44 40 M60 30 L56 40 M50 26 L50 38" stroke="#C9F24E" stroke-width="2" stroke-linecap="round" opacity=".7"/>';
+      return g;
+    } },
+  { id: 'drache', name: 'Glutdrache', hint: 'Noch klein, aber schon heiß',
+    svg: () => {
+      let g = '';
+      g += '<path d="M66 92 Q90 96 92 80 Q96 92 86 102 Q74 106 64 98Z" fill="#D9542B"/>';
+      g += '<path d="M30 60 Q8 44 10 70 Q18 64 30 72Z M70 60 Q92 44 90 70 Q82 64 70 72Z" fill="#F08A3C"/>';
+      g += '<ellipse cx="50" cy="88" rx="20" ry="18" fill="#E5632E"/><ellipse cx="50" cy="92" rx="12" ry="12" fill="#FFD08A"/>';
+      g += '<rect x="36" y="100" width="10" height="12" rx="4" fill="#E5632E"/><rect x="54" y="100" width="10" height="12" rx="4" fill="#E5632E"/>';
+      g += '<ellipse cx="50" cy="50" rx="24" ry="21" fill="#E5632E"/>';
+      g += '<path d="M32 36 L28 16 L42 32Z M68 36 L72 16 L58 32Z" fill="#FFD08A"/>';
+      g += '<ellipse cx="50" cy="60" rx="13" ry="8" fill="#F59A5C"/>';
+      g += '<ellipse cx="41" cy="47" rx="4.6" ry="5.6" fill="#fff"/><ellipse cx="59" cy="47" rx="4.6" ry="5.6" fill="#fff"/>';
+      g += '<ellipse cx="41.6" cy="48" rx="3" ry="4.4" fill="#2E8B57"/><ellipse cx="58.4" cy="48" rx="3" ry="4.4" fill="#2E8B57"/>';
+      g += '<circle cx="42.8" cy="46" r="1.2" fill="#fff"/><circle cx="59.6" cy="46" r="1.2" fill="#fff"/>';
+      g += '<circle cx="46" cy="59" r="1.2" fill="#7a2b1e"/><circle cx="54" cy="59" r="1.2" fill="#7a2b1e"/>';
+      g += '<path d="M46 64 Q50 67 54 64" stroke="#7a2b1e" stroke-width="1.4" fill="none" stroke-linecap="round"/>';
+      g += '<path d="M50 22 Q46 14 50 6 Q54 14 50 22Z" fill="#FFB347"/>';
+      return g;
+    } },
+  { id: 'baer', name: 'Donnerbär', hint: 'Brüllt lauter als das Gewitter',
+    svg: () => {
+      let g = '';
+      g += '<path d="M36 94 L34 112 L48 112 L47 94Z M64 94 L66 112 L52 112 L53 94Z" fill="#5E6E80"/>';
+      g += '<ellipse cx="50" cy="80" rx="26" ry="22" fill="#8A9BAF"/><ellipse cx="50" cy="84" rx="15" ry="14" fill="#C9D4E0"/>';
+      g += '<ellipse cx="22" cy="82" rx="8" ry="12" fill="#8A9BAF"/><ellipse cx="78" cy="82" rx="8" ry="12" fill="#8A9BAF"/>';
+      g += '<path d="M16 92 l2 5 M20 93 l1 5 M24 92 l0 5 M84 92 l-2 5 M80 93 l-1 5 M76 92 l0 5" stroke="#F2F6FA" stroke-width="1.8" stroke-linecap="round"/>';
+      g += '<circle cx="30" cy="30" r="9" fill="#8A9BAF"/><circle cx="70" cy="30" r="9" fill="#8A9BAF"/><circle cx="30" cy="30" r="4.5" fill="#5E6E80"/><circle cx="70" cy="30" r="4.5" fill="#5E6E80"/>';
+      g += '<circle cx="50" cy="48" r="23" fill="#8A9BAF"/><ellipse cx="50" cy="58" rx="12" ry="9" fill="#C9D4E0"/>';
+      g += '<ellipse cx="50" cy="53" rx="4" ry="3" fill="#1F2733"/>';
+      g += '<path d="M44 61 Q50 66 56 61" stroke="#1F2733" stroke-width="1.6" fill="none"/>';
+      g += '<path d="M36 44 L45 46 M64 44 L55 46" stroke="#1F2733" stroke-width="1.8" stroke-linecap="round"/>';
+      g += '<circle cx="41" cy="49" r="2.6" fill="#7FE7FF"/><circle cx="59" cy="49" r="2.6" fill="#7FE7FF"/>';
+      g += '<path d="M48 22 L42 34 L50 33 L45 44 L58 28 L50 29 L55 22Z" fill="#7FE7FF"/>';
+      return g;
+    } },
+  { id: 'koch', name: 'Pinguin-Pirat', hint: 'Watschelt, plündert, feiert',
+    svg: () => {
+      let g = '';
+      g += '<ellipse cx="40" cy="110" rx="8" ry="3.5" fill="#F2A33A"/><ellipse cx="60" cy="110" rx="8" ry="3.5" fill="#F2A33A"/>';
+      g += '<ellipse cx="50" cy="74" rx="26" ry="34" fill="#1F2733"/><ellipse cx="50" cy="80" rx="17" ry="25" fill="#F4F6F8"/>';
+      g += '<path d="M24 70 Q12 86 20 98 Q26 84 28 76Z M76 70 Q88 86 80 98 Q74 84 72 76Z" fill="#1F2733"/>';
+      g += '<ellipse cx="42" cy="56" rx="4.4" ry="5" fill="#fff"/><circle cx="42.6" cy="57" r="2.4" fill="#1F2733"/>';
+      g += '<path d="M54 52 L66 52 L64 60 L56 60Z" fill="#1F2733"/><path d="M28 50 L72 46" stroke="#1F2733" stroke-width="1.4"/>';
+      g += '<path d="M44 64 L56 64 L50 72Z" fill="#F2A33A"/>';
+      g += '<path d="M24 40 Q50 18 76 40 Q50 34 24 40Z" fill="#2A2E3A"/><path d="M30 38 Q50 26 70 38" stroke="#E6C25A" stroke-width="2" fill="none"/>';
+      g += '<circle cx="50" cy="31" r="3" fill="#F4F6F8"/>';
+      return g;
+    } }
+];
+const AV_BY_ID = new Map(AVATARS.map(a => [a.id, a]));
+const _avCache = new Map();
+function avatarSvg(id, cls) {
+  const a = AV_BY_ID.get(id); if (!a) return '';
+  if (!_avCache.has(id)) _avCache.set(id, a.svg());
+  return '<svg class="' + (cls || 'avsvg') + '" viewBox="0 0 100 118" aria-hidden="true">' +
+    '<ellipse cx="50" cy="113" rx="28" ry="4" fill="#000" opacity=".35"/>' + _avCache.get(id) + '</svg>';
+}
 
 const PALETTE = ['#F0C97B', '#0AC8B9', '#9B8CFF', '#FF8A5B', '#5FB8FF', '#F2A2C0'];
 const RANDOM = { id: '__random', name: 'Random', color: '#7C8B9C', random: true };
@@ -702,6 +994,7 @@ async function flushQueue() {
     try {
       if (item.op === 'add') await FB.addDoc(FB.col(item.col), item.data);
       else if (item.op === 'set') await FB.setDoc(FB.doc(item.col + '/' + item.id), item.data);
+      else if (item.op === 'merge') await FB.setDoc(FB.doc(item.col + '/' + item.id), item.data, { merge: true });
       else if (item.op === 'del') await FB.deleteDoc(FB.doc(item.col + '/' + item.id));
       S.queue = S.queue.filter(x => x !== item);
       saveQueue();
@@ -747,7 +1040,8 @@ async function storeDelete(col, id) {
 }
 
 async function putTeam(team) {
-  const body = { name: team.name, players: team.players };
+  const prev = team.id ? S.teams.find(t => t.id === team.id) : null;
+  const body = { name: team.name, players: team.players, looks: (prev && prev.looks) || team.looks || {} };
   if (team.id && team.id !== 'seed' && S.teams.some(t => t.id === team.id && !t.unsaved)) {
     await storeSet('teams', team.id, body); return team.id;
   }
@@ -1497,33 +1791,135 @@ function kdaBlock(a) {
     '<p class="tiny muted" style="margin:8px 0 0">Gesamt <b class="gold">' + dec1(kdaRatio(tot.k, tot.d, tot.a)) + '</b> · ' + tot.k + ' Kills, ' + tot.d + ' Tode, ' + tot.a + ' Assists aus ' +
       plural(tot.n, 'Pick', 'Picks') + '. Von Hand eingetragene Runden haben keine KDA und zählen hier nicht mit.</p>';
 }
-/* KDA-Podest: Plätze 1–3 nach KDA über alle Runden mit Riot-Daten */
+/* ---------- Figur & Spruch je Spieler ----------
+   Liegt im Team-Dokument unter looks[Spieler-ID] = { av, q, qt }.
+   Geschrieben wird nur der eigene Eintrag (Merge), damit sich
+   gleichzeitige Änderungen verschiedener Spieler nicht überschreiben. */
+const QUOTE_MAX = 80;
+const TEASES = [
+  'Ich carry euch – wie immer.', 'Platz 8? Lag am Lag.', 'Bravery ist nur was für Feiglinge.',
+  'Wer braucht schon Augments?', 'Ich hab nur getestet, ob man auch ohne Hände spielen kann.',
+  'Schaden machen ist überbewertet.', 'Heute zählt nicht, morgen auch nicht.',
+  'Ich bin nicht tot, ich bin taktisch abwesend.', 'Mein Champion war kaputt, nicht ich.',
+  'Erst Podest, dann Pommes.', 'Nerft mich doch.', 'Die anderen hatten Glück. Fünfmal.'
+];
+function lookOf(t, pid) { return (t && t.looks && t.looks[pid]) || {}; }
+function avatarOf(t, pid) { const a = lookOf(t, pid).av; return AV_BY_ID.has(a) ? a : ''; }
+async function setLook(pid, patch) {
+  const t = currentTeam(); if (!t) return;
+  const full = Object.assign({ av: '', q: '', qt: 0 }, lookOf(t, pid), patch);
+  if (t.unsaved) {
+    S.curTeamId = await putTeam({ id: null, name: t.name, players: t.players, looks: { [pid]: full } });
+    saveMirror(); render(); return;
+  }
+  t.looks = Object.assign({}, t.looks, { [pid]: full });
+  const data = { looks: { [pid]: full } };
+  if (FB) await FB.setDoc(FB.doc('teams/' + t.id), data, { merge: true });
+  else { queueWrite('merge', 'teams', t.id, data); saveMirror(); }
+  render();
+}
+let look = null;
+function openLook(pid) {
+  const t = currentTeam(); const p = playerById(t, pid); if (!p || p.random) return;
+  const l = lookOf(t, pid);
+  look = { pid: pid, av: avatarOf(t, pid), q: l.q || '' };
+  paintLook();
+}
+function paintLook() {
+  if (!look) { closeModal(); return; }
+  const t = currentTeam(); const p = playerById(t, look.pid);
+  const sel = AV_BY_ID.get(look.av);
+  showModal(
+    '<div class="sec-head"><h2>' + esc(p.name) + ' · Figur &amp; Spruch</h2>' +
+      '<button class="btn ghost sm" onclick="look=null;closeModal()">Schließen</button></div>' +
+    '<div class="lk-top">' +
+      '<div class="lk-prev" style="--pc:' + p.color + '">' + (look.q ? '<span class="pod-bw"><span class="pod-bub">' + esc(look.q) + '</span></span>' : '') +
+        (sel ? avatarSvg(sel.id, 'avsvg') : '<span class="lk-none">?</span>') + '</div>' +
+      '<div class="lk-form">' +
+        '<label class="eyebrow" for="lkq">Spruch auf dem Podest</label>' +
+        '<textarea id="lkq" class="lk-q" maxlength="' + QUOTE_MAX + '" rows="3" placeholder="Was sagt die Figur? Darf auch fies sein." ' +
+          'oninput="look.q=this.value;byId(\'lkc\').textContent=this.value.length+\' / ' + QUOTE_MAX + '\'">' + esc(look.q) + '</textarea>' +
+        '<div class="lk-row"><span class="tiny muted" id="lkc">' + look.q.length + ' / ' + QUOTE_MAX + '</span>' +
+          '<button class="btn ghost sm" onclick="look.q=TEASES[Math.floor(Math.random()*TEASES.length)];paintLook()">Zufallsspruch</button>' +
+          (look.q ? '<button class="btn ghost sm" onclick="look.q=\'\';paintLook()">Leeren</button>' : '') + '</div>' +
+        '<p class="tiny muted" style="margin:6px 0 0">Jeder darf den Spruch jederzeit ändern – auch für die anderen.</p>' +
+      '</div></div>' +
+    '<div class="eyebrow" style="margin-top:14px">Figur wählen' + (sel ? ' · <span class="muted">' + esc(sel.name) + '</span>' : '') + '</div>' +
+    '<div class="lk-grid" role="radiogroup" aria-label="Figur">' + AVATARS.map(a =>
+      '<button type="button" class="lk-av" role="radio" aria-checked="' + (look.av === a.id) + '" title="' + esc(a.name + ' – ' + a.hint) + '" ' +
+        'onclick="look.av=\'' + a.id + '\';paintLook()">' + avatarSvg(a.id, 'avsvg') + '<span>' + esc(a.name) + '</span></button>').join('') +
+      '<button type="button" class="lk-av" role="radio" aria-checked="' + (!look.av) + '" onclick="look.av=\'\';paintLook()"><span class="lk-none">–</span><span>keine</span></button>' +
+    '</div>' +
+    '<p class="tiny muted" style="margin:10px 0 0">Eigene Zeichnungen, angelehnt an bekannte Arena-Typen – keine offiziellen Riot-Figuren.</p>' +
+    '<div class="rowend"><button class="btn ghost" onclick="look=null;closeModal()">Abbrechen</button>' +
+      '<button class="btn primary" onclick="saveLook()">Speichern</button></div>');
+}
+async function saveLook() {
+  if (!look) return;
+  const pid = look.pid, t = currentTeam();
+  const q = String(look.q || '').replace(/\s+/g, ' ').trim().slice(0, QUOTE_MAX);
+  const old = lookOf(t, pid);
+  const patch = { av: look.av || '' };
+  if (q !== (old.q || '')) { patch.q = q; patch.qt = Date.now(); }
+  look = null; closeModal();
+  try { await setLook(pid, patch); toast('Gespeichert.'); }
+  catch (e) { toast('Speichern fehlgeschlagen.', 'bad'); }
+}
+
+function playerMark(t, p) {
+  const av = p && !p.random ? avatarOf(t, p.id) : '';
+  return av ? '<span class="mini-av">' + avatarSvg(av, 'avsvg') + '</span>' : '<span class="pdot" style="background:' + (p ? p.color : 'var(--ink-3)') + '"></span>';
+}
+/* KDA-Podest: alle Kaderspieler, sortiert nach KDA über alle Runden mit Riot-Daten */
+const POD_H = [0, 100, 76, 56, 40, 30, 22];
 function podiumHtml(a) {
-  const rows = a.roster.filter(p => !p.random).map(p => {
+  const t = currentTeam();
+  const all = a.roster.filter(p => !p.random).map(p => {
     const rec = a.byPlayer.get(p.id), kd = rec.kd;
     let fav = null; rec.champs.forEach((n, c) => { if (!fav || n > fav[1]) fav = [c, n]; });
     return { p: p, kd: kd, r: kd.n ? kdaRatio(kd.k, kd.d, kd.a) : -1, fav: fav };
-  }).filter(x => x.kd.n).sort((x, y) => y.r - x.r || y.kd.n - x.kd.n).slice(0, 3);
-  if (!rows.length) return '';
+  });
+  if (!all.length) return '';
+  const rows = all.filter(x => x.kd.n).sort((x, y) => y.r - x.r || y.kd.n - x.kd.n)
+    .concat(all.filter(x => !x.kd.n));
   /* gleiche KDA (auf eine Nachkommastelle) = gleicher Platz */
-  rows.forEach((x, i) => { x.rank = i && dec1(x.r) === dec1(rows[i - 1].r) ? rows[i - 1].rank : i + 1; });
+  rows.forEach((x, i) => {
+    x.rank = !x.kd.n ? null : (i && rows[i - 1].kd.n && dec1(x.r) === dec1(rows[i - 1].r) ? rows[i - 1].rank : i + 1);
+  });
+  const n = Math.max(rows.length, 3);
+  /* Anordnung von der Mitte nach außen: … 4 2 1 3 5 … */
+  const order = [1];
+  for (let s = 2; s <= n; s++) { if (s % 2 === 0) order.unshift(s); else order.push(s); }
   const crown = '<svg class="pod-crown" viewBox="0 0 30 20" aria-hidden="true"><path d="M2 18h26l2-13-8 6-7-10-7 10-8-6z" fill="#F0D9A8" stroke="#C8AA6E" stroke-width="1.2" stroke-linejoin="round"/></svg>';
-  const cell = (x, slot) => {
-    if (!x) return '<div class="pod p' + slot + ' empty" aria-hidden="true"><span class="pod-av"><span class="hx"><i>?</i></span></span>' +
-      '<span class="pod-name muted">frei</span><span class="pod-kda">–</span><span class="pod-sub">keine Riot-Daten</span><span class="pod-step">' + slot + '</span></div>';
+  const cell = slot => {
+    const x = rows[slot - 1];
+    const h = 'height:' + (POD_H[slot] || 18) + 'px';
+    if (!x) return '<div class="pod p' + slot + ' empty" aria-hidden="true"><span class="pod-fig"><span class="pod-av"><span class="hx"><i>?</i></span></span></span>' +
+      '<span class="pod-name muted">frei</span><span class="pod-kda">–</span><span class="pod-sub">&nbsp;</span><span class="pod-step" style="' + h + '">' + slot + '</span></div>';
+    const id = esc(x.p.id);
+    const l = lookOf(t, x.p.id), av = avatarOf(t, x.p.id);
     const img = x.fav ? champIcon(x.fav[0]) : '';
-    return '<button class="pod p' + slot + '" style="--pc:' + x.p.color + '" onclick="openPlayer(\'' + esc(x.p.id) + '\')" ' +
-      'title="' + esc(x.p.name) + ': ' + x.kd.k + ' / ' + x.kd.d + ' / ' + x.kd.a + ' aus ' + plural(x.kd.n, 'Runde', 'Runden') + '" ' +
-      'aria-label="Platz ' + x.rank + ': ' + esc(x.p.name) + ', KDA ' + dec1(x.r) + '">' +
-      '<span class="pod-av">' + (slot === 1 ? crown : '') + '<span class="hx"><i' + (img ? ' style="background-image:url(\'' + img + '\')">' : '>' + esc(x.p.name.charAt(0))) + '</i></span></span>' +
-      '<span class="pod-name">' + esc(x.p.name) + '</span>' +
-      '<span class="pod-kda">' + dec1(x.r) + '</span>' +
-      '<span class="pod-sub">Ø ' + dec1(x.kd.k / x.kd.n) + ' / ' + dec1(x.kd.d / x.kd.n) + ' / ' + dec1(x.kd.a / x.kd.n) + '</span>' +
-      '<span class="pod-step">' + x.rank + '</span></button>';
+    const fig = av ? avatarSvg(av, 'avsvg pod-svg') :
+      '<span class="pod-av"><span class="hx"><i' + (img ? ' style="background-image:url(\'' + img + '\')">' : '>' + esc(x.p.name.charAt(0))) + '</i></span></span>';
+    const label = x.rank ? 'Platz ' + x.rank : 'ohne Riot-Daten';
+    return '<div class="pod p' + slot + (x.rank ? '' : ' nokda') + '" style="--pc:' + x.p.color + '">' +
+      '<button type="button" class="pod-look" onclick="openLook(\'' + id + '\')" aria-label="Figur und Spruch von ' + esc(x.p.name) + ' ändern">' +
+        (l.q ? '<span class="pod-bw"><span class="pod-bub" title="' + esc(l.q) + '">' + esc(l.q) + '</span></span>' : '<span class="pod-bw add"><span class="pod-bub add">+ Spruch</span></span>') +
+        '<span class="pod-fig">' + (slot === 1 && x.rank ? crown : '') + fig + (av ? '' : '<span class="pod-pick">Figur</span>') + '</span>' +
+      '</button>' +
+      '<button type="button" class="pod-info" onclick="openPlayer(\'' + id + '\')" ' +
+        'title="' + esc(x.p.name) + (x.kd.n ? ': ' + x.kd.k + ' / ' + x.kd.d + ' / ' + x.kd.a + ' aus ' + plural(x.kd.n, 'Runde', 'Runden') : ': noch keine Riot-Daten') + '" ' +
+        'aria-label="' + label + ': ' + esc(x.p.name) + (x.kd.n ? ', KDA ' + dec1(x.r) : '') + '">' +
+        '<span class="pod-name">' + esc(x.p.name) + '</span>' +
+        '<span class="pod-kda">' + (x.kd.n ? dec1(x.r) : '–') + '</span>' +
+        '<span class="pod-sub">' + (x.kd.n ? 'Ø ' + dec1(x.kd.k / x.kd.n) + ' / ' + dec1(x.kd.d / x.kd.n) + ' / ' + dec1(x.kd.a / x.kd.n) : 'keine Riot-Daten') + '</span>' +
+        '<span class="pod-step" style="' + h + '">' + (x.rank || '·') + '</span>' +
+      '</button></div>';
   };
   return '<div class="podium"><div class="podium-h"><span class="eyebrow">Podest · beste KDA</span>' +
-    '<span class="tiny muted">(Kills + Assists) ÷ Tode</span></div>' +
-    '<div class="pod-row">' + cell(rows[1], 2) + cell(rows[0], 1) + cell(rows[2], 3) + '</div></div>';
+    '<span class="tiny muted">Figur antippen für Spruch &amp; Figur</span></div>' +
+    '<div class="pod-row" style="grid-template-columns:' + order.map(s => s === 1 ? '1.15fr' : '1fr').join(' ') + ';max-width:' + Math.min(140 * n, 760) + 'px">' +
+      order.map(cell).join('') + '</div></div>';
 }
 function bilanzHtml() {
   const a = agg();
@@ -1577,7 +1973,7 @@ function spielerHtml() {
     a.roster.map(p => {
       const r = a.byPlayer.get(p.id);
       const best = [...r.champs.entries()].sort((x, y) => y[1] - x[1])[0];
-      return '<tr class="click" onclick="openPlayer(\'' + esc(p.id) + '\')"><td><span class="pdot" style="background:' + p.color + '"></span>' + esc(p.name) + '</td>' +
+      return '<tr class="click" onclick="openPlayer(\'' + esc(p.id) + '\')"><td>' + playerMark(t, p) + esc(p.name) + '</td>' +
         '<td class="num" data-l="Wertungen">' + r.g + '</td>' +
         '<td class="num" data-l="Ø Platz"><b class="gold">' + avgTxt(r) + '</b></td>' +
         '<td class="num" data-l="Siege">' + r.w + '</td>' +
@@ -1857,8 +2253,10 @@ function openPlayer(pid) {
   a.entries.forEach(e => { if (e.place && e.picks.some(pk => pk.p === pid)) dist[e.place - 1]++; });
   const maxD = Math.max.apply(null, dist.concat([1]));
   showModal(
-    '<div class="sec-head"><h2><span class="pdot" style="background:' + p.color + '"></span>' + esc(p.name) + '</h2>' +
-      '<button class="btn ghost sm" onclick="closeModal()">Schließen</button></div>' +
+    '<div class="sec-head"><h2>' + playerMark(t, p) + esc(p.name) + '</h2>' +
+      '<span style="display:flex;gap:8px;margin-left:auto">' + (p.random ? '' : '<button class="btn sm" onclick="closeModal();openLook(\'' + esc(p.id) + '\')">Figur &amp; Spruch</button>') +
+      '<button class="btn ghost sm" onclick="closeModal()">Schließen</button></span></div>' +
+    (lookOf(t, p.id).q ? '<p class="lk-quote">„' + esc(lookOf(t, p.id).q) + '“</p>' : '') +
     '<div class="tiles">' +
       tile('Wertungen', r.g, plural(r.champs.size, 'Champion', 'Champions')) +
       tile('Ø Platz', avgTxt(r), (seOf(r) ? '± ' + dec1(seOf(r)) : '')) +
