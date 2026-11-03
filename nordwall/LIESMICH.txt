@@ -1,0 +1,83 @@
+NORDWALL - COA-WERKSTATT
+
+Eigenstaendige Seite fuer ein fiktives Planspiel (Stabsausbildung).
+Liegt im Ordner nordwall/ und hat mit dem Arena Logbuch nichts zu tun:
+eigene Seite, eigener Datenbereich. Das Logbuch wird nicht veraendert.
+
+Adresse: https://nfalkenstein94-create.github.io/LOL-Logbuch/nordwall/
+
+
+------------------------------------------------------------------
+ZUGANG
+------------------------------------------------------------------
+Beim ersten Aufruf fragt die Seite nach einem Zugangscode und nach
+Bereich und Funktion. Alle mit demselben Code arbeiten im selben
+Arbeitsraum und sehen Aenderungen der anderen sofort.
+
+Der Code steht absichtlich in keiner Datei dieses Repositorys, weil
+das Repository oeffentlich ist. Weitergeben nur an die eigene JOPG,
+am besten als Link:
+  https://nfalkenstein94-create.github.io/LOL-Logbuch/nordwall/#k=CODE
+"Neuen Zugangscode erzeugen" legt einen neuen, leeren Arbeitsraum an
+(zum Beispiel fuer das naechste Planspiel).
+
+Wer den Code kennt, kann lesen und schreiben. Es gibt keine weitere
+Anmeldung.
+
+
+------------------------------------------------------------------
+WAS REIN DARF
+------------------------------------------------------------------
+Nur fiktive Uebungsinhalte aus offenen Quellen. Keine Verschluss-
+sachen, keine echten Planungen, keine Namen. Personen erscheinen nur
+mit ihrer Funktion (z. B. "LAND - PlgStOffz 2").
+
+
+------------------------------------------------------------------
+WAS DIE SEITE KANN
+------------------------------------------------------------------
+Ausgangslage, Moeglichkeit 1, Moeglichkeit 2
+  Globus mit Kraeften, Sperren, Routen und Angriffspfeilen.
+  Bearbeiten: Verbaende ziehen, Linien erst anklicken und dann ziehen,
+  Punkte einfuegen und loeschen, neue Elemente zeichnen.
+  Praesentieren: Bereiche Schritt fuer Schritt einblenden
+  (Pfeiltasten oder Praesentations-Klicker).
+  Pruefung: Eigene Elemente auf russischem oder belarussischem Gebiet
+  werden rot markiert (Grundsatz: Verteidigung auf Buendnisgebiet).
+
+Folgerungen
+  Board mit einer Spalte je Arbeitsbereich der JOPG. J5 ordnet
+  Folgerungen mit "-> M1" / "-> M2" einer Moeglichkeit zu.
+
+Zeitplan
+  Zeitstrahl ab T+0 mit Meilensteinen und Zeitraeumen je Bereich.
+  Ziehen verschiebt Zeit und Bereich, die rechte Kante eines Balkens
+  aendert die Dauer, Doppelklick legt einen Meilenstein an.
+  Lieferliste darunter: wer liefert was bis wann an wen, mit Status
+  und "ueberfaellig", sobald T+0 als Datum gesetzt ist.
+
+"Alles exportieren" speichert den Stand als JSON-Datei.
+
+
+------------------------------------------------------------------
+ABLAGE (FIREBASE)
+------------------------------------------------------------------
+Nutzt dasselbe Firebase-Projekt wie das Logbuch (../firebase-config.js),
+aber einen eigenen Pfad je Zugangscode:
+  logs/<Zugangscode>/nw_scen      Lagen (basis, coa1, coa2)
+  logs/<Zugangscode>/nw_folg      Folgerungen
+  logs/<Zugangscode>/nw_plan      Zeitplan-Eintraege
+  logs/<Zugangscode>/nw_meta      Zeitplan-Einstellungen (T+0)
+  logs/<Zugangscode>/nw_presence  wer gerade online ist
+
+Meldet die Seite "Kein Zugriff auf die gemeinsame Ablage", erlauben
+die Firestore-Regeln nur den Logbuch-Code. Dann in der Firebase-Konsole
+(Firestore -> Regeln) diesen Block ergaenzen und veroeffentlichen:
+
+  match /logs/{code}/{rest=**} {
+    allow read, write: if code.size() >= 12;
+  }
+
+Aktualisieren: neue nordwall/index.html hochladen. Der Service Worker
+des Logbuchs laedt Seiten zuerst aus dem Netz, daher ist nichts weiter
+noetig.
