@@ -53,9 +53,11 @@ canvas#globe.move{cursor:move}
 .btn[disabled]{opacity:.4;cursor:default}
 .zoom{position:absolute;right:max(10px,env(safe-area-inset-right,0px));bottom:12px;display:grid;gap:4px}
 .zoom .btn{width:36px;height:36px;font-size:18px;padding:0}
+.maplegend{position:absolute;left:max(10px,env(safe-area-inset-left,0px));bottom:40px;display:flex;flex-wrap:wrap;gap:4px 10px;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);background:rgba(10,17,19,.85);padding:5px 8px;border:1px solid var(--rule);max-width:calc(100% - 80px)}
+.maplegend span{display:inline-flex;align-items:center;gap:5px}.maplegend i{width:12px;height:10px;display:inline-block;border:1px solid #3b4f4b}
 .scale{position:absolute;left:max(10px,env(safe-area-inset-left,0px));bottom:12px;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);background:rgba(10,17,19,.85);padding:4px 7px;border:1px solid var(--rule)}
 .hintbar{position:absolute;left:50%;transform:translateX(-50%);top:52px;font-family:var(--f-mono);font-size:11.5px;background:rgba(10,17,19,.92);border:1px solid var(--signal);color:var(--ink);padding:7px 12px;max-width:calc(100% - 24px);text-align:center}
-.caption{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(70px,env(safe-area-inset-right,0px));bottom:56px;display:flex;flex-direction:column;gap:4px;pointer-events:none}
+.caption{position:absolute;left:max(16px,env(safe-area-inset-left,0px));right:max(70px,env(safe-area-inset-right,0px));bottom:78px;display:flex;flex-direction:column;gap:4px;pointer-events:none}
 .caption .t{font-family:var(--f-disp);font-size:30px;font-weight:600;letter-spacing:.03em;text-shadow:0 2px 8px #000}
 .caption .n{font-size:15px;color:#cdd6d0;max-width:70ch;text-shadow:0 1px 6px #000}
 .stepbar{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;display:flex;align-items:center;gap:6px;background:rgba(10,17,19,.92);border:1px solid var(--line);padding:6px}
@@ -228,6 +230,7 @@ tr.late .stp{color:var(--danger)}
     <button class="btn" id="stAll">Alles</button>
     <button class="btn" id="stFull" aria-label="Seitenleiste ein- oder ausblenden">⇔</button>
   </div>
+  <div class="maplegend" aria-label="Kartenlegende"><span><i style="background:#1b3150"></i>NATO / EU</span><span><i style="background:#24467a"></i>Deutschland</span><span><i style="background:#43191c"></i>Feind (RUS, BLR)</span><span><i style="background:#272c2c"></i>neutral</span></div>
   <div class="scale" id="scale"></div>
   <div class="zoom"><button class="btn" id="zin" aria-label="Hineinzoomen">+</button><button class="btn" id="zout" aria-label="Herauszoomen">−</button></div>
 </div>
@@ -390,6 +393,13 @@ const canvas=$("#globe"),ctx=canvas.getContext("2d");
 const land50=topojson.feature(GEO50,GEO50.objects.land),bord50=topojson.mesh(GEO50,GEO50.objects.countries,(a,b)=>a!==b);
 const land110=topojson.feature(GEO110,GEO110.objects.land),bord110=topojson.mesh(GEO110,GEO110.objects.countries,(a,b)=>a!==b);
 const deu=topojson.feature(GEO50,GEO50.objects.countries).features.find(f=>String(f.id)==="276");
+const NATO_EU=new Set(["008","056","100","124","191","203","208","233","246","250","276","300","348","352","380","428","440","442","499","528","807","578","616","620","642","703","705","724","752","792","826","840","304","040","196","372","470"]);
+const ENEMY=new Set(["643","112"]);
+function grpOf(G){const fs=topojson.feature(G,G.objects.countries).features;const id=f=>String(f.id).padStart(3,"0");
+  return {nato:{type:"FeatureCollection",features:fs.filter(f=>NATO_EU.has(id(f)))},enemy:{type:"FeatureCollection",features:fs.filter(f=>ENEMY.has(id(f)))}};}
+const GR50=grpOf(GEO50),GR110=grpOf(GEO110);
+const FILL={neutral:"#272c2c",nato:"#1b3150",enemy:"#43191c",deu:"#24467a"};
+
 const grat=d3.geoGraticule10();
 const NOGO=topojson.feature(GEO50,GEO50.objects.countries).features.filter(f=>["643","112"].includes(String(f.id)));
 const nogoCache=new Map();
@@ -497,8 +507,9 @@ function draw(){
   const lo=view.interacting&&view.k<10;
   ctx.beginPath();path({type:"Sphere"});ctx.fillStyle=C.ocean;ctx.fill();
   ctx.beginPath();path(grat);ctx.strokeStyle=C.grat;ctx.lineWidth=1;ctx.stroke();
-  ctx.beginPath();path(lo?land110:land50);ctx.fillStyle=C.land;ctx.fill();
-  if(deu){ctx.beginPath();path(deu);ctx.fillStyle="#283a2a";ctx.fill();}
+  ctx.beginPath();path(lo?land110:land50);ctx.fillStyle=FILL.neutral;ctx.fill();
+  {const gr=lo?GR110:GR50;ctx.beginPath();path(gr.nato);ctx.fillStyle=FILL.nato;ctx.fill();ctx.beginPath();path(gr.enemy);ctx.fillStyle=FILL.enemy;ctx.fill();}
+  if(deu){ctx.beginPath();path(deu);ctx.fillStyle=FILL.deu;ctx.fill();}
   ctx.beginPath();path(lo?bord110:bord50);ctx.strokeStyle=C.border;ctx.lineWidth=view.k>15?1.1:.7;ctx.stroke();
   ctx.beginPath();path({type:"Sphere"});ctx.strokeStyle="rgba(140,170,160,.25)";ctx.stroke();
   hits=[];const lab=[];
