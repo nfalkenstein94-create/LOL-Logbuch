@@ -230,7 +230,7 @@ tr.late .stp{color:var(--danger)}
     <button class="btn" id="stAll">Alles</button>
     <button class="btn" id="stFull" aria-label="Seitenleiste ein- oder ausblenden">⇔</button>
   </div>
-  <div class="maplegend" aria-label="Kartenlegende"><span><i style="background:#1b3150"></i>NATO / EU</span><span><i style="background:#24467a"></i>Deutschland</span><span><i style="background:#43191c"></i>Feind (RUS, BLR)</span><span><i style="background:#272c2c"></i>neutral</span></div>
+  <div class="maplegend" aria-label="Kartenlegende"><span><i style="background:#1b3150"></i>NATO / EU</span><span><i style="background:#24467a"></i>Deutschland</span><span><i style="background:#1c4150"></i>Partner (UKR)</span><span><i style="background:#43191c"></i>Feind (RUS, BLR)</span><span><i style="background:#272c2c"></i>neutral</span></div>
   <div class="scale" id="scale"></div>
   <div class="zoom"><button class="btn" id="zin" aria-label="Hineinzoomen">+</button><button class="btn" id="zout" aria-label="Herauszoomen">−</button></div>
 </div>
@@ -395,10 +395,11 @@ const land110=topojson.feature(GEO110,GEO110.objects.land),bord110=topojson.mesh
 const deu=topojson.feature(GEO50,GEO50.objects.countries).features.find(f=>String(f.id)==="276");
 const NATO_EU=new Set(["008","056","100","124","191","203","208","233","246","250","276","300","348","352","380","428","440","442","499","528","807","578","616","620","642","703","705","724","752","792","826","840","304","040","196","372","470"]);
 const ENEMY=new Set(["643","112"]);
+const PARTNER=new Set(["804"]);
 function grpOf(G){const fs=topojson.feature(G,G.objects.countries).features;const id=f=>String(f.id).padStart(3,"0");
-  return {nato:{type:"FeatureCollection",features:fs.filter(f=>NATO_EU.has(id(f)))},enemy:{type:"FeatureCollection",features:fs.filter(f=>ENEMY.has(id(f)))}};}
+  return {nato:{type:"FeatureCollection",features:fs.filter(f=>NATO_EU.has(id(f)))},enemy:{type:"FeatureCollection",features:fs.filter(f=>ENEMY.has(id(f)))},partner:{type:"FeatureCollection",features:fs.filter(f=>PARTNER.has(id(f)))}};}
 const GR50=grpOf(GEO50),GR110=grpOf(GEO110);
-const FILL={neutral:"#272c2c",nato:"#1b3150",enemy:"#43191c",deu:"#24467a"};
+const FILL={neutral:"#272c2c",nato:"#1b3150",partner:"#1c4150",enemy:"#43191c",deu:"#24467a"};
 
 const grat=d3.geoGraticule10();
 const NOGO=topojson.feature(GEO50,GEO50.objects.countries).features.filter(f=>["643","112"].includes(String(f.id)));
@@ -508,7 +509,7 @@ function draw(){
   ctx.beginPath();path({type:"Sphere"});ctx.fillStyle=C.ocean;ctx.fill();
   ctx.beginPath();path(grat);ctx.strokeStyle=C.grat;ctx.lineWidth=1;ctx.stroke();
   ctx.beginPath();path(lo?land110:land50);ctx.fillStyle=FILL.neutral;ctx.fill();
-  {const gr=lo?GR110:GR50;ctx.beginPath();path(gr.nato);ctx.fillStyle=FILL.nato;ctx.fill();ctx.beginPath();path(gr.enemy);ctx.fillStyle=FILL.enemy;ctx.fill();}
+  {const gr=lo?GR110:GR50;ctx.beginPath();path(gr.nato);ctx.fillStyle=FILL.nato;ctx.fill();ctx.beginPath();path(gr.partner);ctx.fillStyle=FILL.partner;ctx.fill();ctx.beginPath();path(gr.enemy);ctx.fillStyle=FILL.enemy;ctx.fill();}
   if(deu){ctx.beginPath();path(deu);ctx.fillStyle=FILL.deu;ctx.fill();}
   ctx.beginPath();path(lo?bord110:bord50);ctx.strokeStyle=C.border;ctx.lineWidth=view.k>15?1.1:.7;ctx.stroke();
   ctx.beginPath();path({type:"Sphere"});ctx.strokeStyle="rgba(140,170,160,.25)";ctx.stroke();
