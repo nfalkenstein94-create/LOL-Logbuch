@@ -36,18 +36,31 @@ mit ihrer Funktion (z. B. "LAND - PlgStOffz 2").
 ------------------------------------------------------------------
 WAS DIE SEITE KANN
 ------------------------------------------------------------------
-Ausgangslage, Moeglichkeit 1, Moeglichkeit 2
-  Globus mit Kraeften, Sperren, Routen und Angriffspfeilen.
-  Bearbeiten: Verbaende ziehen, Linien erst anklicken und dann ziehen,
-  Punkte einfuegen und loeschen, neue Elemente zeichnen.
-  Praesentieren: Bereiche Schritt fuer Schritt einblenden
-  (Pfeiltasten oder Praesentations-Klicker).
+Phase 0 (Ausgangslage) und Moeglichkeiten mit Phasen
+  Phase 0 zeigt die Kraefte in ihren Standorten und ist fuer alle
+  Moeglichkeiten gleich. "+ Moeglichkeit" legt eine neue Moeglichkeit an,
+  "+ Phase" eine weitere Phase (Kopie der gezeigten Phase).
+  "+ Element hinzufuegen" (oben links) bietet fertige Elemente je
+  Bereich: Heer, Luftwaffe, Marine, CIR, Logistik, Sanitaet,
+  Heimatschutz, Spezialkraefte, Fuehrung, Verbuendete, Feind sowie
+  Linien, Raeume und Textfelder.
+  Bearbeiten: Elemente ziehen, Linien erst anklicken und dann ziehen.
+  Praesentieren: Phase fuer Phase (Pfeiltasten oder Klicker); neue und
+  verschobene Elemente leuchten kurz auf.
   Pruefung: Eigene Elemente auf russischem oder belarussischem Gebiet
   werden rot markiert (Grundsatz: Verteidigung auf Buendnisgebiet).
 
+Datenaustausch ohne gemeinsame Ablage
+  Jeder Bereich arbeitet in seiner Kopie und klickt "Meinen Stand
+  exportieren". J5 waehlt "Beitrag zusammenfuehren", sucht aus, welche
+  Bereiche uebernommen werden (z. B. nur Feind aus der J2-Datei), und
+  fuehrt zusammen. Bei gleichen Elementen gilt der neuere Stand.
+  "Stand komplett laden" ersetzt alles, z. B. um den J5-Stand als
+  Grundlage an die Bereiche zu verteilen.
+
 Folgerungen
   Board mit einer Spalte je Arbeitsbereich der JOPG. J5 ordnet
-  Folgerungen mit "-> M1" / "-> M2" einer Moeglichkeit zu.
+  Folgerungen mit "-> M1", "-> M2" ... einer Moeglichkeit zu.
 
 Zeitplan
   Zeitstrahl ab T+0 mit Meilensteinen und Zeitraeumen je Bereich.
@@ -64,10 +77,10 @@ ABLAGE (FIREBASE)
 ------------------------------------------------------------------
 Nutzt dasselbe Firebase-Projekt wie das Logbuch (../firebase-config.js),
 aber einen eigenen Pfad je Zugangscode:
-  logs/<Zugangscode>/nw_scen      Lagen (basis, coa1, coa2)
+  logs/<Zugangscode>/nw_scen      Lagen (Phase 0 und alle Phasen)
   logs/<Zugangscode>/nw_folg      Folgerungen
   logs/<Zugangscode>/nw_plan      Zeitplan-Eintraege
-  logs/<Zugangscode>/nw_meta      Zeitplan-Einstellungen (T+0)
+  logs/<Zugangscode>/nw_meta      Liste der Moeglichkeiten, Zeitplan (T+0)
   logs/<Zugangscode>/nw_presence  wer gerade online ist
 
 Meldet die Seite "Kein Zugriff auf die gemeinsame Ablage", erlauben
