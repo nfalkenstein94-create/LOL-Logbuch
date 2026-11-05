@@ -23,6 +23,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 .app{height:100%;display:grid;grid-template-rows:auto 1fr;grid-template-columns:minmax(0,1fr) 400px;grid-template-areas:"head head" "map side"}
 .app.full{grid-template-columns:minmax(0,1fr) 0}
 .app.full aside{display:none}
+.app.maponly{grid-template-rows:minmax(0,1fr)!important;grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"map"!important}
+.app.maponly>header,.app.maponly>aside{display:none!important}
+.mapctl{position:absolute;right:max(10px,env(safe-area-inset-right,0px));bottom:100px;display:flex;flex-direction:column;gap:4px;align-items:flex-end;z-index:3}
+.mapctl .row2{display:flex;align-items:center;gap:3px;background:rgba(10,17,19,.88);border:1px solid var(--line);padding:3px 4px}
+.mapctl .row2 span{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);min-width:44px;text-align:center}
+.mapctl .row2 b{font-family:var(--f-disp);font-size:12px;font-weight:600;color:var(--ink);padding:0 4px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mapctl .btn{padding:4px 8px}
+.rng{display:flex;align-items:center;gap:6px}.rng input[type=range]{flex:1;accent-color:var(--signal)}.rng output{font-family:var(--f-mono);font-size:11px;min-width:44px;text-align:right}
 .app.folgview{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "board"}
 .app.folgview .mapwrap,.app.folgview aside{display:none}
 header{grid-area:head;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--rule);background:var(--panel)}
@@ -252,6 +260,7 @@ tr.late .stp{color:var(--danger)}
   </div>
   <div class="maplegend" aria-label="Kartenlegende"><span><i style="background:#1b3150"></i>NATO / EU</span><span><i style="background:#24467a"></i>Deutschland</span><span><i style="background:#1c4150"></i>Partner (UKR)</span><span><i style="background:#43191c"></i>Feind (RUS, BLR)</span><span><i style="background:#272c2c"></i>neutral</span></div>
   <div class="scale" id="scale"></div>
+  <div class="mapctl" id="mapctl"><button class="btn primary" id="fsbtn" title="Vollbild (Taste F)">⛶ Vollbild</button><div class="row2" title="Größe aller Symbole"><b>Alle Symbole</b><button class="btn" id="ssm" aria-label="Alle Symbole kleiner">−</button><span id="ssv">100 %</span><button class="btn" id="ssp" aria-label="Alle Symbole größer">+</button></div><div class="row2" id="selsz" hidden title="Größe des ausgewählten Elements"><b id="selszn">Auswahl</b><button class="btn" id="esm" aria-label="Auswahl kleiner">−</button><span id="esv">100 %</span><button class="btn" id="esp" aria-label="Auswahl größer">+</button></div></div>
   <div class="zoom"><button class="btn" id="zin" aria-label="Hineinzoomen">+</button><button class="btn" id="zout" aria-label="Herauszoomen">−</button></div>
 </div>
 
@@ -328,7 +337,7 @@ const C={ocean:"#0e1b20",land:"#1b2827",border:"#3b4f4b",grat:"rgba(140,170,160,
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 
 // ---------- state ----------
-const S={app6:ls.get("nw-app6",false),light:ls.get("nw-light",false),palFr:"land",palAff:"f",palTxt:"",palSz:1,palFs:16,view:"basis",mode:"edit",tool:"select",drawKind:"gegen",drawT:"heer",palT:"heer",palS:"pz",palE:"II",
+const S={app6:ls.get("nw-app6",false),light:ls.get("nw-light",false),palFr:"land",palAff:"f",palTxt:"",palSz:1,palFs:16,symScale:ls.get("nw-symscale",1),maponly:false,view:"basis",mode:"edit",tool:"select",drawKind:"gegen",drawT:"heer",palT:"heer",palS:"pz",palE:"II",
   scen:{basis:undefined},coas:undefined,coa:null,phase:null,pal:false,palTab:"heer",palN:"",palSh:"",pop:null,folg:[],sel:null,off:new Set(),step:new Proxy({},{get:(o,k)=>k in o?o[k]:-1}),
   draft:null,hover:null,drag:null,undo:[],confirm:null,full:false,myB:ls.get("nw-bereich","j5"),lastSeen:ls.get("nw-seen",0),fFilter:"alle",editF:null,myFn:"",plan:[],pmeta:undefined,peers:[],code:""};
 let FB=null,mode="connecting";
@@ -655,7 +664,7 @@ function draw(){
     const m=midOf(segs);if(m&&view.k>14&&!L.lab&&kd!=="phase"&&kd!=="grenze")lab.push({x:m[0]+8,y:m[1]-8,t:L.n,col:base,pr:2});
   }
   // units
-  const s=Math.max(5.5,Math.min(15,4+view.k*0.35));
+  const s=Math.max(5.5,Math.min(15,4+view.k*0.35))*(S.symScale||1);
   const us=list.filter(e=>e.typ==="u"&&visible(e.p)).map(u=>[u,proj(u.p)]);
   us.sort((a,b)=>(a[0].id===S.sel)-(b[0].id===S.sel));
   for(const [u,p] of us){
@@ -666,7 +675,7 @@ function draw(){
     const ut=u.fr?(u.sh||""):(u.sh||u.n);if(ut&&(view.k>=9||S.sel===u.id||u.fr))lab.push({x:p[0]+(u._hw||s*.8)+5,y:p[1],t:ut,col:u.t==="feind"?TSK.feind.c:C.ink,pr:S.sel===u.id?0:3});
   }
   // text fields
-  for(const x of list.filter(e=>e.typ==="x"&&e.p&&visible(e.p))){const p=proj(x.p);const fs=+x.fs||16;ctx.font=`500 ${fs}px "Archivo",Arial,sans-serif`;
+  for(const x of list.filter(e=>e.typ==="x"&&e.p&&visible(e.p))){const p=proj(x.p);const fs=(+x.fs||16)*(S.symScale||1);ctx.font=`500 ${fs}px "Archivo",Arial,sans-serif`;
     const lines=String(x.txt||"").split("\n");const pad=x.box?8:2;const w=Math.max(20,...lines.map(l=>ctx.measureText(l).width))+pad*2;const lh=fs*1.25;const h=lines.length*lh+pad*1.2;
     const x0=p[0],y0=p[1];const sel=S.sel===x.id;
     if(x.box){ctx.fillStyle=C.tbox;ctx.fillRect(x0,y0,w,h);ctx.strokeStyle=sel?C.signal:(x.col?LCOL[x.col]:C.tline);ctx.lineWidth=sel?2:1.2;ctx.strokeRect(x0+.5,y0+.5,w,h);}
@@ -1008,12 +1017,13 @@ function kindIcon(k,c){
 function opt(list,cur){return list.map(([v,n])=>`<option value="${esc(v)}"${v===cur?" selected":""}>${esc(n)}</option>`).join("");}
 const TSKOPTS=Object.entries(TSK).map(([k,v])=>[k,v.n]);
 function chipsHTML(){return `<div><p class="lbl">Bereiche ein- / ausblenden</p><div class="chips" id="chips">`+Object.entries(TSK).map(([k,v])=>`<button class="chip" data-t="${k}" aria-pressed="${!S.off.has(k)}"><span class="sw" style="background:${v.c}"></span>${v.n}</button>`).join("")+`</div></div>`;}
-function dispHTML(){return `<div><p class="lbl">Darstellung</p><div class="row"><div class="seg" id="d-app6"><button data-a="0" aria-pressed="${!S.app6}">Farben nach Bereich</button><button data-a="1" aria-pressed="${S.app6}">NATO-Symbolfarben</button></div><div class="seg" id="d-light"><button data-l="0" aria-pressed="${!S.light}">Karte dunkel</button><button data-l="1" aria-pressed="${S.light}">Karte hell</button></div></div></div>`;}
+function dispHTML(){return `<div><p class="lbl">Darstellung</p><label class="field"><span>Größe aller Symbole und Texte (nur deine Ansicht)</span><div class="rng"><input type="range" id="d-ss" min="0.4" max="3" step="0.1" value="${S.symScale}"><output id="d-sso">${Math.round(S.symScale*100)} %</output></div></label><div class="row"><div class="seg" id="d-app6"><button data-a="0" aria-pressed="${!S.app6}">Farben nach Bereich</button><button data-a="1" aria-pressed="${S.app6}">NATO-Symbolfarben</button></div><div class="seg" id="d-light"><button data-l="0" aria-pressed="${!S.light}">Karte dunkel</button><button data-l="1" aria-pressed="${S.light}">Karte hell</button></div></div></div>`;}
 function folgFor(v){return S.folg.filter(f=>f[v]);}
 function folgListHTML(v){const fs=folgFor(v);if(!fs.length)return `<p class="hint">Noch keine Folgerung dieser Möglichkeit zugeordnet. Im Board „Folgerungen“ mit „→ ${esc(coaShort(curCoa()))}“ zuordnen.</p>`;
   return `<div class="fl">`+fs.map(f=>{const b=BEREICHE.find(x=>x[0]===f.b)||BEREICHE[1];return `<div class="fitem" style="border-left-color:${b[2]}"><b>${esc(b[1])}</b>${esc(f.folg)}</div>`;}).join("")+`</div>`;}
 
 function renderSide(){
+  try{updSelSz();}catch(e){}
   const p=$("#pane");if(isFull()){p.innerHTML="";return;}
   const sc=scen(),raw=curSid()?S.scen[curSid()]:null;let h="";
   if(mode==="local")h+=`<div class="banner">Keine Verbindung zur gemeinsamen Ablage: Änderungen bleiben in diesem Browser.</div>`;
@@ -1149,11 +1159,11 @@ function detailHTML(edit){
   let h=`<div class="card" id="detail"${violates(e)?' style="border-color:var(--danger)"':""}><p class="lbl" style="margin:0">Ausgewählt · ${esc(kindName)}</p>${violates(e)?`<p class="hint" style="color:var(--danger)">Liegt ganz oder teilweise auf russischem oder belarussischem Gebiet. Bitte auf Bündnisgebiet verschieben.</p>`:""}
     <label class="field"><span>Bezeichnung</span><input type="text" id="f-n" value="${esc(e.n)}"></label>`;
   if(e.typ==="x")h+=`<label class="field"><span>Text (Enter für neue Zeile)</span><textarea id="f-txt" rows="4">${esc(e.txt||"")}</textarea></label>
-    <div class="row"><label class="field"><span>Schriftgröße</span><select id="f-fs">${opt([["12","12"],["14","14"],["16","16"],["20","20"],["26","26"],["34","34"]],String(e.fs||16))}</select></label><label class="field"><span>Kasten</span><select id="f-box">${opt([["1","mit Kasten"],["0","ohne Kasten"]],e.box?"1":"0")}</select></label></div>
+    <div class="row"><label class="field"><span>Schriftgröße (auch Tasten + und −)</span><div class="rng"><input type="range" id="f-fsr" min="8" max="72" step="1" value="${+e.fs||16}"><output id="f-fso">${+e.fs||16} px</output></div></label><label class="field"><span>Kasten</span><select id="f-box">${opt([["1","mit Kasten"],["0","ohne Kasten"]],e.box?"1":"0")}</select></label></div>
     <div class="row"><label class="field"><span>Farbe</span><select id="f-col">${opt(LCOLOPTS,e.col||"")}</select></label><label class="field"><span>Bereich (Ebene)</span><select id="f-t">${opt(TSKOPTS,e.t)}</select></label></div>`;
   else if(e.typ==="u")h+=`<div class="row"><label class="field"><span>Rahmen</span><select id="f-fr">${opt(FRAMES,e.fr||defFr(e))}</select></label><label class="field"><span>Zugehörigkeit</span><select id="f-aff">${opt(AFFS,e.aff||(e.t==="feind"?"h":"f"))}</select></label></div>
     <label class="field"><span>Text im Rahmen (statt Symbol; Umbruch mit |)</span><input type="text" id="f-txt" value="${esc(e.txt||"")}"></label>
-    <div class="row"><label class="field"><span>Darstellgröße</span><select id="f-sz">${opt([["0.7","klein"],["1","normal"],["1.6","groß"],["2.4","sehr groß"]],String(e.sz||1))}</select></label></div>
+    <label class="field"><span>Größe dieses Symbols (auch Tasten + und −)</span><div class="rng"><input type="range" id="f-szr" min="0.4" max="5" step="0.1" value="${+e.sz||1}"><output id="f-szo">${Math.round((+e.sz||1)*100)} %</output></div></label>
     <div class="row"><label class="field"><span>Beschriftung rechts (z. B. DEU, Name)</span><input type="text" id="f-sh" value="${esc(e.sh||"")}"></label><label class="field" style="max-width:90px"><span>Größe (Ebene)</span><select id="f-e">${opt(ECH.map(x=>[x,x||"–"]),e.e||"")}</select></label></div>
     <div class="row"><label class="field"><span>Bereich</span><select id="f-t">${opt(TSKOPTS,e.t)}</select></label><label class="field"><span>Symbol</span><select id="f-s">${opt(SYMS2.concat(SYMS),e.s||"none")}</select></label></div>`;
   else h+=`<div class="row"><label class="field"><span>Bereich</span><select id="f-t">${opt(TSKOPTS,e.t)}</select></label>`+(e.typ==="l"?`<label class="field"><span>Art</span><select id="f-k">${opt(Object.entries(KINDS).filter(([,v])=>v.line).map(([k,v])=>[k,v.n]),e.k)}</select></label>`:"")+`</div>`+
@@ -1186,6 +1196,7 @@ function bindSide(){
   on("p-fr","change",e=>{S.palFr=e.target.value;renderSide();});on("p-aff","change",e=>{S.palAff=e.target.value;renderSide();});
   on("p-sz","change",e=>{S.palSz=+e.target.value;});on("p-fs","change",e=>{S.palFs=+e.target.value;});
   on("p-txt","input",e=>{S.palTxt=e.target.value;const c=$("#p-prev");if(c){const x=c.getContext("2d");x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,c.width,c.height);x.scale(2,2);const a6=S.app6;S.app6=true;drawSymbol2(x,{t:S.palT,s:S.palS,e:S.palE,fr:S.palFr,aff:S.palAff,txt:S.palTxt,sz:1},50,26,14,false);S.app6=a6;}});
+  on("d-ss","input",ev=>setSymScale(+ev.target.value,true));
   p.querySelectorAll("#d-app6 [data-a]").forEach(b=>b.onclick=()=>{S.app6=b.dataset.a==="1";ls.set("nw-app6",S.app6);render();renderSide();});
   p.querySelectorAll("#d-light [data-l]").forEach(b=>b.onclick=()=>{S.light=b.dataset.l==="1";ls.set("nw-light",S.light);applyTheme();render();renderSide();});on("p-e","change",e=>{S.palE=e.target.value;});on("p-s","change",e=>{S.palS=e.target.value;renderSide();});
   p.querySelectorAll("[data-kind]").forEach(b=>b.onclick=()=>{S.drawKind=b.dataset.kind;S.draft=null;if(KINDS[S.drawKind].t)S.drawT=KINDS[S.drawKind].t;else if(S.drawT==="feind")S.drawT="heer";renderSide();updHint();render();});
@@ -1199,6 +1210,8 @@ function bindSide(){
     ["n","sh","a","d","txt"].forEach(k=>on("f-"+k,"input",ev=>save(k,ev.target.value)));
     const NUM={sz:1,w:1,fs:1,cv:1,lab:1,box:1};
     ["t","s","e","k","fr","aff","sz","col","w","cv","lab","fs","box"].forEach(k=>on("f-"+k,"change",ev=>{const v=NUM[k]?+ev.target.value:ev.target.value;save(k,v);if(k==="aff"&&v==="h")save("t","feind");}));
+    on("f-szr","input",ev=>{const v=Math.round(+ev.target.value*10)/10;save("sz",v);const o=$("#f-szo");if(o)o.textContent=Math.round(v*100)+" %";updSelSz();});
+    on("f-fsr","input",ev=>{const v=+ev.target.value;save("fs",v);const o=$("#f-fso");if(o)o.textContent=v+" px";updSelSz();});
     on("act-del","click",delSel);
     on("act-fly","click",()=>{const x=getEl(S.sel);if(!x)return;const ll=x.p||x.center||x.c[Math.floor(x.c.length/2)];flyTo(ll,Math.max(view.k,x.typ==="u"?24:10));});
     on("act-rev","click",()=>{const x=getEl(S.sel);if(!x||!x.c)return;pushUndo(x.id,x);const c=x.c.slice().reverse();scen().els[x.id].c=c;store.updEl(curSid(),x.id,{c});render();});
@@ -1300,6 +1313,34 @@ function bindBoard(){
   box.querySelectorAll("[data-fdelyes]").forEach(b=>b.onclick=()=>{store.delFolg(b.dataset.fdelyes);S.fdel=null;});
 }
 
+// ---------- Größe und Vollbild ----------
+function setSymScale(v,fromSlider){S.symScale=Math.max(.4,Math.min(3,Math.round(v*10)/10));ls.set("nw-symscale",S.symScale);
+  $("#ssv").textContent=Math.round(S.symScale*100)+" %";if(!fromSlider){const r=$("#d-ss");if(r)r.value=S.symScale;}const o=$("#d-sso");if(o)o.textContent=Math.round(S.symScale*100)+" %";render();}
+function selSizeKey(e){return e&&e.typ==="x"?"fs":"sz";}
+function stepSel(dir){const e=S.sel&&getEl(S.sel);if(!e||!editable()||(e.typ!=="u"&&e.typ!=="x")){if(!e)setSymScale(S.symScale*(dir>0?1.15:1/1.15));return;}
+  const k=selSizeKey(e);let v=k==="fs"?Math.max(8,Math.min(72,(+e.fs||16)+(dir>0?2:-2))):Math.max(.4,Math.min(5,Math.round((+e.sz||1)*(dir>0?1.15:1/1.15)*10)/10));
+  pushUndo(e.id,e);scen().els[e.id][k]=v;clearTimeout(fieldT);fieldT=setTimeout(()=>store.updEl(curSid(),e.id,{[k]:v}),300);
+  const r=$(k==="fs"?"#f-fsr":"#f-szr");if(r){r.value=v;const o=$(k==="fs"?"#f-fso":"#f-szo");if(o)o.textContent=k==="fs"?v+" px":Math.round(v*100)+" %";}
+  updSelSz();render();}
+function updSelSz(){const box=$("#selsz");const e=S.sel&&getEl(S.sel);const ok=e&&editable()&&(e.typ==="u"||e.typ==="x");box.hidden=!ok;if(!ok)return;
+  $("#selszn").textContent=e.sh||e.n||"Auswahl";$("#esv").textContent=e.typ==="x"?(+e.fs||16)+" px":Math.round((+e.sz||1)*100)+" %";}
+$("#ssm").onclick=()=>setSymScale(S.symScale/1.15);$("#ssp").onclick=()=>setSymScale(S.symScale*1.15);
+$("#esm").onclick=()=>stepSel(-1);$("#esp").onclick=()=>stepSel(1);
+function fsActive(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+function setMapOnly(on){S.maponly=on;$("#app").classList.toggle("maponly",on);$("#fsbtn").textContent=on?"✕ Vollbild beenden":"⛶ Vollbild";setTimeout(resize,30);setTimeout(resize,300);}
+function toggleFull(){
+  if(!S.maponly){setMapOnly(true);const el=document.documentElement;const rq=el.requestFullscreen||el.webkitRequestFullscreen;
+    if(rq){try{const pr=rq.call(el);if(pr&&pr.catch)pr.catch(()=>{});}catch(e){}}}
+  else{if(fsActive()){const ex=document.exitFullscreen||document.webkitExitFullscreen;try{const pr=ex.call(document);if(pr&&pr.catch)pr.catch(()=>{});}catch(e){}}setMapOnly(false);}}
+$("#fsbtn").onclick=toggleFull;
+document.addEventListener("fullscreenchange",()=>{if(!fsActive()&&S.maponly)setMapOnly(false);setTimeout(resize,50);});
+document.addEventListener("webkitfullscreenchange",()=>{if(!fsActive()&&S.maponly)setMapOnly(false);setTimeout(resize,50);});
+document.addEventListener("keydown",ev=>{const inField=/INPUT|TEXTAREA|SELECT/.test(document.activeElement&&document.activeElement.tagName);if(inField||ev.ctrlKey||ev.metaKey||ev.altKey)return;
+  if(ev.key==="f"||ev.key==="F"){if(S.view==="folg"||S.view==="zeit")return;ev.preventDefault();toggleFull();return;}
+  if(ev.key==="+"||ev.key==="="){ev.preventDefault();stepSel(1);return;}
+  if(ev.key==="-"||ev.key==="_"){ev.preventDefault();stepSel(-1);return;}
+  if(ev.key==="Escape"&&S.maponly&&!fsActive())setMapOnly(false);});
+setSymScale(S.symScale);
 // ---------- Zeitplan ----------
 const LANES0=[
  {id:"fue",n:"Führung JOPG",c:"#e9e4d0",m:[["Ltr JOPG"],["stv. Ltr JOPG"],["InfoMgr"]]},

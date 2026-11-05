@@ -47,6 +47,9 @@ Phase 0 (Ausgangslage) und Moeglichkeiten mit Phasen
   Bearbeiten: Elemente ziehen, Linien erst anklicken und dann ziehen.
   Praesentieren: Phase fuer Phase (Pfeiltasten oder Klicker); neue und
   verschobene Elemente leuchten kurz auf.
+  Vollbild: Knopf "Vollbild" rechts auf der Karte oder Taste F.
+  Symbolgroesse: "Alle Symbole" -/+ auf der Karte; ausgewaehltes
+  Element mit -/+ bzw. Tasten + und - oder dem Regler in der Seitenleiste.
   Pruefung: Eigene Elemente auf russischem oder belarussischem Gebiet
   werden rot markiert (Grundsatz: Verteidigung auf Buendnisgebiet).
 
